@@ -18,12 +18,10 @@
 namespace Zikula\Module\ExtensionLibraryModule\Controller;
 
 use SecurityUtil;
-use LogUtil;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpFoundation\Response;
 use Zikula\Core\Response\PlainResponse;
 
 class UserController extends \Zikula_AbstractController
@@ -50,13 +48,13 @@ class UserController extends \Zikula_AbstractController
     public function processInboundAction()
     {
         // log that the method was called
-        LogUtil::log('ExtensionLibraryModule::processInboundAction called.', \Monolog\Logger::INFO);
+        $this->log('ExtensionLibraryModule::processInboundAction called.');
 
         $payload = $this->request->request->get('payload', null);
 
         // github is guaranteed to send via POST and param is 'payload'
         if (!isset($payload)) {
-            LogUtil::log('ExtensionLibraryModule::payload was null.', \Monolog\Logger::ERROR);
+            $this->log('ExtensionLibraryModule::payload was null.');
             throw new NotFoundHttpException($this->__('Sorry! Page not found.'), null, 404);
         }
 
@@ -74,45 +72,47 @@ class UserController extends \Zikula_AbstractController
             $requestIP = null;
         }
         if (!$this->ipCIDRCheck($requestIP)) {
-            LogUtil::log('ExtensionLibraryModule::IP was invalid.', \Monolog\Logger::ERROR);
+            $this->log('ExtensionLibraryModule::IP was invalid.');
             throw new NotFoundHttpException($this->__('Sorry! Page not found.'), null, 404);
         }
 
         // payload is valid
-        LogUtil::log($payload, \Monolog\Logger::INFO);
+        $this->log($payload);
         try {
             $jsonPayload = json_decode($payload);
         } catch (Exception $e) {
-            LogUtil::log('ExtensionLibraryModule::unable to decode json payload.', \Monolog\Logger::ERROR);
-            return;
+            $this->log('ExtensionLibraryModule::unable to decode json payload.');
+            throw new \InvalidArgumentException();
         }
 
         // check 'refs' for tags, if none, then return
         if (!strpos($jsonPayload->ref, 'tags')) {
-            return;
+            return new PlainResponse();
         }
 
         $vendor = $jsonPayload->repository->owner->name;
         $extension = $jsonPayload->repository->name;
         list(, , $version) = explode('/', $jsonPayload->ref);
-        LogUtil::log(sprintf('ExtensionLibraryModule: %s has update the extension %s to version %s.', $vendor, $extension, $version), \Monolog\Logger::INFO);
-        return new PlainResponse();
+        $this->log(sprintf('ExtensionLibraryModule: %s has update the extension %s to version %s.', $vendor, $extension, $version));
 
         // if 'tags' then process new version to extension
 
-        // check for vendor exists, if not create new
+        // check for vendor exists, if not create new vendor
 
-        // check for existing extension and either create or add new.
+        // check for existing extension and either create or add new version
 
+        return new PlainResponse();
     }
 
     /**
-     * @Route("/test")
+     * @Route("/test/{type}", requirements={"id" = "\d+"})
      */
-    public function testAction()
+    public function testAction($type = 0)
     {
-        $payload = '{"ref":"refs/tags/0.0.6","after":"5a794a194bd1d7b52b04a9254421a1e2a207af7b","before":"0000000000000000000000000000000000000000","created":true,"deleted":false,"forced":true,"base_ref":"refs/heads/master","compare":"https://github.com/craigh/Nutin/compare/0.0.6","commits":[],"head_commit":{"id":"5a794a194bd1d7b52b04a9254421a1e2a207af7b","distinct":true,"message":"commit C","timestamp":"2014-01-25T13:59:41-08:00","url":"https://github.com/craigh/Nutin/commit/5a794a194bd1d7b52b04a9254421a1e2a207af7b","author":{"name":"Craig Heydenburg","email":"craigh@mac.com","username":"craigh"},"committer":{"name":"Craig Heydenburg","email":"craigh@mac.com","username":"craigh"},"added":[],"removed":[],"modified":["file1.txt"]},"repository":{"id":16236813,"name":"Nutin","url":"https://github.com/craigh/Nutin","description":"This is nutin","watchers":0,"stargazers":0,"forks":0,"fork":false,"size":0,"owner":{"name":"craigh","email":"craigh@mac.com"},"private":false,"open_issues":0,"has_issues":true,"has_downloads":true,"has_wiki":true,"created_at":1390673890,"pushed_at":1390687196,"master_branch":"master"},"pusher":{"name":"craigh","email":"craigh@mac.com"}}';
+        $tagPayload = '{"ref":"refs/tags/0.0.6","after":"5a794a194bd1d7b52b04a9254421a1e2a207af7b","before":"0000000000000000000000000000000000000000","created":true,"deleted":false,"forced":true,"base_ref":"refs/heads/master","compare":"https://github.com/craigh/Nutin/compare/0.0.6","commits":[],"head_commit":{"id":"5a794a194bd1d7b52b04a9254421a1e2a207af7b","distinct":true,"message":"commit C","timestamp":"2014-01-25T13:59:41-08:00","url":"https://github.com/craigh/Nutin/commit/5a794a194bd1d7b52b04a9254421a1e2a207af7b","author":{"name":"Craig Heydenburg","email":"craigh@mac.com","username":"craigh"},"committer":{"name":"Craig Heydenburg","email":"craigh@mac.com","username":"craigh"},"added":[],"removed":[],"modified":["file1.txt"]},"repository":{"id":16236813,"name":"Nutin","url":"https://github.com/craigh/Nutin","description":"This is nutin","watchers":0,"stargazers":0,"forks":0,"fork":false,"size":0,"owner":{"name":"craigh","email":"craigh@mac.com"},"private":false,"open_issues":0,"has_issues":true,"has_downloads":true,"has_wiki":true,"created_at":1390673890,"pushed_at":1390687196,"master_branch":"master"},"pusher":{"name":"craigh","email":"craigh@mac.com"}}';
+        $nonTagPayload = '{"ref":"refs/heads/master","after":"5a794a194bd1d7b52b04a9254421a1e2a207af7b","before":"ea5cbe141d9ad4eae9f6ceb5fbb1f0d4b666d289","created":false,"deleted":false,"forced":false,"compare":"https://github.com/craigh/Nutin/compare/ea5cbe141d9a...5a794a194bd1","commits":[{"id":"5a794a194bd1d7b52b04a9254421a1e2a207af7b","distinct":true,"message":"commit C","timestamp":"2014-01-25T13:59:41-08:00","url":"https://github.com/craigh/Nutin/commit/5a794a194bd1d7b52b04a9254421a1e2a207af7b","author":{"name":"Craig Heydenburg","email":"craigh@mac.com","username":"craigh"},"committer":{"name":"Craig Heydenburg","email":"craigh@mac.com","username":"craigh"},"added":[],"removed":[],"modified":["file1.txt"]}],"head_commit":{"id":"5a794a194bd1d7b52b04a9254421a1e2a207af7b","distinct":true,"message":"commit C","timestamp":"2014-01-25T13:59:41-08:00","url":"https://github.com/craigh/Nutin/commit/5a794a194bd1d7b52b04a9254421a1e2a207af7b","author":{"name":"Craig Heydenburg","email":"craigh@mac.com","username":"craigh"},"committer":{"name":"Craig Heydenburg","email":"craigh@mac.com","username":"craigh"},"added":[],"removed":[],"modified":["file1.txt"]},"repository":{"id":16236813,"name":"Nutin","url":"https://github.com/craigh/Nutin","description":"This is nutin","watchers":0,"stargazers":0,"forks":0,"fork":false,"size":0,"owner":{"name":"craigh","email":"craigh@mac.com"},"private":false,"open_issues":0,"has_issues":true,"has_downloads":true,"has_wiki":true,"created_at":1390673890,"pushed_at":1390687184,"master_branch":"master"},"pusher":{"name":"craigh","email":"craigh@mac.com"}}';
         $url = 'http://127.0.0.1/core.git/src/el/postreceive-hook';
+        $payload = ($type == 1) ? $tagPayload : $nonTagPayload;
         $data = array('payload' => $payload);
 
         //open connection
@@ -125,6 +125,9 @@ class UserController extends \Zikula_AbstractController
 
         //execute post
         $result = curl_exec($ch); // boolean
+        $result = $result ? 'true' : 'false';
+        $this->log("The result of the curl_exec() was $result");
+
         return $this->response('');
     }
 
@@ -153,6 +156,23 @@ class UserController extends \Zikula_AbstractController
         $ip_ip = ip2long($IP);
         $ip_ip_net = $ip_ip & $ip_mask;
         return ($ip_ip_net == $ip_net);
+    }
+
+    /**
+     * Log a message to a file
+     *
+     * @param $msg
+     */
+    private function log($msg)
+    {
+        // open file
+        $fd = fopen('./app/logs/el.log', "a");
+        // prepend date/time to message
+        $str = "[" . date("Y/m/d h:i:s", time()) . "] " . $msg;
+        // write string
+        fwrite($fd, $str . "\n");
+        // close file
+        fclose($fd);
     }
 
 }
