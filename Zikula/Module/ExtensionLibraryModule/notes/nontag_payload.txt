@@ -1,0 +1,78 @@
+"normal" commit
+payload:
+{
+    "ref":"refs/heads/master",
+    "after":"fb83c2016e9d487e57041ef5ccf64cfe2ff1e51e",
+    "before":"a5539a01ce22dd72d25055b1b17d97e6de43fe26",
+    "created":false,
+    "deleted":false,
+    "forced":false,
+    "compare":"https://github.com/craigh/Nutin/compare/a5539a01ce22...fb83c2016e9d",
+    "commits":[{
+        "id":"fb83c2016e9d487e57041ef5ccf64cfe2ff1e51e",
+        "distinct":true,
+        "message":"Update file1.txt\n\nnormal post tag commit",
+        "timestamp":"2014-01-25T10:46:00-08:00",
+        "url":"https://github.com/craigh/Nutin/commit/fb83c2016e9d487e57041ef5ccf64cfe2ff1e51e",
+        "author":{
+            "name":"Craig Heydenburg",
+            "email":"craigh@mac.com",
+            "username":"craigh"
+        },
+        "committer":{
+            "name":"Craig Heydenburg",
+            "email":"craigh@mac.com",
+            "username":"craigh"
+        },
+        "added":[],
+        "removed":[],
+        "modified":["file1.txt"]
+    }],
+    "head_commit":{
+        "id":"fb83c2016e9d487e57041ef5ccf64cfe2ff1e51e",
+        "distinct":true,
+        "message":"Update file1.txt\n\nnormal post tag commit",
+        "timestamp":"2014-01-25T10:46:00-08:00",
+        "url":"https://github.com/craigh/Nutin/commit/fb83c2016e9d487e57041ef5ccf64cfe2ff1e51e",
+        "author":{
+            "name":"Craig Heydenburg",
+            "email":"craigh@mac.com",
+            "username":"craigh"
+        },
+        "committer":{
+            "name":"Craig Heydenburg",
+            "email":"craigh@mac.com",
+            "username":"craigh"
+        },
+        "added":[],
+        "removed":[],
+        "modified":["file1.txt"]
+    },
+    "repository":{
+        "id":16236813,
+        "name":"Nutin",
+        "url":"https://github.com/craigh/Nutin",
+        "description":"This is nutin",
+        "watchers":0,
+        "stargazers":0,
+        "forks":0,
+        "fork":false,
+        "size":0,
+        "owner":{
+            "name":"craigh",
+            "email":"craigh@mac.com"
+        },
+        "private":false,
+        "open_issues":0,
+        "has_issues":true,
+        "has_downloads":true,
+        "has_wiki":true,
+        "created_at":1390673890,
+        "pushed_at":1390675561,
+        "master_branch":"master"
+    },
+    "pusher":{
+        "name":"craigh",
+        "email":"craigh@mac.com"
+    }
+}

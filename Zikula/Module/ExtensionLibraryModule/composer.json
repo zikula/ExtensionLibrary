@@ -1,0 +1,24 @@
+{
+    "name": "zikula/extension-library-module",
+    "description": "Extension Library Module",
+    "type": "zikula-module",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Craig Heydenburg",
+            "homepage": "http://zikula.org/",
+            "email": "craig@zikula.org"
+        }
+    ],
+    "autoload": {
+        "psr-0": { "Zikula\\Module\\ExtensionLibraryModule\\": "" }
+    },
+    "require": {
+        "php": ">5.3.3"
+    },
+    "extra": {
+        "zikula": {
+            "class": "Zikula\\Module\\ExtensionLibraryModule\\ZikulaExtensionLibraryModule"
+        }
+    }
+}

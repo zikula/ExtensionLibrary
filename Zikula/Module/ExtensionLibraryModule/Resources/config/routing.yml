@@ -1,0 +1,4 @@
+zikulaextensionlibrarymodule:
+    resource: "@ZikulaExtensionLibraryModule/Controller"
+    prefix:   /el
+    type:     annotation

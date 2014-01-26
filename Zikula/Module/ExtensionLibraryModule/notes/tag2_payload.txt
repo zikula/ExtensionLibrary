@@ -1,0 +1,57 @@
+{
+    "ref":"refs/tags/0.0.2",
+    "after":"32e035fc550d4659cc7df45449610396abae9c89",
+    "before":"0000000000000000000000000000000000000000",
+    "created":true,
+    "deleted":false,
+    "forced":true,
+    "compare":"https://github.com/craigh/Nutin/compare/0.0.2",
+    "commits":[],
+    "head_commit":{
+        "id":"08b4a674b93f92fd7a8ee95b45a202758c99f395",
+        "distinct":true,
+        "message":"local update",
+        "timestamp":"2014-01-25T10:59:10-08:00",
+        "url":"https://github.com/craigh/Nutin/commit/08b4a674b93f92fd7a8ee95b45a202758c99f395",
+        "author":{
+            "name":"Craig Heydenburg",
+            "email":"craigh@mac.com",
+            "username":"craigh"
+        },
+        "committer":{
+            "name":"Craig Heydenburg",
+            "email":"craigh@mac.com",
+            "username":"craigh"
+        },
+        "added":[],
+        "removed":[],
+        "modified":["file1.txt"]
+    },
+    "repository":{
+        "id":16236813,
+        "name":"Nutin",
+        "url":"https://github.com/craigh/Nutin",
+        "description":"This is nutin",
+        "watchers":0,
+        "stargazers":0,
+        "forks":0,
+        "fork":false,
+        "size":0,
+        "owner":{
+            "name":"craigh",
+            "email":"craigh@mac.com"
+        },
+        "private":false,
+        "open_issues":0,
+        "has_issues":true,
+        "has_downloads":true,
+        "has_wiki":true,
+        "created_at":1390673890,
+        "pushed_at":1390676418,
+        "master_branch":"master"
+    },
+    "pusher":{
+        "name":"craigh",
+        "email":"craigh@mac.com"
+    }
+}
