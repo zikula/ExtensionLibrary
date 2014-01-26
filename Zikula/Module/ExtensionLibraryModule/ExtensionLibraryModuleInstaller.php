@@ -13,11 +13,17 @@
 
 namespace Zikula\Module\ExtensionLibraryModule;
 
+use DoctrineHelper;
+
 /**
  * ExtensionLibrary module installer.
  */
 class ExtensionLibraryModuleInstaller extends \Zikula_AbstractInstaller
 {
+    private $entities = array(
+        'Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity',
+        'Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity',
+    );
 
     /**
      * Initialise the module.
@@ -26,6 +32,13 @@ class ExtensionLibraryModuleInstaller extends \Zikula_AbstractInstaller
      */
     public function install()
     {
+        try {
+            DoctrineHelper::createSchema($this->entityManager, $this->entities);
+        } catch (\Exception $e) {
+            $this->request->getSession()->getFlashBag()->add('error', $e->getMessage());
+            return false;
+        }
+
         return true;
     }
 
@@ -54,6 +67,13 @@ class ExtensionLibraryModuleInstaller extends \Zikula_AbstractInstaller
      */
     public function uninstall()
     {
+        try {
+            DoctrineHelper::dropSchema($this->entityManager, $this->entities);
+        } catch (\PDOException $e) {
+            $this->request->getSession()->getFlashBag()->add('error', $e->getMessage());
+            return false;
+        }
+
         return true;
     }
 
