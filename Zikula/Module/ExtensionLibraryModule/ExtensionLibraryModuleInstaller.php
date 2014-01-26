@@ -23,6 +23,7 @@ class ExtensionLibraryModuleInstaller extends \Zikula_AbstractInstaller
     private $entities = array(
         'Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity',
         'Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity',
+        'Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity',
     );
 
     /**

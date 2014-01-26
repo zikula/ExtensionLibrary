@@ -237,7 +237,6 @@ class VendorEntity extends EntityAccess
     public function addExtension(ExtensionEntity $extension)
     {
         $this->extensions->add($extension);
-//        $extension->setVendor($this);
     }
 
     /**

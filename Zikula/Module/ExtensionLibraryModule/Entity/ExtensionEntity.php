@@ -13,6 +13,7 @@
 
 namespace Zikula\Module\ExtensionLibraryModule\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Zikula\Core\Doctrine\EntityAccess;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -52,6 +53,12 @@ class ExtensionEntity extends EntityAccess
     private $name;
 
     /**
+     * @ORM\Column(type="datetime")
+     * @Gedmo\Timestampable(on="update")
+     */
+    private $updated;
+
+    /**
      * name slug
      * automatically computed from $name
      *
@@ -63,21 +70,10 @@ class ExtensionEntity extends EntityAccess
     /**
      * extension version
      *
-     * @ORM\Column(type="string", length=10)
+     * @ORM\OneToMany(targetEntity="ExtensionVersionEntity", mappedBy="extension", indexBy="version", cascade={"remove"})
+     * @ORM\OrderBy({"version" = "DESC"})
      */
-    private $version = '';
-
-    /**
-     * @ORM\Column(type="datetime")
-     * @Gedmo\Timestampable(on="change", field={"version"})
-     */
-    private $updated;
-
-    private $url;
-    private $description;
-    private $compatibilty;
-    private $license;
-    private $status; // active/not
+    private $versions;
 
     /**
      * @ORM\ManyToOne(targetEntity="VendorEntity", inversedBy="extensions")
@@ -88,13 +84,13 @@ class ExtensionEntity extends EntityAccess
     /**
      * Constructor
      */
-    public function __construct(VendorEntity $vendor, $id, $name, $version)
+    public function __construct(VendorEntity $vendor, $id, $name)
     {
         $this->vendor = $vendor;
         $this->repositoryId = $id;
         $this->name = $name;
-        $this->version = $version;
         $this->updated = new \DateTime();
+        $this->versions = new ArrayCollection();
     }
 
     /**
@@ -122,27 +118,11 @@ class ExtensionEntity extends EntityAccess
     }
 
     /**
-     * @param mixed $nameSlug
-     */
-    public function setNameSlug($nameSlug)
-    {
-        $this->nameSlug = $nameSlug;
-    }
-
-    /**
      * @return mixed
      */
     public function getNameSlug()
     {
         return $this->nameSlug;
-    }
-
-    /**
-     * @param mixed $updated
-     */
-    public function setUpdated($updated)
-    {
-        $this->updated = $updated;
     }
 
     /**
@@ -154,26 +134,52 @@ class ExtensionEntity extends EntityAccess
     }
 
     /**
-     * @param mixed $version
-     */
-    public function setVersion($version)
-    {
-        $this->version = $version;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getVersion()
-    {
-        return $this->version;
-    }
-
-    /**
      * @return VendorEntity
      */
     public function getVendor()
     {
         return $this->vendor;
     }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getVersions()
+    {
+        return $this->versions;
+    }
+
+    /**
+     * @return ExtensionVersionEntity|boolean
+     */
+    public function getNewestVersion()
+    {
+        return $this->versions->first();
+    }
+
+    /**
+     * @param ExtensionVersionEntity $version
+     */
+    public function addVersion(ExtensionVersionEntity $version)
+    {
+        $this->versions->add($version);
+    }
+
+    /**
+     * @param ExtensionVersionEntity $version
+     */
+    public function removeExtension(ExtensionVersionEntity $version)
+    {
+        $this->versions->removeElement($version);
+    }
+
+    /**
+     * @param string $semver
+     * @return ExtensionEntity|null
+     */
+    public function getVersionBySemver($semver)
+    {
+        return $this->versions->get($semver);
+    }
+
 }

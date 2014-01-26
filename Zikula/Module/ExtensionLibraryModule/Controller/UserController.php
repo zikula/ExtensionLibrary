@@ -23,6 +23,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Zikula\Core\Response\PlainResponse;
+use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 
@@ -80,7 +81,7 @@ class UserController extends \Zikula_AbstractController
             return new PlainResponse();
         }
 
-        // check for vendor exists, if not create new vendor
+        // check vendor exists, if not create new vendor
         $vendor = $this->entityManager
             ->getRepository('ZikulaExtensionLibraryModule:VendorEntity')
             ->findOneBy(array('owner' => $jsonPayload->repository->owner->name));
@@ -94,23 +95,27 @@ class UserController extends \Zikula_AbstractController
             $this->log(sprintf('Vendor (%s) found', $jsonPayload->repository->owner->name));
         }
 
-        // check for existing extension and either create or add new version
-        list(, , $version) = explode('/', $jsonPayload->ref);
+        // check extension exists, if not create new extension
         if ($vendor->hasExtensionById($jsonPayload->repository->id)) {
             $this->log(sprintf('Extension (%s) found', $jsonPayload->repository->id));
             $extension = $vendor->getExtensionById($jsonPayload->repository->id);
-            // compare version
-            if (version_compare($version, $extension->getVersion(), '>')) {
-                // update existing extension
-                $extension->setVersion($version);
-                $this->log(sprintf('Extension (%s) updated to version %s', $jsonPayload->repository->id, $version));
-            }
         } else {
             // not found, create new extension and assign to vendor
-            $extension = new ExtensionEntity($vendor, (int)$jsonPayload->repository->id, $jsonPayload->repository->name, $version);
+            $extension = new ExtensionEntity($vendor, (int)$jsonPayload->repository->id, $jsonPayload->repository->name);
             $vendor->addExtension($extension);
             $this->entityManager->persist($extension);
-            $this->log(sprintf('Extension (%s) created at version %s', $jsonPayload->repository->id, $version));
+            $this->log(sprintf('Extension (%s) created', $jsonPayload->repository->id));
+        }
+
+        // compare version to newest available. If newer, add new version
+        list(, , $version) = explode('/', $jsonPayload->ref);
+        $newestVersion = $extension->getNewestVersion();
+        if (empty($newestVersion) || (version_compare($version, $newestVersion->getVersion(), '>'))) {
+            // add new version of extension
+            $versionEntity = new ExtensionVersionEntity($extension, $version);
+            $this->entityManager->persist($versionEntity);
+            $extension->addVersion($versionEntity);
+            $this->log(sprintf('Version %s added to extension %s', $version, $jsonPayload->repository->id));
         }
 
         $this->entityManager->flush();
