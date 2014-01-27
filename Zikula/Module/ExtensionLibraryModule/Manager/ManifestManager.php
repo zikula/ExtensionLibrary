@@ -23,6 +23,11 @@ class ManifestManager {
      */
     private $name = 'ZikulaExtensionLibraryModule';
     /**
+     * The module path
+     * @var string
+     */
+    private $modulePath;
+    /**
      * The raw manifest request response
      * @var json
      */
@@ -32,6 +37,16 @@ class ManifestManager {
      * @var json
      */
     private $content;
+    /**
+     * Is the manifest valid?
+     * @var bool
+     */
+    private $valid = false;
+    /**
+     * Validation error discovered in the validation method
+     * @var array
+     */
+    private $validationErrors;
 
     /**
      * Constructor
@@ -45,7 +60,8 @@ class ManifestManager {
     public function __construct($owner, $repo, $refs)
     {
         $module = ModUtil::getModule($this->name);
-        require_once $module->getPath() . '/vendor/autoload.php';
+        $this->modulePath = $module->getPath();
+        require_once $this->modulePath . '/vendor/autoload.php';
 
         $client = new \Github\Client();
         try {
@@ -56,6 +72,7 @@ class ManifestManager {
         }
 
         $this->decodeContent();
+        $this->validate();
     }
 
     /**
@@ -69,6 +86,31 @@ class ManifestManager {
         } catch (\Exception $e) {
             Util::log(sprintf("Unable to decode manifest content (%s)", json_last_error_msg()));
             throw new \InvalidArgumentException();
+        }
+    }
+
+    /**
+     * validate the manifest with the schema
+     */
+    private function validate()
+    {
+        // Get the schema and data as objects
+        $retriever = new \JsonSchema\Uri\UriRetriever;
+        $schema = $retriever->retrieve($this->modulePath . '/Schema/manifest.json');
+
+        // Validate
+        $validator = new \JsonSchema\Validator();
+        $validator->check($this->content, $schema);
+
+        if ($validator->isValid()) {
+            $this->valid = true;
+            Util::log('The manifest validated!');
+        } else {
+            $this->validationErrors = $validator->getErrors();
+            Util::log("manifest does not validate. Violations:");
+            foreach ($this->validationErrors as $error) {
+                Util::log(sprintf("[%s] %s\n", $error['property'], $error['message']));
+            }
         }
     }
 
