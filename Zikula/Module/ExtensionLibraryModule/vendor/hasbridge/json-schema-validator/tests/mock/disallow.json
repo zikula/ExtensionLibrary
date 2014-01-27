@@ -1,9 +1,0 @@
-{
-    "type" : "object",
-    "properties" : {
-        "foo" : {
-            "type" : "any",
-            "disallow" : ["number", "array"]
-        }
-    }
-}

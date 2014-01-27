@@ -1,5 +1,0 @@
-{
-    "type" : "integer",
-    "minimum" : 1,
-    "exclusiveMinimum" : true
-}
