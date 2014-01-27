@@ -61,6 +61,15 @@ class UserController extends \Zikula_AbstractController
 
         // check 'refs' for tags, if none, then return
         if (!strpos($jsonPayload->ref, 'tags')) {
+            Util::log('processInboundAction aborted. no tags in payload');
+            return new PlainResponse();
+        }
+
+        // fetch the manifest, validate and get contents
+        $manifestManager = new ManifestManager($jsonPayload->repository->owner->name, $jsonPayload->repository->name, $jsonPayload->ref);
+        $manifestContent = $manifestManager->getContent();
+        if (empty($manifestContent)) {
+            Util::log("processInboundAction aborted. The manifest was invalid.");
             return new PlainResponse();
         }
 
@@ -77,6 +86,7 @@ class UserController extends \Zikula_AbstractController
             // found
             Util::log(sprintf('Vendor (%s) found', $jsonPayload->repository->owner->name));
         }
+        $vendor->mergeManifest($manifestContent);
 
         // check extension exists, if not create new extension
         if ($vendor->hasExtensionById($jsonPayload->repository->id)) {
@@ -84,27 +94,27 @@ class UserController extends \Zikula_AbstractController
             $extension = $vendor->getExtensionById($jsonPayload->repository->id);
         } else {
             // not found, create new extension and assign to vendor
-            $title = 'title'; // temp
-            $type = 'm'; // temp
-            $extension = new ExtensionEntity($vendor, (int)$jsonPayload->repository->id, $jsonPayload->repository->name, $title, $type);
+            $extension = new ExtensionEntity($vendor, (int)$jsonPayload->repository->id, $jsonPayload->repository->name, $manifestContent->extension->title, $manifestContent->extension->type);
             $vendor->addExtension($extension);
             $this->entityManager->persist($extension);
             Util::log(sprintf('Extension (%s) created', $jsonPayload->repository->id));
         }
+        $extension->mergeManifest($manifestContent);
 
         // compare version to newest available. If newer, add new version
         list(, , $semver) = explode('/', $jsonPayload->ref);
         $newestVersion = $extension->getNewestVersion();
         if (empty($newestVersion) || (version_compare($semver, $newestVersion->getSemver(), '>'))) {
             // add new version of extension
-            $compatibility = '>=1.3.7'; // temp
-            $licenses = '{}'; // temp
-            $versionEntity = new ExtensionVersionEntity($extension, $semver, $compatibility, $licenses);
-            $this->entityManager->persist($versionEntity);
-            $extension->addVersion($versionEntity);
+            $version = new ExtensionVersionEntity($extension, $semver, $manifestContent->version->compatibility, $manifestContent->version->licenses);
+            $this->entityManager->persist($version);
+            $extension->addVersion($version);
+            $version->mergeManifest($manifestContent);
             Util::log(sprintf('Version %s added to extension %s', $semver, $jsonPayload->repository->id));
         } else {
             Util::log("The version was not added because it was the same or older than the current version.");
+            // return without flushing since there should be no changes if version isn't new
+            return new PlainResponse();
         }
 
         $this->entityManager->flush();
