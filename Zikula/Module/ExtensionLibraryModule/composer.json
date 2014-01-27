@@ -14,11 +14,15 @@
         "psr-0": { "Zikula\\Module\\ExtensionLibraryModule\\": "" }
     },
     "require": {
-        "php": ">5.3.3"
+        "php": ">5.3.3",
+        "knplabs/github-api": "*"
     },
     "extra": {
         "zikula": {
             "class": "Zikula\\Module\\ExtensionLibraryModule\\ZikulaExtensionLibraryModule"
         }
+    },
+    "config": {
+        "vendor-dir": "vendor"
     }
 }

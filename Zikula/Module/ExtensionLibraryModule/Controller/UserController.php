@@ -18,6 +18,7 @@
 namespace Zikula\Module\ExtensionLibraryModule\Controller;
 
 use SecurityUtil;
+use ModUtil;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
@@ -43,6 +44,26 @@ class UserController extends \Zikula_AbstractController
         }
 
         return $this->response($this->view->fetch('User/view.tpl'));
+    }
+
+    /**
+     * @Route("/getmanifest")
+     */
+    public function getManifestAction($owner = 'craigh', $repo ='Nutin', $refs ='refs/tags/0.0.7')
+    {
+        $module = ModUtil::getModule($this->name);
+        require_once $module->getPath() . '/vendor/autoload.php';
+
+        $client = new \Github\Client();
+        $file = $client->api('repo')->contents()->show($owner, $repo, 'zikula.manifest.json', $refs);
+
+        echo "<pre>";
+        var_dump($file);
+
+        $content = json_decode(base64_decode($file["content"]));
+        var_dump($content);
+
+        return new PlainResponse();
     }
 
     /**

@@ -1,0 +1,82 @@
+{
+    "ref":"refs/heads/master",
+    "after":"3d08e51e09a121a33eba9eaaec74e2735704df64",
+    "before":"1311bf87db3ba7f04ded476dee1ce1563b4cc7ea",
+    "created":false,
+    "deleted":false,
+    "forced":false,
+    "compare":"https://github.com/zikula-modules/DizkusModule/compare/1311bf87db3b...3d08e51e09a1",
+    "commits":[
+        {
+            "id":"3d08e51e09a121a33eba9eaaec74e2735704df64",
+            "distinct":true,
+            "message":"remove experimental file",
+            "timestamp":"2014-01-26T16:42:23-08:00",
+            "url":"https://github.com/zikula-modules/DizkusModule/commit/3d08e51e09a121a33eba9eaaec74e2735704df64",
+            "author":{
+                "name":"Craig Heydenburg",
+                "email":"craigh@mac.com",
+                "username":"craigh"
+            },
+            "committer":{
+                "name":"Craig Heydenburg",
+                "email":"craigh@mac.com",
+                "username":"craigh"
+            },
+            "added":[],
+            "removed":["githubupdate.php"],
+            "modified":[]
+        }
+    ],
+    "head_commit":{
+        "id":"3d08e51e09a121a33eba9eaaec74e2735704df64",
+        "distinct":true,
+        "message":"remove experimental file",
+        "timestamp":"2014-01-26T16:42:23-08:00",
+        "url":"https://github.com/zikula-modules/DizkusModule/commit/3d08e51e09a121a33eba9eaaec74e2735704df64",
+        "author":{
+            "name":"Craig Heydenburg",
+            "email":"craigh@mac.com",
+            "username":"craigh"
+        },
+        "committer":{
+            "name":"Craig Heydenburg",
+            "email":"craigh@mac.com",
+            "username":"craigh"
+        },
+        "added":[],
+        "removed":["githubupdate.php"],
+        "modified":[]
+    },
+    "repository":{
+        "id":2260329,
+        "name":"DizkusModule",
+        "url":"https://github.com/zikula-modules/DizkusModule",
+        "description":"Official repository for Dizkus,
+         a fully integrated forum solution for Zikula 1.3+",
+        "homepage":"",
+        "watchers":27,
+        "stargazers":27,
+        "forks":10,
+        "fork":false,
+        "size":12536,
+        "owner":{
+            "name":"zikula-modules",
+            "email":null
+        },
+        "private":false,
+        "open_issues":37,
+        "has_issues":true,
+        "has_downloads":true,
+        "has_wiki":true,
+        "language":"PHP",
+        "created_at":1314172950,
+        "pushed_at":1390783346,
+        "master_branch":"master",
+        "organization":"zikula-modules"
+    },
+    "pusher":{
+        "name":"craigh",
+        "email":"craigh@mac.com"
+    }
+}
