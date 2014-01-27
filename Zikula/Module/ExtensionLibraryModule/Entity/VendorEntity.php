@@ -381,4 +381,19 @@ class VendorEntity extends EntityAccess
     {
         return $this->extensions->get($extensionId);
     }
+
+    /**
+     * merge some properties of the manifest
+     * @param $manifest
+     */
+    public function mergeManifest($manifest)
+    {
+        $this->title = $manifest->vendor->title;
+        $this->url = $manifest->vendor->url;
+        $this->logo = $manifest->vendor->logo;
+        $this->ownerName = $manifest->vendor->owner->name;
+        $this->ownerEmail = $manifest->vendor->owner->email;
+        $this->ownerUrl = $manifest->vendor->owner->url;
+    }
+
 }

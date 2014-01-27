@@ -310,4 +310,14 @@ class ExtensionEntity extends EntityAccess
         return $this->icon;
     }
 
+    /**
+     * merge some properties of the manifest
+     * @param $manifest
+     */
+    public function mergeManifest($manifest)
+    {
+        $this->url = $manifest->extension->url;
+        $this->icon = $manifest->extension->icon;
+    }
+
 }

@@ -306,4 +306,16 @@ class ExtensionVersionEntity extends EntityAccess
         return $this->impressions;
     }
 
+    /**
+     * merge some properties of the manifest
+     * @param $manifest
+     */
+    public function mergeManifest($manifest)
+    {
+        $this->description = $manifest->version->description;
+        $this->urls = $manifest->version->urls;
+        $this->contributors = $manifest->version->contributors;
+        $this->dependencies = $manifest->version->dependencies;
+    }
+
 }
