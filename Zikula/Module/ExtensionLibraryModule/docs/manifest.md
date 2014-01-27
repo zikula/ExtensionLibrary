@@ -4,73 +4,105 @@ Zikula Extension Manifest Specification
 
 This document is all you need to know about what's required in your `zikula.manifest.json` file(s).
 
+See the sample zikula.manifest.json file in `/docs`
+
 Manifest files must live in the root of your repository and exist in your tags. The files must be actual JSON, not just
 a JavaScript object literal.
 
 Fields
 ------
 
-Required Fields
- - name
+ - vendor
+     - title
+     - url
+     - logo
+     - owner
+ - extension
+     - title (required)
+     - type (required)
+     - url
+     - icon
  - version
- - title
- - author
- - licenses
- - dependencies
+     - semver (required)
+     - compatibility (required)
+     - licenses (required)
+     - description
+     - keywords
+     - urls
+     - contributors
+     - dependencies
 
-Optional Fields
- - description
- - keywords
- - homepage
- - docs
- - demo
- - download
- - bugs
- - maintainers
 
-name
-----
-
-The most important things in your manifest file are the name and version fields. The name and version together form an
-identifier that is assumed to be completely unique. Changes to the extension should come along with changes to the version.
-
-The name is what your thing is called. Some tips:
-
-Don't put "zikula" in the name. It's assumed that it's zikula related, since you're writing a zikula.manifest.json file.
-The name ends up being part of a URL. Any name with non-url-safe characters will be rejected. The Zikula Extension
-Library Site is UTF-8. The name should be short, but also reasonably descriptive.
-You may want to check the library site to see if there's something by that name already, before you get too attached to
-it. If you have a extension with the same name as a extension already in the Zikula Extension Library Site, either
-consider renaming your extension or namespacing it.
-
-version
--------
-
-The most important things in your manifest file are the name and version fields. The name and version together form an 
-identifier that is assumed to be completely unique. Changes to the extension should come along with changes to the version. 
-Version number must be a valid semantic version number per node-semver.
-
-See Specifying Versions.
+Vendor
+======
 
 title
 -----
 
-A nice complete and pretty title of your extension. This will be used for the page title and top-level heading on your 
-extension's page. Include spaces and mixed case as desired, unlike name.
+The display title of your vendor. This will be used for the page title and top-level heading on your vendor's page.
+Include spaces and mixed case as desired.
 
-author
-------
+url
+---
 
-One person.
+The url to the homepage for your self, group or company. A Github page is suitable or any other page as you desire.
 
-See People Fields.
+logo
+----
 
-licenses
---------
+The url to your vendor logo (not extension logo/icon). The image will be copied to our servers.
+
+owner
+-----
+
+One person. See People Fields.
+
+
+Extension
+=========
+
+title (required)
+----------------
+
+The display title of your extension. This will be used for the page title and top-level heading on your
+extension's page. Include spaces and mixed case as desired.
+
+type (required)
+---------------
+
+A single character only: "m", "t" or "p" for module, theme or plugin, respectively.
+
+url
+---
+
+The url to the site for the extension. A Github page is suitable or any other page as you desire.
+
+icon
+----
+
+The url to your extension icon (not vendor logo). The image will be copied to our servers.
+
+
+Version
+=======
+
+semver (required)
+-----------------
+
+A valid version string as defined by SemVer 2.0.0 (http://semver.org). Changes to the extension should come along with
+changes to the version. See Specifying Versions.
+
+compatibility (required)
+------------------------
+
+A string defining Zikula Core version compatibility. See Specifying Versions.
+
+licenses (required)
+-------------------
 
 Array of licenses under which the extension is provided. Each license is a hash with a url property linking to the actual 
-text and an optional "type" property specifying the type of license. If the license is one of the official open source 
-licenses, the official license name or its abbreviation may be explicated with the "type" property.
+text and a "type" property specifying the type of license. You must use the standardized identifier acronym for the
+license as defined (here)[http://spdx.org/licenses/]
 
 ```json
 "licenses": [
@@ -81,74 +113,64 @@ licenses, the official license name or its abbreviation may be explicated with t
 ]
 ```
 
+description
+-----------
+
+Put a description in it. It's a string. This helps people discover your extension, as it's listed in the
+Zikula Extensions Library site.
+
+keywords
+--------
+
+Put keywords in it. It's an array of strings. This helps people discover your extension as it's listed on the
+Zikula Extensions Library site. Keywords may only contain letters, numbers, hyphens, and dots.
+
+urls
+----
+
+ - version
+     - The url to the specific version site.
+ - docs
+     - The url to the version documentation.
+ - demo
+     - The url to the version demo.
+ - download
+     - The url to download the extension. A download URL will be automatically generated based on the tag in GitHub,
+       but you can specify a custom URL if you'd prefer to send users to your own site.
+ - issues
+     - The url to the issue tracker for the version.
+
+contributors
+------------
+
+An array of people. See People Fields.
+
 dependencies
 ------------
 
-Dependencies are specified with a simple hash of package name to version range. The version range is EITHER a string 
-which has one or more space-separated descriptors, OR a range like "fromVersion - toVersion".
+Dependencies are specified with a simple hash of name, type and version. The name should be the repository name and not
+the title. The type must be as defined in extension type above. Version uses the same definition as core compatibility.
+See Specifying Versions.
 
 If a extension that you depend on uses other extensions as dependencies that your extension uses as well, we recommend
 you list those also. In the event that the depended on extension alters its dependencies, your extension's dependency
 tree won't be affected.
 
-description
------------
 
-Put a description in it. It's a string. This helps people discover your extension, as it's listed on the Zikula extensions Site.
-
-keywords
---------
-
-Put keywords in it. It's an array of strings. This helps people discover your extension as it's listed on the Zikula extensions 
-Site. Keywords may only contain letters, numbers, hyphens, and dots.
-
-homepage
---------
-
-The url to the extension homepage.
-
-docs
-----
-
-The url to the extension documentation.
-
-demo
-----
-
-The url to the extension demo or demos.
-
-download
---------
-
-The url to download the extension. A download URL will be automatically generated based on the tag in GitHub, but you can 
-specify a custom URL if you'd prefer to send users to your own site.
-
-bugs
-----
-
-The url to the bug tracker for the extension.
-
-maintainers
------------
-
-An array of people.
-
-See People Fields.
-
+Additional Details
+==================
 
 People Fields
 -------------
-A "person" is an object with a "name" field and optionally "url" and "email", like this:
+A "person" is an object with a "name" field and optional "url" and "email", like this:
 
 ```json
 {
-    "name" : "Barney Rubble",
-        "email" : "b@rubble.com",
-        "url" : "http://barnyrubble.tumblr.com/"
+    "name" : "Susan Miller",
+    "email" : "smiller@acme.com",
+    "url" : "http://www.acme.com/smiller"
 }
 ```
-
-Both the email and url are optional.
 
 Specifying Versions
 -------------------
@@ -213,43 +235,3 @@ The following are equivalent:
  - `"1" = "1.x.x"`
 
 You may not supply a comparator with a version containing an x. Any digits after the first "x" are ignored.
-
-Sample manifest
----------------
-
-```json
-{
-    "name": "color",
-    "title": "Zikula Color",
-    "description": "Zikula extension for color manipulation and animation support.",
-    "keywords": [
-        "color",
-        "animation"
-    ],
-    "version": "2.1.2",
-    "author": {
-        "name": "Zikula Foundation and other contributors",
-        "url": "https://github.com/Zikula/Zikula-color/blob/2.1.2/AUTHORS.txt"
-    },
-    "maintainers": [
-        {
-            "name": "Corey Frang",
-            "email": "gnarf37@gmail.com",
-            "url": "http://gnarf.net"
-        }
-    ],
-    "licenses": [
-        {
-            "type": "MIT",
-            "url": "https://github.com/Zikula/Zikula-color/blob/2.1.2/MIT-LICENSE.txt"
-        }
-    ],
-    "bugs": "https://github.com/Zikula/Zikula-color/issues",
-    "homepage": "https://github.com/Zikula/Zikula-color",
-    "docs": "https://github.com/Zikula/Zikula-color",
-    "download": "http://code.Zikula.com/#color",
-    "dependencies": {
-        "Zikula": ">=1.5"
-    }
-}
-```

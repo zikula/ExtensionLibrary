@@ -129,14 +129,14 @@ class UserController extends \Zikula_AbstractController
         }
 
         // compare version to newest available. If newer, add new version
-        list(, , $version) = explode('/', $jsonPayload->ref);
+        list(, , $semver) = explode('/', $jsonPayload->ref);
         $newestVersion = $extension->getNewestVersion();
-        if (empty($newestVersion) || (version_compare($version, $newestVersion->getVersion(), '>'))) {
+        if (empty($newestVersion) || (version_compare($semver, $newestVersion->getSemver(), '>'))) {
             // add new version of extension
-            $versionEntity = new ExtensionVersionEntity($extension, $version);
+            $versionEntity = new ExtensionVersionEntity($extension, $semver);
             $this->entityManager->persist($versionEntity);
             $extension->addVersion($versionEntity);
-            $this->log(sprintf('Version %s added to extension %s', $version, $jsonPayload->repository->id));
+            $this->log(sprintf('Version %s added to extension %s', $semver, $jsonPayload->repository->id));
         }
 
         $this->entityManager->flush();

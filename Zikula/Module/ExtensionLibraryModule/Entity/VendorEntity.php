@@ -52,6 +52,33 @@ class VendorEntity extends EntityAccess
     private $owner;
 
     /**
+     * owner name
+     * supplied by vendor
+     * can be null
+     *
+     * @ORM\Column(type="string", length=128, nullable=true)
+     */
+    private $ownerName;
+
+    /**
+     * owner email
+     * supplied by vendor
+     * can be null
+     *
+     * @ORM\Column(type="string", length=128, nullable=true)
+     */
+    private $ownerEmail;
+
+    /**
+     * owner email
+     * supplied by vendor
+     * can be null
+     *
+     * @ORM\Column(type="string", length=128, nullable=true)
+     */
+    private $ownerUrl;
+
+    /**
      * Associated Zikula Core user_id
      * can be empty array if the vendor has been unclaimed
      *
@@ -62,7 +89,7 @@ class VendorEntity extends EntityAccess
     /**
      * vendor url
      * supplied by vendor
-     * can be null if the vendor has been unclaimed
+     * can be null
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
@@ -71,20 +98,37 @@ class VendorEntity extends EntityAccess
     /**
      * vendor title
      * supplied by vendor
-     * can be null if the vendor has been unclaimed
+     * can be null
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $title = null;
 
     /**
-     * owner slug
-     * automatically computed from $owner
+     * local logo image path
+     * can be null
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $logo = null;
+
+    /**
+     * ownerName slug
+     * automatically computed from $ownerName
      *
      * @ORM\Column(type="string", length=128)
-     * @Gedmo\Slug(fields={"owner"})
+     * @Gedmo\Slug(fields={"ownerName"})
      */
-    private $ownerSlug;
+    private $ownerNameSlug;
+
+    /**
+     * title slug
+     * automatically computed from $title
+     *
+     * @ORM\Column(type="string", length=128)
+     * @Gedmo\Slug(fields={"title"})
+     */
+    private $titleSlug;
 
     /**
      * vendor verification status
@@ -135,11 +179,59 @@ class VendorEntity extends EntityAccess
     }
 
     /**
+     * @param string $ownerEmail
+     */
+    public function setOwnerEmail($ownerEmail)
+    {
+        $this->ownerEmail = $ownerEmail;
+    }
+
+    /**
      * @return string
      */
-    public function getOwnerSlug()
+    public function getOwnerEmail()
     {
-        return $this->ownerSlug;
+        return $this->ownerEmail;
+    }
+
+    /**
+     * @param string $ownerName
+     */
+    public function setOwnerName($ownerName)
+    {
+        $this->ownerName = $ownerName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOwnerName()
+    {
+        return $this->ownerName;
+    }
+
+    /**
+     * @param string $ownerUrl
+     */
+    public function setOwnerUrl($ownerUrl)
+    {
+        $this->ownerUrl = $ownerUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOwnerUrl()
+    {
+        return $this->ownerUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOwnerNameSlug()
+    {
+        return $this->ownerNameSlug;
     }
 
     /**
@@ -156,6 +248,30 @@ class VendorEntity extends EntityAccess
     public function getTitle()
     {
         return $this->title;
+    }
+
+    /**
+     * @param string $logo
+     */
+    public function setLogo($logo)
+    {
+        $this->logo = $logo;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogo()
+    {
+        return $this->logo;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitleSlug()
+    {
+        return $this->titleSlug;
     }
 
     /**

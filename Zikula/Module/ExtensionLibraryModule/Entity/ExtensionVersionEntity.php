@@ -26,6 +26,12 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class ExtensionVersionEntity extends EntityAccess
 {
     /**
+     * constants defining the status of this version
+     */
+    const ACTIVE = 1;
+    const INACTIVE = 0;
+
+    /**
      * id field
      *
      * @ORM\Id
@@ -35,11 +41,12 @@ class ExtensionVersionEntity extends EntityAccess
     private $id;
 
     /**
-     * extension version
+     * extension version (semver)
+     * taken from "refs" in payload POST
      *
      * @ORM\Column(type="string", length=10)
      */
-    private $version = '';
+    private $semver = '';
 
     /**
      * @ORM\Column(type="datetime")
@@ -48,31 +55,70 @@ class ExtensionVersionEntity extends EntityAccess
     private $created;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * json array of related urls
+     * supplied by vendor
+     * 
+     * @ORM\Column(type="json_array", nullable=true)
      */
-    private $url;
+    private $urls;
 
     /**
+     * extension version description
+     * supplied by vendor
+     * 
      * @ORM\Column(type="text", nullable=true)
      */
     private $description;
 
     /**
-     * @ORM\Column(type="array", nullable=true)
+     * string defining Zikula Core version compatibility
+     * supplied by vendor
+     * 
+     * @ORM\Column(type="string")
      */
-    private $compatibilty;
+    private $compatibility;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * json array of licenses
+     * supplied by vendor
+     * 
+     * @ORM\Column(type="json_array")
      */
-    private $license;
+    private $licenses;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * json array of contributors
+     * supplied by vendor
+     * 
+     * @ORM\Column(type="json_array", nullable=true)
      */
-    private $status; // active/not
+    private $contributors;
 
     /**
+     * json array of extension dependencies
+     * supplied by vendor
+     * 
+     * @ORM\Column(type="json_array", nullable=true)
+     */
+    private $dependencies;
+
+    /**
+     * active status of version
+     * 
+     * @ORM\Column(type="integer")
+     */
+    private $status = self::ACTIVE;
+
+    /**
+     * the number of times this version has been viewed
+     *
+     * @ORM\Column(type="integer")
+     */
+    private $impressions;
+
+    /**
+     * the related extension
+     * 
      * @ORM\ManyToOne(targetEntity="ExtensionEntity", inversedBy="versions")
      * @ORM\JoinColumn(name="id", referencedColumnName="id")
      */
@@ -81,14 +127,14 @@ class ExtensionVersionEntity extends EntityAccess
     /**
      * Constructor
      */
-    public function __construct(ExtensionEntity $extension, $version)
+    public function __construct(ExtensionEntity $extension, $semver)
     {
         $this->extension = $extension;
-        $this->version = $version;
+        $this->semver = $semver;
     }
 
     /**
-     * @return mixed
+     * @return integer
      */
     public function getId()
     {
@@ -96,11 +142,165 @@ class ExtensionVersionEntity extends EntityAccess
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getVersion()
+    public function getSemver()
     {
-        return $this->version;
+        return $this->semver;
+    }
+
+    /**
+     * @param string $compatibility
+     */
+    public function setCompatibility($compatibility)
+    {
+        $this->compatibility = $compatibility;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompatibility()
+    {
+        return $this->compatibility;
+    }
+
+    /**
+     * @param json $contributors
+     */
+    public function setContributors($contributors)
+    {
+        $this->contributors = $contributors;
+    }
+
+    /**
+     * @return json
+     */
+    public function getContributors()
+    {
+        return $this->contributors;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
+    /**
+     * @param json $dependencies
+     */
+    public function setDependencies($dependencies)
+    {
+        $this->dependencies = $dependencies;
+    }
+
+    /**
+     * @return json
+     */
+    public function getDependencies()
+    {
+        return $this->dependencies;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @return ExtensionEntity
+     */
+    public function getExtension()
+    {
+        return $this->extension;
+    }
+
+    /**
+     * @param json $licenses
+     */
+    public function setLicenses($licenses)
+    {
+        $this->licenses = $licenses;
+    }
+
+    /**
+     * @return json
+     */
+    public function getLicenses()
+    {
+        return $this->licenses;
+    }
+
+    /**
+     * @param integer $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param json $urls
+     */
+    public function setUrls($urls)
+    {
+        $this->urls = $urls;
+    }
+
+    /**
+     * @return json
+     */
+    public function getUrls()
+    {
+        return $this->urls;
+    }
+
+    public function incrementImpressions()
+    {
+        $this->impressions++;
+    }
+
+    public function decrementImpressions()
+    {
+        $this->impressions--;
+    }
+
+    /**
+     * @param integer $impressions
+     */
+    public function setImpressions($impressions)
+    {
+        $this->impressions = $impressions;
+    }
+
+    /**
+     * @return integer
+     */
+    public function getImpressions()
+    {
+        return $this->impressions;
     }
 
 }

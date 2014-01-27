@@ -27,6 +27,13 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class ExtensionEntity extends EntityAccess
 {
     /**
+     * constants defining the type of extension
+     */
+    const TYPE_MODULE = 'm';
+    const TYPE_THEME = 't';
+    const TYPE_PLUGIN = 'p';
+
+    /**
      * id field
      *
      * @ORM\Id
@@ -68,10 +75,54 @@ class ExtensionEntity extends EntityAccess
     private $nameSlug;
 
     /**
+     * extension title
+     * supplied by vendor
+     * can be null if the vendor has been unclaimed
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $title;
+
+    /**
+     * title slug
+     * automatically computed from $title
+     *
+     * @ORM\Column(type="string", length=128)
+     * @Gedmo\Slug(fields={"title"})
+     */
+    private $titleSlug;
+
+    /**
+     * extension type
+     * supplied by vendor
+     * must be one of the TYPE_* constants above
+     *
+     * @ORM\Column(type="string", length=1)
+     */
+    private $type = 'm';
+
+    /**
+     * extension url
+     * supplied by vendor
+     * can be null
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $url = null;
+
+    /**
+     * local icon image path
+     * can be null
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $icon = null;
+
+    /**
      * extension version
      *
-     * @ORM\OneToMany(targetEntity="ExtensionVersionEntity", mappedBy="extension", indexBy="version", cascade={"remove"})
-     * @ORM\OrderBy({"version" = "DESC"})
+     * @ORM\OneToMany(targetEntity="ExtensionVersionEntity", mappedBy="extension", indexBy="semver", cascade={"remove"})
+     * @ORM\OrderBy({"semver" = "DESC"})
      */
     private $versions;
 
@@ -180,6 +231,82 @@ class ExtensionEntity extends EntityAccess
     public function getVersionBySemver($semver)
     {
         return $this->versions->get($semver);
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitleSlug()
+    {
+        return $this->titleSlug;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType($type)
+    {
+        if (($type == self::TYPE_MODULE) || ($type == self::TYPE_PLUGIN) || ($type == self::TYPE_THEME)) {
+            $this->type = $type;
+        } else {
+            $this->type = self::TYPE_MODULE;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $url
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $icon
+     */
+    public function setIcon($icon)
+    {
+        $this->icon = $icon;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return $this->icon;
     }
 
 }
