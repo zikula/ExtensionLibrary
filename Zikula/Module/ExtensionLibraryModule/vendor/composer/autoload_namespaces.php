@@ -8,6 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'Zikula\\Module\\ExtensionLibraryModule\\' => array($baseDir . '/'),
     'Symfony\\Component\\EventDispatcher\\' => array($vendorDir . '/symfony/event-dispatcher'),
+    'Json' => array($vendorDir . '/hasbridge/json-schema-validator/src'),
     'Guzzle\\Tests' => array($vendorDir . '/guzzle/guzzle/tests'),
     'Guzzle' => array($vendorDir . '/guzzle/guzzle/src'),
     'Github\\' => array($vendorDir . '/knplabs/github-api/lib'),

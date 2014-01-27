@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "b0b6a16aa0d55154424e0d2fa7f4c3f0",
+    "hash": "862ba8e11b50fbb3dc48fec6cb3237cf",
     "packages": [
         {
             "name": "guzzle/guzzle",
@@ -96,6 +96,46 @@
                 "web service"
             ],
             "time": "2013-12-05 23:39:20"
+        },
+        {
+            "name": "hasbridge/json-schema-validator",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hasbridge/php-json-schema.git",
+                "reference": "93aaf12c3fb772b547e5d03b9c41c64b7633875f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hasbridge/php-json-schema/zipball/93aaf12c3fb772b547e5d03b9c41c64b7633875f",
+                "reference": "93aaf12c3fb772b547e5d03b9c41c64b7633875f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Json": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Harold Asbridge",
+                    "email": "hasbridge@gmail.com"
+                }
+            ],
+            "description": "PHP 5.3 implementation of json schema validation",
+            "keywords": [
+                "json",
+                "schema"
+            ],
+            "time": "2012-01-24 15:18:47"
         },
         {
             "name": "knplabs/github-api",

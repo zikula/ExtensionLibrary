@@ -15,7 +15,8 @@
     },
     "require": {
         "php": ">5.3.3",
-        "knplabs/github-api": "*"
+        "knplabs/github-api": "*",
+        "hasbridge/json-schema-validator": "*"
     },
     "extra": {
         "zikula": {

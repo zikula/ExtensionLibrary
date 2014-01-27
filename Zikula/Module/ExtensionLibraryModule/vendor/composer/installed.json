@@ -211,5 +211,47 @@
             "gist",
             "github"
         ]
+    },
+    {
+        "name": "hasbridge/json-schema-validator",
+        "version": "0.1.0",
+        "version_normalized": "0.1.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/hasbridge/php-json-schema.git",
+            "reference": "93aaf12c3fb772b547e5d03b9c41c64b7633875f"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/hasbridge/php-json-schema/zipball/93aaf12c3fb772b547e5d03b9c41c64b7633875f",
+            "reference": "93aaf12c3fb772b547e5d03b9c41c64b7633875f",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.2"
+        },
+        "time": "2012-01-24 15:18:47",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Json": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Harold Asbridge",
+                "email": "hasbridge@gmail.com"
+            }
+        ],
+        "description": "PHP 5.3 implementation of json schema validation",
+        "keywords": [
+            "json",
+            "schema"
+        ]
     }
 ]
