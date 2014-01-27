@@ -26,7 +26,7 @@ class PayloadManager {
      */
     private $request;
     /**
-     * @var json
+     * @var \stdClass
      */
     private $jsonPayload;
 
@@ -105,7 +105,7 @@ class PayloadManager {
     }
 
     /**
-     * @return json
+     * @return \stdClass
      */
     public function getJsonPayload()
     {
