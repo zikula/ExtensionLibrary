@@ -119,7 +119,7 @@ class UserController extends \Zikula_AbstractController
 
         $this->entityManager->flush();
 
-        // @todo handle the 'keywords' as tags
+        // @todo handle the 'keywords' as tags or hooks?
 
         return new PlainResponse();
     }
