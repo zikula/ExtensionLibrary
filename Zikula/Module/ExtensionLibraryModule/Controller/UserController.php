@@ -119,6 +119,8 @@ class UserController extends \Zikula_AbstractController
 
         $this->entityManager->flush();
 
+        // @todo handle the 'keywords' as tags
+
         return new PlainResponse();
     }
 
