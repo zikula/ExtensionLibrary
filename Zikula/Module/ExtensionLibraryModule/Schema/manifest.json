@@ -83,30 +83,27 @@
                     "uniqueItems": true
                 },
                 "urls": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "version": {
-                                "type": "string",
-                                "format": "uri"
-                            },
-                            "docs": {
-                                "type": "string",
-                                "format": "uri"
-                            },
-                            "demo": {
-                                "type": "string",
-                                "format": "uri"
-                            },
-                            "download": {
-                                "type": "string",
-                                "format": "uri"
-                            },
-                            "issues": {
-                                "type": "string",
-                                "format": "uri"
-                            }
+                    "type": "object",
+                    "properties": {
+                        "version": {
+                            "type": "string",
+                            "format": "uri"
+                        },
+                        "docs": {
+                            "type": "string",
+                            "format": "uri"
+                        },
+                        "demo": {
+                            "type": "string",
+                            "format": "uri"
+                        },
+                        "download": {
+                            "type": "string",
+                            "format": "uri"
+                        },
+                        "issues": {
+                            "type": "string",
+                            "format": "uri"
                         }
                     }
                 },
@@ -145,7 +142,7 @@
                     "uniqueItems": true
                 }
             },
-            "required": ["semver", "compatibilty", "licenses"]
+            "required": ["semver", "compatibility", "licenses"]
         }
     },
     "required": ["extension", "version"]
