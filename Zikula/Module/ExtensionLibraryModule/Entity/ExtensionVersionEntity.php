@@ -127,10 +127,13 @@ class ExtensionVersionEntity extends EntityAccess
     /**
      * Constructor
      */
-    public function __construct(ExtensionEntity $extension, $semver)
+    public function __construct(ExtensionEntity $extension, $semver, $compatibility, $licenses)
     {
         $this->extension = $extension;
         $this->semver = $semver;
+        $this->compatibility = $compatibility;
+        $this->licenses = $licenses;
+        $this->impressions = 0;
     }
 
     /**

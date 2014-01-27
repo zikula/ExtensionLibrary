@@ -77,9 +77,8 @@ class ExtensionEntity extends EntityAccess
     /**
      * extension title
      * supplied by vendor
-     * can be null if the vendor has been unclaimed
      *
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
     private $title;
 
@@ -135,11 +134,13 @@ class ExtensionEntity extends EntityAccess
     /**
      * Constructor
      */
-    public function __construct(VendorEntity $vendor, $id, $name)
+    public function __construct(VendorEntity $vendor, $id, $name, $title, $type = 'm')
     {
         $this->vendor = $vendor;
         $this->repositoryId = $id;
         $this->name = $name;
+        $this->title= $title;
+        $this->type = $type;
         $this->updated = new \DateTime();
         $this->versions = new ArrayCollection();
     }
