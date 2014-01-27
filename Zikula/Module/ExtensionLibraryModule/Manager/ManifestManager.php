@@ -29,12 +29,12 @@ class ManifestManager {
     private $modulePath;
     /**
      * The raw manifest request response
-     * @var json
+     * @var string
      */
     private $manifest;
     /**
      * The decoded content of the manifest
-     * @var json
+     * @var \stdClass
      */
     private $content;
     /**
@@ -46,18 +46,18 @@ class ManifestManager {
      * Validation error discovered in the validation method
      * @var array
      */
-    private $validationErrors;
+    private $validationErrors = array();
 
     /**
      * Constructor
      *
      * @param string $owner
      * @param string $repo
-     * @param string $refs
+     * @param string $ref
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($owner, $repo, $refs)
+    public function __construct($owner, $repo, $ref)
     {
         $module = ModUtil::getModule($this->name);
         $this->modulePath = $module->getPath();
@@ -65,7 +65,7 @@ class ManifestManager {
 
         $client = new \Github\Client();
         try {
-            $this->manifest = $client->api('repo')->contents()->show($owner, $repo, 'zikula.manifest.json', $refs);
+            $this->manifest = $client->api('repo')->contents()->show($owner, $repo, 'zikula.manifest.json', $ref);
         } catch (\Exception $e) {
             Util::log("Unable to fetch manifest file");
             throw new \InvalidArgumentException();
@@ -73,6 +73,7 @@ class ManifestManager {
 
         $this->decodeContent();
         $this->validate();
+        $this->validateVersion($ref);
     }
 
     /**
@@ -96,7 +97,7 @@ class ManifestManager {
     {
         // Get the schema and data as objects
         $retriever = new \JsonSchema\Uri\UriRetriever;
-        $schema = $retriever->retrieve($this->modulePath . '/Schema/manifest.json');
+        $schema = $retriever->retrieve('file://' . realpath($this->modulePath . '/Schema/manifest.json'));
 
         // Validate
         $validator = new \JsonSchema\Validator();
@@ -106,19 +107,54 @@ class ManifestManager {
             $this->valid = true;
             Util::log('The manifest validated!');
         } else {
-            $this->validationErrors = $validator->getErrors();
-            Util::log("manifest does not validate. Violations:");
-            foreach ($this->validationErrors as $error) {
-                Util::log(sprintf("[%s] %s\n", $error['property'], $error['message']));
-            }
+            $this->validationErrors = array_merge($this->validationErrors, $validator->getErrors());
         }
     }
 
     /**
-     * @return json object
+     * Check if version in $ref is the same as the version in the manifest
+     *
+     * @param $ref
+     * @return boolean
+     */
+    private function validateVersion($ref)
+    {
+        list(, , $semver) = explode('/', $ref);
+        if (version_compare($semver, $this->content->version->semver, '!=')) {
+            $this->valid = false;
+            $this->validationErrors[] = array('property' => 'version.semver', 'message' => 'manifest version.semver does not match tagged version');
+        }
+    }
+
+    /**
+     * @return \stdClass|boolean
      */
     public function getContent()
     {
-        return $this->content;
+        if ($this->isvalid()) {
+            return $this->content;
+        } else {
+            Util::log("manifest does not validate. Violations:");
+            foreach ($this->validationErrors as $error) {
+                Util::log(sprintf("[%s] %s", $error['property'], $error['message']));
+            }
+            return false;
+        }
     }
-} 
+
+    /**
+     * @return bool
+     */
+    public function isValid()
+    {
+        return $this->valid;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValidationErrors()
+    {
+        return $this->validationErrors;
+    }
+}
