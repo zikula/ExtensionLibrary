@@ -70,6 +70,8 @@ class ManifestManager {
             Util::log("Unable to fetch manifest file");
             throw new \InvalidArgumentException();
         }
+        $rateLimitRemaining = $client->getHttpClient()->getLastResponse()->getHeader('X-RateLimit-Remaining');
+        Util::log('Rate limit remaining: ' . $rateLimitRemaining);
 
         $this->decodeContent();
         $this->validate();
