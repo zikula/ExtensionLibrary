@@ -74,6 +74,16 @@ class ManifestManager {
         $this->decodeContent();
         $this->validate();
         $this->validateVersion($ref);
+
+        // append download links
+        $tags = $client->api('repo')->tags($owner, $repo);
+        foreach ($tags as $tag) {
+            if (version_compare($tag['name'], $this->content->version->semver, '==')) {
+                $this->content->version->urls->zipball_url = $tag['zipball_url'];
+                $this->content->version->urls->tarball_url = $tag['tarball_url'];
+                break; // exit foreach loop
+            }
+        }
     }
 
     /**

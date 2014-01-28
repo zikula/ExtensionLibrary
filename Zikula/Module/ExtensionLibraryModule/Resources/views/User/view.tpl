@@ -18,7 +18,12 @@
                         <li>Date: {$version.created->format('j M Y')}</li>
                         <li>Description: {$version.description|safetext}</li>
                     </ul>
-                    <a type="button" class="btn btn-success" href="{$version.urls.download}">Download</a>
+                    {if isset($version.urls.download)}
+                        <a type="button" class="btn btn-success" href="{$version.urls.download}">Download</a>
+                    {else}
+                        <a type="button" class="btn btn-success" href="{$version.urls.zipball_url}">Download Zipball</a>
+                        <a type="button" class="btn btn-success" href="{$version.urls.tarball_url}">Download Tarball</a>
+                    {/if}
                 </div>
             </div>
         </div>
