@@ -14,6 +14,7 @@
 namespace Zikula\Module\ExtensionLibraryModule\Controller;
 
 use SecurityUtil;
+use ModUtil;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
 
@@ -35,6 +36,8 @@ class UserController extends \Zikula_AbstractController
         if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_READ)) {
             throw new AccessDeniedException();
         }
+        $extensions = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:ExtensionEntity')->findAll();
+        $this->view->assign('extensions', $extensions);
 
         return $this->response($this->view->fetch('User/view.tpl'));
     }

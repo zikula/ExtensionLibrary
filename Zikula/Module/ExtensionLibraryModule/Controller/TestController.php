@@ -38,7 +38,7 @@ class TestController extends \Zikula_AbstractController
             throw new AccessDeniedException();
         }
 
-        return $this->response($this->view->fetch('User/view.tpl'));
+        return $this->response($this->view->fetch('Test/view.tpl'));
     }
 
     /**
