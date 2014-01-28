@@ -88,7 +88,7 @@ class PayloadManager {
         }
 
         // allow local use for testing
-        if ($requestIP == $this->request->server->get('HTTP_HOST')) {
+        if ($requestIP == $this->request->server->get('SERVER_ADDR')) {
             return true;
         }
         // IP range taken from https://help.github.com/articles/what-ip-addresses-does-github-use-that-i-should-whitelist#service-hook-ip-addresses
