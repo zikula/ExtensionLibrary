@@ -388,12 +388,16 @@ class VendorEntity extends EntityAccess
      */
     public function mergeManifest($manifest)
     {
-        $this->title = $manifest->vendor->title;
-        $this->url = $manifest->vendor->url;
-        $this->logo = $manifest->vendor->logo;
-        $this->ownerName = $manifest->vendor->owner->name;
-        $this->ownerEmail = $manifest->vendor->owner->email;
-        $this->ownerUrl = $manifest->vendor->owner->url;
+        if (!empty($manifest->vendor)) {
+            $this->title = !empty($manifest->vendor->title) ? $manifest->vendor->title : null;
+            $this->url = !empty($manifest->vendor->url) ? $manifest->vendor->url : null;
+            $this->logo = !empty($manifest->vendor->logo) ? $manifest->vendor->logo : null;
+            if (!empty($manifest->vendor->owner)) {
+                $this->ownerName = !empty($manifest->vendor->owner->name) ? $manifest->vendor->name : null;
+                $this->ownerEmail = !empty($manifest->vendor->owner->email) ? $manifest->vendor->email : null;
+                $this->ownerUrl = !empty($manifest->vendor->owner->url) ? $manifest->vendor->url : null;
+            }
+        }
     }
 
 }

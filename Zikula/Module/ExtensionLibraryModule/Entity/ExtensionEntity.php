@@ -324,8 +324,8 @@ class ExtensionEntity extends EntityAccess
      */
     public function mergeManifest($manifest)
     {
-        $this->url = $manifest->extension->url;
-        $this->icon = $manifest->extension->icon;
+        $this->url = !empty($manifest->extension->url) ? $manifest->extension->url : null;
+        $this->icon = !empty($manifest->extension->icon) ? $manifest->extension->icon : null;
     }
 
 }

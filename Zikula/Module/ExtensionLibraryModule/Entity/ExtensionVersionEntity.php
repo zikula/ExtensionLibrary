@@ -312,10 +312,10 @@ class ExtensionVersionEntity extends EntityAccess
      */
     public function mergeManifest($manifest)
     {
-        $this->description = $manifest->version->description;
-        $this->urls = $manifest->version->urls;
-        $this->contributors = $manifest->version->contributors;
-        $this->dependencies = $manifest->version->dependencies;
+        $this->description = !empty($manifest->version->description) ? $manifest->version->description : null;
+        $this->urls = !empty($manifest->version->urls) ? $manifest->version->urls : null;
+        $this->contributors = !empty($manifest->version->contributors) ? $manifest->version->contributors : null;
+        $this->dependencies = !empty($manifest->version->dependencies) ? $manifest->version->dependencies : null;
     }
 
 }
