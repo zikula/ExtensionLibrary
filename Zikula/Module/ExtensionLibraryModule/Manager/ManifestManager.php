@@ -107,6 +107,7 @@ class ManifestManager {
             Util::log(sprintf("Unable to json_decode manifest content (%s). Be sure json is valid.", json_last_error_msg()));
             throw new \InvalidArgumentException();
         }
+        Util:log("Content decoded!");
     }
 
     /**
@@ -126,6 +127,7 @@ class ManifestManager {
             $this->valid = true;
             Util::log('The manifest validated!');
         } else {
+            $this->valid = false;
             $this->validationErrors = array_merge($this->validationErrors, $validator->getErrors());
         }
     }
@@ -143,6 +145,7 @@ class ManifestManager {
             $this->valid = false;
             $this->validationErrors[] = array('property' => 'version.semver', 'message' => 'manifest version.semver does not match tagged version');
         }
+        Util::log("The version is valid.");
     }
 
     /**
