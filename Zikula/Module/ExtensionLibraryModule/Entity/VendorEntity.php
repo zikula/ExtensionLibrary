@@ -393,9 +393,9 @@ class VendorEntity extends EntityAccess
             $this->url = !empty($manifest->vendor->url) ? $manifest->vendor->url : null;
             $this->logo = !empty($manifest->vendor->logo) ? $manifest->vendor->logo : null;
             if (!empty($manifest->vendor->owner)) {
-                $this->ownerName = !empty($manifest->vendor->owner->name) ? $manifest->vendor->name : null;
-                $this->ownerEmail = !empty($manifest->vendor->owner->email) ? $manifest->vendor->email : null;
-                $this->ownerUrl = !empty($manifest->vendor->owner->url) ? $manifest->vendor->url : null;
+                $this->ownerName = !empty($manifest->vendor->owner->name) ? $manifest->vendor->owner->name : null;
+                $this->ownerEmail = !empty($manifest->vendor->owner->email) ? $manifest->vendor->owner->email : null;
+                $this->ownerUrl = !empty($manifest->vendor->owner->url) ? $manifest->vendor->owner->url : null;
             }
         }
     }
