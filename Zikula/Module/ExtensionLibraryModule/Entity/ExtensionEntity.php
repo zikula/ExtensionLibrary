@@ -247,7 +247,11 @@ class ExtensionEntity extends EntityAccess
      */
     public function getTitle()
     {
-        return $this->title;
+        if (!empty($this->title)) {
+            return $this->title;
+        } else {
+            return $this->name;
+        }
     }
 
     /**
@@ -255,7 +259,11 @@ class ExtensionEntity extends EntityAccess
      */
     public function getTitleSlug()
     {
-        return $this->titleSlug;
+        if (!empty($this->titleSlug)) {
+            return $this->titleSlug;
+        } else {
+            return $this->nameSlug;
+        }
     }
 
     /**

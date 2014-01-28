@@ -163,14 +163,6 @@ class VendorEntity extends EntityAccess
     }
 
     /**
-     * @param string $owner
-     */
-    public function setOwner($owner)
-    {
-        $this->owner = $owner;
-    }
-
-    /**
      * @return string
      */
     public function getOwner()
@@ -247,7 +239,11 @@ class VendorEntity extends EntityAccess
      */
     public function getTitle()
     {
-        return $this->title;
+        if (!empty($this->title)) {
+            return $this->title;
+        } else {
+            return $this->owner;
+        }
     }
 
     /**
@@ -271,7 +267,11 @@ class VendorEntity extends EntityAccess
      */
     public function getTitleSlug()
     {
-        return $this->titleSlug;
+        if (!empty($this->titleSlug)) {
+            return $this->titleSlug;
+        } else {
+            return $this->owner;
+        }
     }
 
     /**
