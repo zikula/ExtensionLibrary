@@ -14,18 +14,11 @@
 namespace Zikula\Module\ExtensionLibraryModule\Controller;
 
 use SecurityUtil;
-use ModUtil;
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Zikula\Core\Response\PlainResponse;
-use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
-use Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity;
-use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Zikula\Module\ExtensionLibraryModule\Manager\ManifestManager;
-use Zikula\Module\ExtensionLibraryModule\Manager\PayloadManager;
 
 /**
  * UI operations executable by general users.
