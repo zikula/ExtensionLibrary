@@ -168,15 +168,15 @@ class ExtensionVersionEntity extends EntityAccess
     }
 
     /**
-     * @param json $contributors
+     * @param \stdClass $contributors from json
      */
-    public function setContributors($contributors)
+    public function setContributors(\stdClass $contributors)
     {
         $this->contributors = $contributors;
     }
 
     /**
-     * @return json
+     * @return \stdClass from json
      */
     public function getContributors()
     {
@@ -192,15 +192,15 @@ class ExtensionVersionEntity extends EntityAccess
     }
 
     /**
-     * @param json $dependencies
+     * @param \stdClass $dependencies from json
      */
-    public function setDependencies($dependencies)
+    public function setDependencies(\stdClass $dependencies)
     {
         $this->dependencies = $dependencies;
     }
 
     /**
-     * @return json
+     * @return \stdClass from json
      */
     public function getDependencies()
     {
@@ -232,15 +232,15 @@ class ExtensionVersionEntity extends EntityAccess
     }
 
     /**
-     * @param json $licenses
+     * @param \stdClass $licenses from json
      */
-    public function setLicenses($licenses)
+    public function setLicenses(\stdClass $licenses)
     {
         $this->licenses = $licenses;
     }
 
     /**
-     * @return json
+     * @return \stdClass from json
      */
     public function getLicenses()
     {
@@ -264,15 +264,15 @@ class ExtensionVersionEntity extends EntityAccess
     }
 
     /**
-     * @param json $urls
+     * @param \stdClass $urls from json
      */
-    public function setUrls($urls)
+    public function setUrls(\stdClass $urls)
     {
         $this->urls = $urls;
     }
 
     /**
-     * @return json
+     * @return \stdClass from json
      */
     public function getUrls()
     {
