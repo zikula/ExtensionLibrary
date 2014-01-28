@@ -11,7 +11,7 @@ Add a Manifest to your Repository
 ---------------------------------
 The Zikula Extensions Library will look in the root level of your repository for a file named `zikula.manifest.json`.
 You will need to create the file according to the (manifest specification)[manifest.md]. Use an online JSON verifier
-such as (JSONlink)[http://jsonlint.com/] to make sure the file is valid. You are now ready to publish your extension!
+such as (JSONlint)[http://jsonlint.com/] to make sure the file is valid. You are now ready to publish your extension!
 
 Publishing a Version
 --------------------
