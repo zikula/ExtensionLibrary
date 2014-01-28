@@ -83,7 +83,7 @@ class TestController extends \Zikula_AbstractController
     /**
      * @Route("/test/getmanifest")
      */
-    public function getManifestAction($owner = 'craigh', $repo = 'Nutin', $refs = 'refs/tags/0.0.8')
+    public function getManifestAction($owner = 'craigh', $repo = 'Nutin', $refs = 'refs/tags/0.0.9')
     {
         $manifestManager = new ManifestManager($owner, $repo, $refs);
         $content = $manifestManager->getContent();
