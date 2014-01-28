@@ -127,7 +127,6 @@ class ExtensionEntity extends EntityAccess
 
     /**
      * @ORM\ManyToOne(targetEntity="VendorEntity", inversedBy="extensions")
-     * @ORM\JoinColumn(name="id", referencedColumnName="id")
      */
     private $vendor;
 

@@ -120,7 +120,6 @@ class ExtensionVersionEntity extends EntityAccess
      * the related extension
      * 
      * @ORM\ManyToOne(targetEntity="ExtensionEntity", inversedBy="versions")
-     * @ORM\JoinColumn(name="id", referencedColumnName="id")
      */
     private $extension;
 
