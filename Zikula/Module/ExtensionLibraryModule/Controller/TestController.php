@@ -42,7 +42,7 @@ class TestController extends \Zikula_AbstractController
     }
 
     /**
-     * @Route("/test/hook/{type}", requirements={"id" = "\d+"})
+     * @Route("/test/hook/{type}", requirements={"type" = "0|1"})
      */
     public function postReceiveHookAction($type = 0)
     {
