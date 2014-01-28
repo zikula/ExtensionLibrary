@@ -97,10 +97,14 @@ class ManifestManager {
      */
     private function decodeContent()
     {
-        try {
-            $this->content = json_decode(base64_decode($this->manifest["content"]));
-        } catch (\Exception $e) {
-            Util::log(sprintf("Unable to decode manifest content (%s)", json_last_error_msg()));
+        $jsonEncodedContent = base64_decode($this->manifest["content"]); // returns false on failure
+        if (!$jsonEncodedContent) {
+            Util::log("Unable to base64_decode manifest content. Be sure json is valid.");
+            throw new \InvalidArgumentException();
+        }
+        $this->content = json_decode($jsonEncodedContent); // return null on failure
+        if (empty($this->content)) {
+            Util::log(sprintf("Unable to json_decode manifest content (%s). Be sure json is valid.", json_last_error_msg()));
             throw new \InvalidArgumentException();
         }
     }
