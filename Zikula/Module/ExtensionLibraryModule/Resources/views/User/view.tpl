@@ -6,10 +6,13 @@
     {foreach from=$extension.versions item="version" name="versionLoop"}
         <div class="panel panel-default">
             <div class="panel-heading">
-                <em class="pull-right">Released: {$version.created->format('j M Y')}</em>
+                <em class="pull-right">
+                    <span class="label label-info tooltips" title="{gt text='Zikula Core version compatibility'}">{$version.compatibility}</span>&nbsp;
+                    Released: {$version.created->format('j M Y')}
+                </em>
                 <h4 class="panel-title">
                     <a data-toggle="collapse" data-parent="#accordion" href="#version-{$version.id}">
-                        Version: {$version.semver|safetext}
+                        <strong>Version: {$version.semver|safetext}</strong>
                     </a>
                 </h4>
             </div>
