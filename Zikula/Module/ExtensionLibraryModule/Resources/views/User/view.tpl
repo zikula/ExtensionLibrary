@@ -7,10 +7,15 @@
         <ul class="list-unstyled" style="padding-left: 100px">
             <li>{$extension.vendor.ownerName|default:''}</li>
             <li>{$extension.vendor.ownerEmail|default:''}</li>
-            <li>{$extension.vendor.ownerUrl|default:''}</li>
+            <li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.ownerUrl|default:''}">{gt text="Vendor Website"}</a></li>
         </ul>
     </div>
     <h3>{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></h3>
+    <div>
+        <ul class="list-unstyled">
+            <li><i class="fa fa-external-link"></i> <a href="{$extension.url|default:''}">{gt text="Extension Website"}</a></li>
+        </ul>
+    </div>
     <div class="panel-group" id="accordion">
     {foreach from=$extension.versions item="version" name="versionLoop"}
         <div class="panel panel-default">
