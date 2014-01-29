@@ -98,7 +98,7 @@ class ExtensionEntity extends EntityAccess
      *
      * @ORM\Column(type="string", length=1)
      */
-    private $type = 'm';
+    private $type = self::TYPE_MODULE;
 
     /**
      * extension url
@@ -133,7 +133,7 @@ class ExtensionEntity extends EntityAccess
     /**
      * Constructor
      */
-    public function __construct(VendorEntity $vendor, $id, $name, $title, $type = 'm')
+    public function __construct(VendorEntity $vendor, $id, $name, $title, $type = self::TYPE_MODULE)
     {
         $this->vendor = $vendor;
         $this->repositoryId = $id;
@@ -282,7 +282,12 @@ class ExtensionEntity extends EntityAccess
      */
     public function getType()
     {
-        return $this->type;
+        $types = array(
+            self::TYPE_MODULE => 'Module',
+            self::TYPE_THEME => 'Theme',
+            self::TYPE_PLUGIN => 'Plugin',
+        );
+        return $types[$this->type];
     }
 
     /**
