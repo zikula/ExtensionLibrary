@@ -120,7 +120,7 @@ class ManifestManager {
             Util::log(sprintf("Unable to json_decode manifest content (%s). Be sure json is valid.", $error));
             throw new \InvalidArgumentException();
         }
-        Util:log("Content decoded!");
+        Util::log("Content decoded!");
     }
 
     /**
