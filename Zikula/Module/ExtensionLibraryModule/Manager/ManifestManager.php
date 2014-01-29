@@ -18,6 +18,18 @@ use Zikula\Module\ExtensionLibraryModule\Util;
 
 class ManifestManager {
     /**
+     * JSON DECODING ERROR CODE DEFINITIONS
+     * @var array
+     */
+    private $jsonErrorCodes = array(
+        JSON_ERROR_NONE	=> "No error has occurred",
+        JSON_ERROR_DEPTH => "The maximum stack depth has been exceeded",
+        JSON_ERROR_STATE_MISMATCH => "Invalid or malformed JSON",
+        JSON_ERROR_CTRL_CHAR => "Control character error, possibly incorrectly encoded",
+        JSON_ERROR_SYNTAX => "Syntax error",
+        JSON_ERROR_UTF8 => "Malformed UTF-8 characters, possibly incorrectly encoded",
+    );
+    /**
      * The module name
      * @var string
      */
@@ -74,11 +86,8 @@ class ManifestManager {
         Util::log('Rate limit remaining: ' . $rateLimitRemaining);
 
         $this->decodeContent();
-        Util::log('content decoded');
         $this->validate();
-        Util::log('content validated');
         $this->validateVersion($ref);
-        Util::log('version validated');
 
         // append download links
         $tags = $client->api('repo')->tags($owner, $repo);
@@ -105,10 +114,10 @@ class ManifestManager {
             Util::log("Unable to base64_decode manifest content. Be sure json is valid.");
             throw new \InvalidArgumentException();
         }
-        Util::log("jsonEncodedContent: " . $jsonEncodedContent);
         $this->content = json_decode($jsonEncodedContent); // return null on failure
         if (empty($this->content)) {
-            Util::log(sprintf("Unable to json_decode manifest content (%s). Be sure json is valid.", json_last_error_msg()));
+            $error = $this->jsonErrorCodes[json_last_error()];
+            Util::log(sprintf("Unable to json_decode manifest content (%s). Be sure json is valid.", $error));
             throw new \InvalidArgumentException();
         }
         Util:log("Content decoded!");
