@@ -6,6 +6,7 @@
     {foreach from=$extension.versions item="version" name="versionLoop"}
         <div class="panel panel-default">
             <div class="panel-heading">
+                <em class="pull-right">Released: {$version.created->format('j M Y')}</em>
                 <h4 class="panel-title">
                     <a data-toggle="collapse" data-parent="#accordion" href="#version-{$version.id}">
                         Version: {$version.semver|safetext}
@@ -15,7 +16,6 @@
             <div id="version-{$version.id}" class="panel-collapse collapse{if $smarty.foreach.versionLoop.first} in{/if}">
                 <div class="panel-body">
                     <ul>
-                        <li>Date: {$version.created->format('j M Y')}</li>
                         <li>Description: {$version.description|safetext}</li>
                     </ul>
                     {if isset($version.urls.download)}
