@@ -17,7 +17,7 @@ use SecurityUtil;
 use ModUtil;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
-
+use Zikula\Module\UsersModule\Constant as UsersConstant;
 
 /**
  * UI operations executable by general users.
@@ -38,6 +38,7 @@ class UserController extends \Zikula_AbstractController
         }
         $extensions = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:ExtensionEntity')->findAll();
         $this->view->assign('extensions', $extensions);
+        $this->view->assign('gravatarDefaultPath', $this->request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
 
         return $this->response($this->view->fetch('User/view.tpl'));
     }

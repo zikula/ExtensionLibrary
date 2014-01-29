@@ -1,7 +1,16 @@
 {foreach from=$extensions item="extension"}
     <h2>{$extension.vendor.title|safetext}</h2>
-    <h3>{$extension.title|safetext}</h3>
-    <h4>{gt text="Type"}: {$extension.type}</h4>
+    <div style="min-height: 80px;">
+        {if isset($extension.vendor.ownerEmail)}
+            <img src="http://www.gravatar.com/avatar/{$extension.vendor.ownerEmail|md5}?d=identicon" alt="" class="img-thumbnail pull-left">
+        {/if}
+        <ul class="list-unstyled" style="padding-left: 100px">
+            <li>{$extension.vendor.ownerName|default:''}</li>
+            <li>{$extension.vendor.ownerEmail|default:''}</li>
+            <li>{$extension.vendor.ownerUrl|default:''}</li>
+        </ul>
+    </div>
+    <h3>{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></h3>
     <div class="panel-group" id="accordion">
     {foreach from=$extension.versions item="version" name="versionLoop"}
         <div class="panel panel-default">
