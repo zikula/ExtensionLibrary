@@ -105,6 +105,7 @@ class ManifestManager {
             Util::log("Unable to base64_decode manifest content. Be sure json is valid.");
             throw new \InvalidArgumentException();
         }
+        Util::log("jsonEncodedContent: " . $jsonEncodedContent);
         $this->content = json_decode($jsonEncodedContent); // return null on failure
         if (empty($this->content)) {
             Util::log(sprintf("Unable to json_decode manifest content (%s). Be sure json is valid.", json_last_error_msg()));
