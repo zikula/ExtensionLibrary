@@ -74,8 +74,11 @@ class ManifestManager {
         Util::log('Rate limit remaining: ' . $rateLimitRemaining);
 
         $this->decodeContent();
+        Util::log('content decoded');
         $this->validate();
+        Util::log('content validated');
         $this->validateVersion($ref);
+        Util::log('version validated');
 
         // append download links
         $tags = $client->api('repo')->tags($owner, $repo);
