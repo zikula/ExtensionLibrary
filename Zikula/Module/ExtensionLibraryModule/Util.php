@@ -31,4 +31,13 @@ class Util {
         fclose($fd);
     }
 
+    public static function setChosenCore($version)
+    {
+        \CookieUtil::setCookie('zikulaextensionslibrarymodule_chosenCore', $version, time() + 60*60*24, '/');
+    }
+
+    public static function getChosenCore()
+    {
+        return \CookieUtil::getCookie('zikulaextensionslibrarymodule_chosenCore');
+    }
 } 

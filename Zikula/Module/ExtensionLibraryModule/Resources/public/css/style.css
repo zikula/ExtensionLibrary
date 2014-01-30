@@ -1,0 +1,10 @@
+.iconStack {
+    position: relative;
+}
+.iconStack .vendorIcon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+}

@@ -1,49 +1,29 @@
-{foreach from=$extensions item="extension"}
-    <h2>{$extension.vendor.title|safetext}</h2>
-    <div style="min-height: 80px;">
-        {if isset($extension.vendor.ownerEmail)}
-            <img src="http://www.gravatar.com/avatar/{$extension.vendor.ownerEmail|md5}?d=identicon" alt="" class="img-thumbnail pull-left">
+{include file='User/header.tpl'}
+<div class="row">
+    {foreach from=$extensions item="extension" name='loop'}
+        {if ($smarty.foreach.loop.iteration - 1) % 3 == 0 && $smarty.foreach.loop.iteration != 1}
+        </div>
+        <hr />
+        <div class="row">
         {/if}
-        <ul class="list-unstyled" style="padding-left: 100px">
-            <li>{$extension.vendor.ownerName|default:''}</li>
-            <li>{$extension.vendor.ownerEmail|default:''}</li>
-            <li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.ownerUrl|default:''}">{gt text="Vendor Website"}</a></li>
-        </ul>
-    </div>
-    <h3>{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></h3>
-    <div>
-        <ul class="list-unstyled">
-            <li><i class="fa fa-external-link"></i> <a href="{$extension.url|default:''}">{gt text="Extension Website"}</a></li>
-        </ul>
-    </div>
-    <div class="panel-group" id="accordion">
-    {foreach from=$extension.versions item="version" name="versionLoop"}
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <em class="pull-right">
-                    <span class="label label-info tooltips" title="{gt text='Zikula Core version compatibility'}">{$version.compatibility}</span>&nbsp;
-                    Released: {$version.created->format('j M Y')}
-                </em>
-                <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordion" href="#version-{$version.id}">
-                        <strong>Version: {$version.semver|safetext}</strong>
-                    </a>
-                </h4>
-            </div>
-            <div id="version-{$version.id}" class="panel-collapse collapse{if $smarty.foreach.versionLoop.first} in{/if}">
-                <div class="panel-body">
-                    <ul>
-                        <li>Description: {$version.description|safetext}</li>
+        <div class="col-sm-4">
+            <div class="media">
+                <a class="pull-left" href="{modurl modname='ZikulaExtensionLibraryModule' type='user' func='display' id=$extension->getId()}">
+                    <div class="iconStack">
+                        <img class="media-object img-thumbnail" src="{$extension->getIcon()}" alt="" width="90" height="90" />
+                        {if isset($extension.vendor.ownerEmail)}
+                            <img class="img-thumbnail vendorIcon" src="http://www.gravatar.com/avatar/{$extension.vendor.ownerEmail|md5}?d=identicon" alt="">
+                        {/if}
+                    </div>
+                </a>
+                <div class="media-body">
+                    <h4 class="media-heading"><a href="{modurl modname='ZikulaExtensionLibraryModule' type='user' func='display' id=$extension->getId()}">{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></a></h4>
+                    <ul class="list-unstyled">
+                        <li>{$extension.vendor.ownerName|default:''}</li>
+                        <li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.ownerUrl|default:''}">{gt text="Vendor Website"}</a></li>
                     </ul>
-                    {if isset($version.urls.download)}
-                        <a type="button" class="btn btn-success" href="{$version.urls.download}">Download</a>
-                    {else}
-                        <a type="button" class="btn btn-success" href="{$version.urls.zipball_url}">Download Zipball</a>
-                        <a type="button" class="btn btn-success" href="{$version.urls.tarball_url}">Download Tarball</a>
-                    {/if}
                 </div>
             </div>
         </div>
     {/foreach}
-    </div>
-{/foreach}
+</div>
