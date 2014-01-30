@@ -19,6 +19,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotatio
 use Zikula\Core\Response\PlainResponse;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Zikula\Module\ExtensionLibraryModule\Manager\ManifestManager;
+use Zikula\Module\ExtensionLibraryModule\Manager\ImageManager;
 
 /**
  * UI operations executable by general users.
@@ -93,6 +94,18 @@ class TestController extends \Zikula_AbstractController
         }
         echo "<pre>";
         var_dump($content);
+
+        return new PlainResponse();
+    }
+
+    /**
+     * @Route("/test/importimage")
+     */
+    public function importImage() {
+        $fileUrl = 'https://raw.github.com/zikula-modules/DizkusModule/master/Zikula/Module/DizkusModule/Resources/public/images/admin.png';
+
+        $imageManager = new ImageManager($fileUrl, 'extension', '123');
+        $imageManager->import();
 
         return new PlainResponse();
     }
