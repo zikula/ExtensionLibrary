@@ -4,7 +4,7 @@
 <div class="row">
 <div class="col-sm-2 text-center">
     <a class="btn btn-default" href="el/choose-your-core/no-filter">
-        {img src='zikula.png'}
+        {img src='logo32.png'}
         <strong>{gt text='All versions'}</strong>
     </a>
 </div>
@@ -14,7 +14,7 @@
     {foreach from=$coreVersions.supported item='versionData' key='version'}
         <div class="col-sm-2 text-center">
             <a class="btn btn-success" href="el/choose-your-core/{$version}">
-                {img src='zikula.png'}
+                {img src='logo32.png'}
                 <strong>{$version}</strong>
             </a>
         </div>
@@ -25,7 +25,7 @@
     {foreach from=$coreVersions.outdated item='versionData' key='version'}
     <div class="col-sm-2 text-center">
         <a class="btn btn-info" href="el/choose-your-core/{$version}">
-            {img src='zikula.png'}
+            {img src='logo32.png'}
             <strong>{$version}</strong>
         </a>
     </div>
@@ -36,7 +36,7 @@
     {foreach from=$coreVersions.dev item='versionData' key='version'}
     <div class="col-sm-2 text-center">
         <a class="btn btn-default" href="el/choose-your-core/{$version}">
-            {img src='zikula.png'}
+            {img src='logo32.png'}
             <strong class="text-muted">{$version}</strong>
         </a>
     </div>
