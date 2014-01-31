@@ -23,6 +23,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter; // used in 
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Zikula\Module\UsersModule\Constant as UsersConstant;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use System;
 
 /**
  * UI operations executable by general users.
@@ -32,7 +34,7 @@ class UserController extends \Zikula_AbstractController
     private function checkChosenCore()
     {
         if (!Util::getChosenCore()) {
-            $this->redirect(ModUtil::url('ZikulaExtensionLibraryModule', 'user', 'chooseCore'));
+            return new RedirectResponse(System::normalizeUrl(ModUtil::url('ZikulaExtensionLibraryModule', 'user', 'chooseCore')));
         }
     }
 
@@ -105,10 +107,26 @@ class UserController extends \Zikula_AbstractController
                 throw new NotFoundHttpException();
             }
             Util::setChosenCore($version);
-            $this->redirect(ModUtil::url('ZikulaExtensionLibraryModule', 'user', 'index'));
+            return new RedirectResponse(System::normalizeUrl(ModUtil::url('ZikulaExtensionLibraryModule', 'user', 'index')));
         }
 
         $this->view->assign('coreVersions', array_reverse($coreVersions, true));
+
         return $this->response($this->view->fetch('User/chooseCore.tpl'));
+    }
+
+    /**
+     * @Route("/log")
+     *
+     * Display the log file
+     *
+     * @return Response
+     */
+    public function displayLog()
+    {
+        $logfile = file_get_contents("app/logs/el.log");
+        $this->view->assign('log', nl2br($logfile));
+
+        return $this->response($this->view->fetch('User/log.tpl'));
     }
 }
