@@ -3,7 +3,7 @@
 <div style="min-height: 140px;">
     <div class="well well-sm pull-right">
         <h3 style="margin-top: 0">{$extension.vendor.title|safetext}</h3>
-        <div style="min-height: 80px;">
+        <div>
             {if isset($extension.vendor.ownerEmail)}
                 <img src="http://www.gravatar.com/avatar/{$extension.vendor.ownerEmail|md5}?d=identicon" alt="" class="img-thumbnail pull-left">
             {/if}
