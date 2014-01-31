@@ -1,8 +1,3 @@
-{if !isset($icon)}
-    <img src="{modgetimage}" alt="" class="pull-left" />
-{else}
-    <img src="{$icon}" alt="" class="pull-left" />
-{/if}
 {elGetChosenCore assign='coreVersion'}
 {if !empty($coreVersion)}
     <p class="pull-right">
@@ -14,5 +9,5 @@
         - <a href="{modurl modname='ZikulaExtensionLibraryModule' type='user' func='chooseCore'}">{gt text='Change'}</a>
     </p>
 {/if}
-<h1><i>{modgetinfo info='displayname'}</i>{if isset($title)} &ndash; {$title}{/if}</h1>
+<h1><img src="{modgetimage}" alt="" style="vertical-align: bottom; padding-right:.5em;" /><i>{modgetinfo info='displayname'}</i></h1>
 <hr />

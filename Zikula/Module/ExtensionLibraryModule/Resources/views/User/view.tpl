@@ -17,7 +17,8 @@
                     </div>
                 </a>
                 <div class="media-body">
-                    <h4 class="media-heading"><a href="{modurl modname='ZikulaExtensionLibraryModule' type='user' func='display' id=$extension->getId()}">{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></a></h4>
+                    <h4 class="media-heading"><a href="{modurl modname='ZikulaExtensionLibraryModule' type='user' func='display' id=$extension->getId()}">{$extension.title|safetext}</a></h4>
+                    <em class="text-muted">{$extension.type}</em>
                     <ul class="list-unstyled">
                         <li>{$extension.vendor.ownerName|default:''}</li>
                         <li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.ownerUrl|default:''}">{gt text="Vendor Website"}</a></li>
