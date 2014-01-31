@@ -22,7 +22,7 @@
         </ul>
     </div>
 </div>
-<div class="clear"></div>
+<div class="clearfix"></div>
 <br />
 
 <div class="panel-group" id="accordion">
