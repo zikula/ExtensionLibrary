@@ -3,7 +3,7 @@
 {else}
     <img src="{$icon}" alt="" class="pull-left" />
 {/if}
-{zikulaextensionlibrarymodulecorefilter assign='coreVersion'}
+{elGetChosenCore assign='coreVersion'}
 {if !empty($coreVersion)}
     <p class="pull-right">
         {if $coreVersion !== 'no-filter'}
