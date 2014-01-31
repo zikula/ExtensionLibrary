@@ -25,6 +25,7 @@ use Zikula\Module\ExtensionLibraryModule\Util;
 use Zikula\Module\UsersModule\Constant as UsersConstant;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use System;
+use StringUtil;
 
 /**
  * UI operations executable by general users.
@@ -128,5 +129,27 @@ class UserController extends \Zikula_AbstractController
         $this->view->assign('log', nl2br($logfile));
 
         return $this->response($this->view->fetch('User/log.tpl'));
+    }
+
+    /**
+     * @Route("/doc/{file}", requirements={"file" = "manifest|sample|instructions"})
+     */
+    public function displayDocFile($file = 'instructions')
+    {
+        $module = ModUtil::getModule($this->name);
+        $docs = array(
+            'manifest' => '/docs/manifest.md',
+            'sample' => '/docs/zikula.manifest.json',
+            'instructions' => '/docs/instructions.md',
+        );
+        $docfile = file_get_contents($module->getPath() . $docs[$file]);
+        if ($file != 'sample') {
+            $docfile = StringUtil::getMarkdownExtraParser()->transform($docfile);
+        } else {
+            $docfile = nl2br(htmlentities($docfile));
+        }
+        $this->view->assign('docfile', $docfile);
+
+        return $this->response($this->view->fetch('User/doc.tpl'));
     }
 }

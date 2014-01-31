@@ -4,14 +4,14 @@ Publishing your Extension
 
 Add a Post-Receive Hook
 ------------------------
-First, you'll need to create a post-receive hook on GitHub. Just follow the (step-by-step guide for adding a webhook)[https://help.github.com/articles/post-receive-hooks]
-and set the URL to http://ntq.zikula.org/el/postreceive-hook.
+First, you'll need to create a post-receive hook on GitHub. Just follow the [step-by-step guide for adding a webhook](https://help.github.com/articles/post-receive-hooks)
+and set the URL to `http://ntq.zikula.org/el/postreceive-hook`.
 
 Add a Manifest to your Repository
 ---------------------------------
 The Zikula Extensions Library will look in the root level of your repository for a file named `zikula.manifest.json`.
-You will need to create the file according to the (manifest specification)[manifest.md]. Use an online JSON verifier
-such as (JSONlint)[http://jsonlint.com/] to make sure the file is valid. You are now ready to publish your extension!
+You will need to create the file according to the [manifest specification](el/doc/manifest). Use an online JSON verifier
+such as [JSONlint](http://jsonlint.com/) to make sure the file is valid. You are now ready to publish your extension!
 
 Publishing a Version
 --------------------
@@ -24,7 +24,7 @@ $ git tag 0.1.0
 $ git push origin --tags
 ```
 
-The name of the tag must be a valid (semver)[http://semver.org/] value, but may contain an optional `v` prefix. The tag
+The name of the tag must be a valid [semver](http://semver.org/) value, but may contain an optional `v` prefix. The tag
 name must also match the version listed in the manifest file. So, if the version field in the manifest is "0.1.1" the
 tag should be either "0.1.1" or "v0.1.1". If the manifest file is valid, the version will be automatically added to the
 extensions site.

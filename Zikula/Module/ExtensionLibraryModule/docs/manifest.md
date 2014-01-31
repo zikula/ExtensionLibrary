@@ -33,8 +33,7 @@ Fields
      - dependencies
 
 
-Vendor
-======
+# Vendor
 
 title
 -----
