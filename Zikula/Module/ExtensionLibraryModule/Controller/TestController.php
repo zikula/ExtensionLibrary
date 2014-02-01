@@ -43,6 +43,8 @@ class TestController extends \Zikula_AbstractController
     }
 
     /**
+     * test postreceive-hook
+     *
      * @Route("/test/hook/{type}", requirements={"type" = "0|10|11"})
      */
     public function postReceiveHookAction($type = 0)
@@ -82,6 +84,8 @@ class TestController extends \Zikula_AbstractController
     }
 
     /**
+     * test get manifest
+     *
      * @Route("/test/getmanifest")
      */
     public function getManifestAction($owner = 'craigh', $repo = 'Nutin', $refs = 'refs/tags/0.0.9')
@@ -99,15 +103,26 @@ class TestController extends \Zikula_AbstractController
     }
 
     /**
-     * @Route("/test/importimage")
+     * Test if image importing works
+     *
+     * @Route("/test/importimage/{type}", requirements={"type" = "valid|invalidUrl|extension|fake|size"})
      */
-    public function importImage() {
-        $fileUrl = 'https://raw.github.com/zikula-modules/DizkusModule/master/Zikula/Module/DizkusModule/Resources/public/images/admin.png';
+    public function importImage($type = 'valid') {
+        $fileUrl = array();
+        $fileUrl['valid'] = 'https://raw.github.com/zikula-modules/DizkusModule/master/Zikula/Module/DizkusModule/Resources/public/images/admin.png';
+        $fileUrl['invalidUrl'] = 'https://raw.github.com/zikula-xxxxxxx/DizkusModule/master/Zikula/Module/DizkusModule/Resources/public/images/admin.png';
+        $fileUrl['extension'] = 'https://raw2.github.com/zikula-modules/DizkusModule/master/README.md';
+        $fileUrl['fake'] = 'https://raw2.github.com/craigh/Nutin/master/file1.png'; // file actually a txt file
+        $fileUrl['size'] = 'https://raw2.github.com/zikula/core/1.3/src/themes/Zikula/Theme/Andreas08Theme/Resources/public/images/preview_large.png';
 
-        $imageManager = new ImageManager($fileUrl, 'extension', '123');
-        $imageManager->import();
+        $imageManager = new ImageManager($fileUrl[$type]);
+        if ($imageManager->import()) {
+            $this->view->assign('src', "el/getimage/" . $imageManager->getName());
+        } else {
+            $this->view->assign('src', "el/getimage");
+        }
 
-        return new PlainResponse();
+        return $this->response($this->view->fetch('Test/image.tpl'));
     }
 
 }

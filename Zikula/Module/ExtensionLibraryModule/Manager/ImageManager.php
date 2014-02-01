@@ -14,16 +14,28 @@
 namespace Zikula\Module\ExtensionLibraryModule\Manager;
 
 use Zikula\Module\ExtensionLibraryModule\Util;
+use ModUtil;
 
+/**
+ * Class ImageManager
+ *
+ * This class will take a url for an image and attempt to validate that as an actual image in three ways:
+ *     1. confirm the extension is .gif, .jpg, .jpeg or .png
+ *     2. use exif_imagetype() to check the headers of the file
+ *     3. check the size of the image (limits set in class)
+ * The class copies the file to a local private directory as defined in a class constant
+ * Images can then be retrieved using the class get() method
+ *
+ * security suggestions taken from http://blog.nic0.me/post/579191344/some-common-php-security-pitfalls
+ *     and http://security.stackexchange.com/a/237
+ */
 class ImageManager {
+
     /**
-     * @var array map IMAGETYPE_* constant to suffix
+     * the private directory all module images are stored in
+     * include trailing slash
      */
-    private $imageTypeMap = array(
-        IMAGETYPE_GIF => '.gif',
-        IMAGETYPE_JPEG => '.jpg',
-        IMAGETYPE_PNG => '.png',
-    );
+    const STORAGE_PATH = "../extensionlibrary/images/";
 
     /**
      * the url of the image's initial location
@@ -32,51 +44,136 @@ class ImageManager {
     private $url;
 
     /**
-     * the local path/filename without suffix
+     * the local image filename
      * @var string
      */
-    private $destination;
+    private $name = null;
+
+    /**
+     * maximum size of image
+     * @var array
+     */
+    private $maxSize = array('height' => 120, 'width' => 120);
 
     /**
      * @param string $url location of the file
-     * @param string $type 'extension'|'vendor'
-     * @param integer $id extension or vendor id
      */
-    public function __construct($url, $type, $id)
+    public function __construct($url)
     {
-        $this->url = $url;
-        $this->destination = "userdata/el/images/{$type}-{$id}"; // temp name without suffix
+        if ($this->checkStorageDir()) {
+            $this->url = $url;
+            if ($this->validateExtension($url)) {
+                $this->name = uniqid();
+            } else {
+                Util::log("could not validate image extension.");
+            }
+        }
     }
 
     /**
-     * copy and image from a url to a local directory
+     * copy image from the url to local STORAGE_PATH
+     *
+     * @return boolean
      */
     public function import()
     {
+        if (!isset($this->name)) {
+            Util::log("image name is not set. Aborting import.");
+            return false;
+        }
         // move the file to local directory
-        // @todo IS THIS A SECURITY CONCERN? is there anyway to check the incoming file before copying?
-        // The file is immediately deleted if the filetype doesn't match
-        // but apparenlty it is possible to insert executable code inside a gif?
-        // if so, then need a safe way to handle this.
-        // maybe only let verified vendors upload their own images?
-        $r = copy($this->url, $this->destination);
+        $r = @copy($this->url, self::STORAGE_PATH . $this->name);
         if ($r) {
             Util::log("file successfully copied to local directory.");
-        }
-        // discover filetype
-        $type = exif_imagetype($this->destination);
-        if (in_array($type, array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
-            $suffix = $this->imageTypeMap[$type];
-            // add filetype suffix
-            $r = rename($this->destination, $this->destination.$suffix);
-            if ($r) {
-                Util::log("file successfully renamed.");
-            }
         } else {
-            // filetype unsupported, delete the file
-            unlink($this->destination);
+            Util::log("could not find file from url.");
+            return false;
         }
-        Util::log("file transfer complete.");
+        // confirm image type
+        $type = exif_imagetype(self::STORAGE_PATH . $this->name);
+        if (!in_array($type, array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
+            $this->removeFile("improper imagetype upload attempted. file removed.");
+            return false;
+        } else {
+            Util::log("valid imagetype.");
+        }
+
+        // confirm image size
+        $imagesize = getimagesize(self::STORAGE_PATH . $this->name);
+        if (!is_array($imagesize)) {
+            $this->removeFile("unable to get image size. file removed.");
+            return false;
+        } else {
+            if ($imagesize[0] > $this->maxSize['width'] || $imagesize[1] > $this->maxSize['height']) {
+                $this->removeFile("image size exceeds allowed limits. file removed.");
+                return false;
+            } else {
+                Util::log("valid image size");
+            }
+        }
+
+        return true;
     }
 
+    /**
+     * get the images new filename (without path)
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * remove the file
+     *
+     * @param string $logtext
+     */
+    private function removeFile($logtext)
+    {
+        unlink(self::STORAGE_PATH . $this->name);
+        unset($this->name);
+        Util::log($logtext);
+    }
+
+    /**
+     * confirm storage directory is available or create
+     *
+     * @return bool
+     */
+    private function checkStorageDir()
+    {
+        if ($dh = @opendir(self::STORAGE_PATH)) {
+            closedir($dh);
+            return true;
+        } else {
+            Util::log("unable to find storage directory! You must manually create the directory.");
+            return false;
+        }
+    }
+
+    /**
+     * determine if the url has an acceptable extension on the filename
+     *
+     * @param string $url
+     * @return bool
+     */
+    private function validateExtension($url)
+    {
+        $parts = explode('/', $url);
+        $filename = array_pop($parts);
+
+        // Valid file extensions.
+        $validExtensions = array('.jpg', '.jpeg', '.png', '.gif');
+
+        // Get current file extension
+        $extension = (strpos($filename, '.') !== false) ? strrchr($filename, '.') : '';
+
+        if (in_array(strtolower($extension), $validExtensions, true)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

@@ -26,6 +26,8 @@ use Zikula\Module\UsersModule\Constant as UsersConstant;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use System;
 use StringUtil;
+use Zikula\Module\ExtensionLibraryModule\Manager\ImageManager;
+use Zikula\Core\Response\PlainResponse;
 
 /**
  * UI operations executable by general users.
@@ -159,5 +161,36 @@ class UserController extends \Zikula_AbstractController
                 ->assign('json', $json);
 
         return $this->response($this->view->fetch('User/doc.tpl'));
+    }
+
+    /**
+     * @Route("/getimage/{name}")
+     *
+     * retrieve an image
+     *
+     * @param $name
+     */
+    public function getImage($name = null)
+    {
+        if (isset($name) && !strpos($name, '/')) {
+            $path = ImageManager::STORAGE_PATH . $name;
+        } else {
+            // get a default image
+            $module = ModUtil::getModule('ZikulaExtensionLibraryModule');
+            // @todo - getRelativePath() is deprecated
+            $path = $module->getRelativePath() . '/Resources/public/images/zikula.png';
+        }
+        if ($type = @exif_imagetype($path)) {
+            header('Content-Type: ' . image_type_to_mime_type($type));
+            header('Content-Length: ' . filesize($path));
+            readfile($path);
+            exit;
+        } else {
+            // return default image instead
+            Util::log("could not retrieve image ($name)");
+            $this->getImage();
+        }
+        return new PlainResponse();
+
     }
 }
