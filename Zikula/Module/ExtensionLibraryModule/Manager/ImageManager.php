@@ -14,7 +14,6 @@
 namespace Zikula\Module\ExtensionLibraryModule\Manager;
 
 use Zikula\Module\ExtensionLibraryModule\Util;
-use ModUtil;
 
 /**
  * Class ImageManager
