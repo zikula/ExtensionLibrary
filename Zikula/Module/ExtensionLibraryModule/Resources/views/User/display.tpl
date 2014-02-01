@@ -4,9 +4,13 @@
     <div class="well well-sm pull-right">
         <h3 style="margin-top: 0">{$extension.vendor.title|safetext}</h3>
         <div>
-            {if isset($extension.vendor.ownerEmail)}
-                <img src="http://www.gravatar.com/avatar/{$extension.vendor.ownerEmail|md5}?d=identicon" alt="" class="img-thumbnail pull-left">
-            {/if}
+            <div class="iconStack pull-left">
+                <img class="media-object img-thumbnail" src="{$extension.vendor.logo}" alt="" width="90" height="90" />
+                {if isset($extension.vendor.ownerEmail)}
+                    <img src="http://www.gravatar.com/avatar/{$extension.vendor.ownerEmail|md5}?d=identicon" alt="" class="img-thumbnail vendorIcon">
+                {/if}
+            </div>
+
             <ul class="list-unstyled" style="padding-left: 100px">
                 <li>{$extension.vendor.ownerName|default:''}</li>
                 <li>{$extension.vendor.ownerEmail|default:''}</li>
@@ -15,6 +19,7 @@
         </div>
     </div>
     <div>
+        <img class="media-object img-thumbnail pull-left" style='margin: 0 1em 1em 0' src="{$extension.icon}" alt="" width="90" height="90" />
         <h3>{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></h3>
         <ul class="list-unstyled">
             <li><i class="fa fa-external-link"></i> <a href="{$extension.url|default:''}">{gt text="Extension Website"}</a></li>

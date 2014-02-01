@@ -21,6 +21,7 @@ use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Zikula\Module\ExtensionLibraryModule\Manager\ManifestManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\PayloadManager;
+use Zikula\Module\ExtensionLibraryModule\Manager\ImageManager;
 
 /**
  * UI operations executable by general users.
@@ -65,6 +66,8 @@ class PostController extends \Zikula_AbstractController
             // found
             Util::log(sprintf('Vendor (%s) found', $jsonPayload->repository->owner->name));
         }
+        $imageManager = new ImageManager($manifestContent->vendor->logo);
+        $manifestContent->vendor->logo = ($imageManager->import()) ? $imageManager->getName() : '';
         $vendor->mergeManifest($manifestContent);
 
         // check extension exists, if not create new extension
@@ -78,6 +81,8 @@ class PostController extends \Zikula_AbstractController
             $this->entityManager->persist($extension);
             Util::log(sprintf('Extension (%s) created', $jsonPayload->repository->id));
         }
+        $imageManager = new ImageManager($manifestContent->extension->icon);
+        $manifestContent->extension->icon = ($imageManager->import()) ? $imageManager->getName() : '';
         $extension->mergeManifest($manifestContent);
 
         // compare version to newest available. If newer, add new version

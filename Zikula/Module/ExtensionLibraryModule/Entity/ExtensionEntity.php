@@ -320,9 +320,9 @@ class ExtensionEntity extends EntityAccess
     public function getIcon()
     {
         if (empty($this->icon)) {
-            return 'modules/Zikula/Module/ExtensionLibraryModule/Resources/public/images/zikula.png';
+            return "el/getimage";
         }
-        return $this->icon;
+        return "el/getimage/" . $this->icon;
     }
 
     /**
