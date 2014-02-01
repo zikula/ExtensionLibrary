@@ -22,7 +22,7 @@ the tag is pushed. Other values MAY optionally be set in the manifest. The `titl
 related extensions, but will default to the repository `owner` if left empty.
 
 The vendor can later be "claimed" by one or more Core User(s) and then managed (somewhat) by those users. Claims are
-processed by moderators to ensure accuracy.
+processed by moderators to ensure authenticity.
 
 Vendors can be *verified*, *unverified* (default), or *denied*. Ultimately, this information will be used to filter
 the user display, probably only displaying verified vendors (at least as a default). Denied vendors would be hidden
@@ -77,3 +77,11 @@ Translations
 Currently there is no mechanism for handling automatic inclusion of translation files on a per-extension basis.
 This will be left to the individual extension owners to allow contributions to their repositories including the
 translation.
+
+
+Images
+------
+Vendor logos and Extension icons are included in the manifest as a URL. When the tag is pushed, the url is processed
+and an attempt is made to transfer that image from the URL to our server. The image is thereafter served from the
+Zikula domain. Several layers of security are active to prevent malicious code from being unwittingly uploaded via this
+process. Only `.jpg`, `.jpeg`, `.gif` and `.png` images are allowed. All images are served from a protected directory.
