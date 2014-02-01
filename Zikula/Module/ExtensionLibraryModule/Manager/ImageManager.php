@@ -82,7 +82,7 @@ class ImageManager {
             return false;
         }
         // move the file to local directory
-        $r = @copy($this->url, self::STORAGE_PATH . $this->name);
+        $r = copy($this->url, self::STORAGE_PATH . $this->name);
         if ($r) {
             Util::log("file successfully copied to local directory.");
         } else {
@@ -145,6 +145,7 @@ class ImageManager {
     private function checkStorageDir()
     {
         if ($dh = @opendir(self::STORAGE_PATH)) {
+            // errors suppressed: only need true/false (without triggering E_WARNING)
             closedir($dh);
             return true;
         } else {

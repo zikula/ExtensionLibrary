@@ -181,6 +181,7 @@ class UserController extends \Zikula_AbstractController
             $path = $module->getRelativePath() . '/Resources/public/images/zikula.png';
         }
         if ($type = @exif_imagetype($path)) {
+            // errors suppressed: only need true/false (without triggering E_NOTICE)
             header('Content-Type: ' . image_type_to_mime_type($type));
             header('Content-Length: ' . filesize($path));
             readfile($path);
