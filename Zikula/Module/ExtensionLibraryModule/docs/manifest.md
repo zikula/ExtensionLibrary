@@ -4,7 +4,7 @@ Zikula Extension Manifest Specification
 
 This document is all you need to know about what's required in your `zikula.manifest.json` file(s).
 
-See the sample zikula.manifest.json file in `/docs`
+[View the sample](el/doc/sample) `zikula.manifest.json` file
 
 Manifest files must live in the root of your repository and exist in your tags. The files must be actual JSON, not just
 a JavaScript object literal.
@@ -12,119 +12,120 @@ a JavaScript object literal.
 Fields
 ------
 
- - vendor
-     - title
-     - url
-     - logo
-     - owner
- - extension
-     - title (required)
-     - type (required)
-     - url
-     - icon
- - version
-     - semver (required)
-     - compatibility (required)
-     - licenses (required)
-     - description
-     - keywords
-     - urls
-     - contributors
-     - dependencies
+ - [vendor](#vendor)
+     - [title](#vendor-title)
+     - [url](#vendor-url)
+     - [logo](#vendor-logo)
+     - [owner](#vendor-owner)
+ - [extension](#extension)
+     - [title](#extension-title) (required)
+     - [type](#extension-type) (required)
+     - [url](#extension-url)
+     - [icon](#extension-icon)
+ - [version](#version)
+     - [semver](#version-semver) (required)
+     - [compatibility](#version-compatibility) (required)
+     - [licenses](#version-licenses) (required)
+     - [description](#version-description)
+     - [keywords](#version-keywords)
+     - [urls](#version-urls)
+     - [contributors](#version-contributors)
+     - [dependencies](#version-dependencies)
 
 
-# Vendor
+<a name="vendor"></a>Vendor
+=======
 
-title
+<a name="vendor-title"></a>title
 -----
 
 The display title of your vendor. This will be used for the page title and top-level heading on your vendor's page.
 Include spaces and mixed case as desired.
 
-url
+<a name="vendor-url"></a>url
 ---
 
 The url to the homepage for your self, group or company. A Github page is suitable or any other page as you desire.
 
-logo
+<a name="vendor-logo"></a>logo
 ----
 
 The url to your vendor logo (not extension logo/icon). The image will be copied to our servers.
 
-owner
+<a name="vendor-owner"></a>owner
 -----
 
-One person. See People Fields.
+One person. See [People Fields](#people-fields).
 
 
-Extension
+<a name="extension"></a>Extension
 =========
 
-title (required)
+<a name="extension-title"></a>title (required)
 ----------------
 
 The display title of your extension. This will be used for the page title and top-level heading on your
 extension's page. Include spaces and mixed case as desired.
 
-type (required)
+<a name="extension-type"></a>type (required)
 ---------------
 
 A single character only: "m", "t" or "p" for module, theme or plugin, respectively.
 
-url
+<a name="extension-url"></a>url
 ---
 
 The url to the site for the extension. A Github page is suitable or any other page as you desire.
 
-icon
+<a name="extension-icon"></a>icon
 ----
 
 The url to your extension icon (not vendor logo). The image will be copied to our servers.
 
 
-Version
+<a name="version"></a>Version
 =======
 
-semver (required)
+<a name="version-semver"></a>semver (required)
 -----------------
 
-A valid version string as defined by SemVer 2.0.0 (http://semver.org). Changes to the extension should come along with
-changes to the version. See Specifying Versions.
+A valid version string as defined by [SemVer 2.0.0](http://semver.org). Changes to the extension should come along with
+changes to the version. See [Specifying Versions](#versions).
 
-compatibility (required)
+<a name="version-compatibility"></a>compatibility (required)
 ------------------------
 
-A string defining Zikula Core version compatibility. See Specifying Versions.
+A string defining Zikula Core version compatibility. See [Specifying Versions](#versions).
 
-licenses (required)
+<a name="version-licenses"></a>licenses (required)
 -------------------
 
 Array of licenses under which the extension is provided. Each license is a hash with a url property linking to the actual 
 text and a "type" property specifying the type of license. You must use the standardized identifier acronym for the
-license as defined (here)[http://spdx.org/licenses/]
+license as defined by [Software Package Data Exchange](http://spdx.org/licenses/)
 
-```json
+<pre>
 "licenses": [
     {
         "type": "GPLv2",
         "url": "http://www.example.com/licenses/gpl.html"
     }
 ]
-```
+</pre>
 
-description
+<a name="version-description"></a>description
 -----------
 
 Put a description in it. It's a string. This helps people discover your extension, as it's listed in the
 Zikula Extensions Library site.
 
-keywords
+<a name="version-keywords"></a>keywords
 --------
 
 Put keywords in it. It's an array of strings. This helps people discover your extension as it's listed on the
 Zikula Extensions Library site. Keywords may only contain letters, numbers, hyphens, and dots.
 
-urls
+<a name="version-urls"></a>urls
 ----
 
  - version
@@ -139,17 +140,17 @@ urls
  - issues
      - The url to the issue tracker for the version.
 
-contributors
+<a name="version-contributors"></a>contributors
 ------------
 
-An array of people. See People Fields.
+An array of people. See [People Fields](#people-fields).
 
-dependencies
+<a name="version-dependencies"></a>dependencies
 ------------
 
 Dependencies are specified with a simple hash of name, type and version. The name should be the repository name and not
 the title. The type must be as defined in extension type above. Version uses the same definition as core compatibility.
-See Specifying Versions.
+See [Specifying Versions](#versions).
 
 If a extension that you depend on uses other extensions as dependencies that your extension uses as well, we recommend
 you list those also. In the event that the depended on extension alters its dependencies, your extension's dependency
@@ -159,19 +160,19 @@ tree won't be affected.
 Additional Details
 ==================
 
-People Fields
+<a name="people-fields"></a>People Fields
 -------------
 A "person" is an object with a "name" field and optional "url" and "email", like this:
 
-```json
+<pre>
 {
     "name" : "Susan Miller",
     "email" : "smiller@acme.com",
     "url" : "http://www.acme.com/smiller"
 }
-```
+</pre>
 
-Specifying Versions
+<a name="versions"></a>Specifying Versions
 -------------------
 
 Version range descriptors may be any of the following styles, where "version" is a semver compatible version identifier.
@@ -182,14 +183,14 @@ Version range descriptors may be any of the following styles, where "version" is
  - `>=version` etc
  - `<version`
  - `<=version`
- - `~version` See 'Tilde Version Ranges' below
- - `1.2.x` See 'X Version Ranges' below
+ - `~version` See '[Tilde Version Ranges](#tilde)' below
+ - `1.2.x` See '[X Version Ranges](#x-version)' below
  - `*` Matches any version
  - `version1 - version2` Same as `>=version1 <=version2`
  - `range1 || range2` Passes if either range1 or range2 are satisfied.
  
 For example, these are all valid:
-```json
+<pre>
 { "dependencies" :
     {
         "foo" : "1.0.0 - 2.9999.9999",
@@ -204,9 +205,9 @@ For example, these are all valid:
             "thr" : "3.3.x"
     }
 }
-```
+</pre>
 
-Tilde Version Ranges
+<a name="tilde"></a>Tilde Version Ranges
 --------------------
 
 A range specifier starting with a tilde ~ character is matched against a version in the following fashion.
@@ -219,7 +220,7 @@ For example, the following are equivalent:
  - `"~1.2" = ">=1.2.0 <1.3.0"`
  - `"~1" = ">=1.0.0 <2.0.0"`
 
-X Version Ranges
+<a name="x-version"></a>X Version Ranges
 ----------------
 
 An "x" in a version range specifies that the version number must start with the supplied digits, but any digit may be 
