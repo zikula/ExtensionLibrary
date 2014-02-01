@@ -133,6 +133,10 @@ class UserController extends \Zikula_AbstractController
 
     /**
      * @Route("/doc/{file}", requirements={"file" = "manifest|sample|instructions"})
+     *
+     * Display a requested doc file
+     *
+     * @return Response
      */
     public function displayDocFile($file = 'instructions')
     {
@@ -143,12 +147,14 @@ class UserController extends \Zikula_AbstractController
             'instructions' => '/docs/instructions.md',
         );
         $docfile = file_get_contents($module->getPath() . $docs[$file]);
+        $json = false;
         if ($file != 'sample') {
             $docfile = StringUtil::getMarkdownExtraParser()->transform($docfile);
         } else {
-            $docfile = nl2br(htmlentities($docfile));
+            $json = true;
         }
-        $this->view->assign('docfile', $docfile);
+        $this->view->assign('docfile', $docfile)
+                ->assign('json', $json);
 
         return $this->response($this->view->fetch('User/doc.tpl'));
     }
