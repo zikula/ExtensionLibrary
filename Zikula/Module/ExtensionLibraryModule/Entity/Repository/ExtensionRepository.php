@@ -15,21 +15,38 @@ namespace Zikula\Module\ExtensionLibraryModule\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
+use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
 use Zikula\Module\ExtensionLibraryModule\Util;
+use vierbergenlars\SemVer\version;
+use vierbergenlars\SemVer\expression;
 
 /**
  * Extension repository class.
  */
 class ExtensionRepository extends EntityRepository
 {
-    public function findAllMatchingCoreFilter($version = null)
+    public function findAllMatchingCoreFilter($filter = null)
     {
-        if (!isset($version)) {
-            $version = Util::getChosenCore();
+        if (!isset($filter)) {
+            $filter = Util::getChosenCore();
         }
-        if ($version === 'no-filter' || $version === false || 1) {
-            // @todo Filter extensions not matching the currently selected filter.
+        if ($filter === 'all') {
             return $this->findAll();
         }
+
+        $userSelectedCoreVersion = new version($filter);
+
+        /** @var ExtensionEntity[] $extensions */
+        $extensions = $this->findAll();
+        foreach ($extensions as $key => $extension) {
+            if ($extension->getVersions()->filter(function (ExtensionVersionEntity $version) use ($userSelectedCoreVersion) {
+                $requiredCoreVersion = new expression($version->getCompatibility());
+                return $requiredCoreVersion->satisfiedBy($userSelectedCoreVersion);
+            })->isEmpty()) {
+                unset($extensions[$key]);
+            }
+        }
+
+        return $extensions;
     }
 }

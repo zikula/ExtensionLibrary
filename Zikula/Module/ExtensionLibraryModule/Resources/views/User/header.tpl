@@ -1,7 +1,7 @@
 {elGetChosenCore assign='coreVersion'}
 {if !empty($coreVersion)}
     <p class="pull-right">
-        {if $coreVersion !== 'no-filter'}
+        {if $coreVersion !== 'all'}
             {gt text='Only showing extensions compatible with'}&nbsp;<span class="label label-info">Zikula Core {$coreVersion}</span>
         {else}
             {gt text='Showing all extensions'}

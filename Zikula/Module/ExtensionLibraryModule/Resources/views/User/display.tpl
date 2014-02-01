@@ -26,12 +26,13 @@
 <br />
 
 <div class="panel-group" id="accordion">
+{assign var='firstMatchingVersion' value=true}
 {foreach from=$extension.versions item="version" name="versionLoop"}
-    <div class="panel panel-default">
+    <div class="panel {if $version->matchesCoreChosen()}{if $firstMatchingVersion}panel-primary{else}panel-default{/if}{else}panel-warning{/if}">
         <div class="panel-heading">
             <em class="pull-right">
-                <span class="label label-info tooltips" title="{gt text='Zikula Core version compatibility'}">{$version.compatibility}</span>&nbsp;
-                Released: {$version.created->format('j M Y')}
+                <span class="label {if $version->matchesCoreChosen()}label-info{else}label-danger{/if} tooltips" title="{gt text='Zikula Core version compatibility'}">{$version.compatibility}</span>&nbsp;
+                {gt text='Released: %s' tag1=$version.created->format('j M Y')}
             </em>
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#accordion" href="#version-{$version.id}">
@@ -39,7 +40,7 @@
                 </a>
             </h4>
         </div>
-        <div id="version-{$version.id}" class="panel-collapse collapse{if $smarty.foreach.versionLoop.first} in{/if}">
+        <div id="version-{$version.id}" class="panel-collapse collapse{if $version->matchesCoreChosen() && $firstMatchingVersion} in{assign var='firstMatchingVersion' value=false}{/if}">
             <div class="panel-body">
                 <ul>
                     <li>Description: {$version.description|safetext}</li>
