@@ -320,6 +320,14 @@ class ExtensionVersionEntity extends EntityAccess
         $this->dependencies = !empty($manifest->version->dependencies) ? $manifest->version->dependencies : null;
     }
 
+    /**
+     * Checks if the current extension version is compatible with the specified core version.
+     * 
+     * @param string|null $coreVersion The core version to check compatability with, can be anything
+     * matching SemVer or 'all'. If null is given, the version will be set to the one selected by the user.
+     * 
+     * @return bool True if this extension version is compatible with the core version, false otherwise.
+     */
     public function matchesCoreChosen($coreVersion = null)
     {
         if (!isset($coreVersion)) {
