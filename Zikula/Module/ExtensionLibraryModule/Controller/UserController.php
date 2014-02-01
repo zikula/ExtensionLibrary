@@ -172,6 +172,10 @@ class UserController extends \Zikula_AbstractController
      */
     public function getImage($name = null)
     {
+        // only allow local request for images
+        if (!($this->request->server->get("REMOTE_ADDR", 0) == $this->request->server->get('SERVER_ADDR', 1))) {
+            throw new AccessDeniedException();
+        }
         if (isset($name) && !strpos($name, '/')) {
             $path = ImageManager::STORAGE_PATH . $name;
         } else {
