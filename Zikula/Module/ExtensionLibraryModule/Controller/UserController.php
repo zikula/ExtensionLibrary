@@ -60,6 +60,7 @@ class UserController extends \Zikula_AbstractController
         $extensions = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:ExtensionEntity')->findAllMatchingCoreFilter();
         $this->view->assign('extensions', $extensions);
         $this->view->assign('gravatarDefaultPath', $this->request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
+        $this->view->assign('breadcrumbs', array());
 
         return $this->response($this->view->fetch('User/view.tpl'));
     }
@@ -84,6 +85,16 @@ class UserController extends \Zikula_AbstractController
 
         $this->view->assign('extension', $extension);
         $this->view->assign('gravatarDefaultPath', $this->request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
+        $this->view->assign('breadcrumbs', array(
+            array(
+                'title' => $extension->getVendor()->getTitle(),
+                'route' => 'el/' . $extension->getVendor()->getTitleSlug(),
+            ),
+            array(
+                'title' => $extension->getName(),
+                'route' => 'el/display/' . $extension->getId(), // @todo change to $extension->getNameSlug
+            ),
+        ));
 
         return $this->response($this->view->fetch('User/display.tpl'));
     }
@@ -116,6 +127,7 @@ class UserController extends \Zikula_AbstractController
         }
 
         $this->view->assign('coreVersions', array_reverse($coreVersions, true));
+        $this->view->assign('breadcrumbs', array(array('title' => $this->__('Choose a Core Version'))));
 
         return $this->response($this->view->fetch('User/chooseCore.tpl'));
     }
@@ -131,6 +143,7 @@ class UserController extends \Zikula_AbstractController
     {
         $logfile = file_get_contents("app/logs/el.log");
         $this->view->assign('log', nl2br($logfile));
+        $this->view->assign('breadcrumbs', array(array('title' => $this->__('Log'))));
 
         return $this->response($this->view->fetch('User/log.tpl'));
     }
@@ -158,9 +171,36 @@ class UserController extends \Zikula_AbstractController
             $json = true;
         }
         $this->view->assign('docfile', $docfile)
-                ->assign('json', $json);
+                ->assign('json', $json)
+                ->assign('breadcrumbs', array(
+                    array(
+                        'title' => $this->__('Docs'),
+                        'route' => 'el/docs',
+                    ),
+                    array(
+                        'title' => $file,
+                        'route' => 'el/' . $file,
+                    ),
+            ));
 
         return $this->response($this->view->fetch('User/doc.tpl'));
+    }
+
+    /**
+     * @Route("/docs")
+     *
+     * Display an index of document files
+     *
+     * @return Response
+     */
+    public function displayDocindex()
+    {
+        $this->view->assign('breadcrumbs', array(
+                array(
+                    'title' => $this->__('Docs'),
+                ),
+            ));
+        return $this->response(($this->view->fetch('User/docs.tpl')));
     }
 
     /**
@@ -195,7 +235,5 @@ class UserController extends \Zikula_AbstractController
             Util::log("could not retrieve image ($name)");
             $this->getImage();
         }
-        return new PlainResponse();
-
     }
 }
