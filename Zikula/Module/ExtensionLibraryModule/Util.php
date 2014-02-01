@@ -38,6 +38,6 @@ class Util {
 
     public static function getChosenCore()
     {
-        return \CookieUtil::getCookie('zikulaextensionslibrarymodule_chosenCore');
+        return \CookieUtil::getCookie('zikulaextensionslibrarymodule_chosenCore', true, 'all');
     }
 } 

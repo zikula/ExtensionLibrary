@@ -3,7 +3,7 @@
 <h3>{gt text='Show extensions for all core versions'}</h3>
 <div class="row">
 <div class="col-sm-2 text-center">
-    <a class="btn btn-default" href="el/choose-your-core/no-filter">
+    <a class="btn btn-default" href="el/choose-your-core/all">
         {img src='logo32.png'}
         <strong>{gt text='All versions'}</strong>
     </a>

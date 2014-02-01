@@ -73,7 +73,6 @@ class ManifestManager {
     {
         $module = ModUtil::getModule($this->name);
         $this->modulePath = $module->getPath();
-        require_once $this->modulePath . '/vendor/autoload.php';
 
         $client = new \Github\Client();
         try {

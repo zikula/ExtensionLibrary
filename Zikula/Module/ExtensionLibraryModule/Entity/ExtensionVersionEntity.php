@@ -13,9 +13,12 @@
 
 namespace Zikula\Module\ExtensionLibraryModule\Entity;
 
+use vierbergenlars\SemVer\expression;
+use vierbergenlars\SemVer\version;
 use Zikula\Core\Doctrine\EntityAccess;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Zikula\Module\ExtensionLibraryModule\Util;
 
 /**
  * ExtensionVersion entity class
@@ -315,6 +318,23 @@ class ExtensionVersionEntity extends EntityAccess
         $this->urls = !empty($manifest->version->urls) ? $manifest->version->urls : null;
         $this->contributors = !empty($manifest->version->contributors) ? $manifest->version->contributors : null;
         $this->dependencies = !empty($manifest->version->dependencies) ? $manifest->version->dependencies : null;
+    }
+
+    public function matchesCoreChosen($coreVersion = null)
+    {
+        if (!isset($coreVersion)) {
+            $coreVersion = Util::getChosenCore();
+        }
+
+        if ($coreVersion === 'all') {
+            return true;
+        }
+
+        $coreVersion = new version($coreVersion);
+
+        $range = new expression($this->getCompatibility());
+
+        return $range->satisfiedBy($coreVersion);
     }
 
 }

@@ -32,11 +32,13 @@ use StringUtil;
  */
 class UserController extends \Zikula_AbstractController
 {
-    private function checkChosenCore()
+    private function checkIfCoreChosen()
     {
         if (!Util::getChosenCore()) {
             return new RedirectResponse(System::normalizeUrl(ModUtil::url('ZikulaExtensionLibraryModule', 'user', 'chooseCore')));
         }
+
+        return true;
     }
 
     /**
@@ -51,7 +53,7 @@ class UserController extends \Zikula_AbstractController
         if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_READ)) {
             throw new AccessDeniedException();
         }
-        $this->checkChosenCore();
+        $this->checkIfCoreChosen();
 
         $extensions = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:ExtensionEntity')->findAllMatchingCoreFilter();
         $this->view->assign('extensions', $extensions);
@@ -76,7 +78,7 @@ class UserController extends \Zikula_AbstractController
         if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_READ)) {
             throw new AccessDeniedException();
         }
-        $this->checkChosenCore();
+        $this->checkIfCoreChosen();
 
         $this->view->assign('extension', $extension);
         $this->view->assign('gravatarDefaultPath', $this->request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
@@ -104,7 +106,7 @@ class UserController extends \Zikula_AbstractController
         );
 
         if (isset($version)) {
-            if (!($version === 'no-filter' || array_key_exists($version, $coreVersions['outdated']) || array_key_exists($version, $coreVersions['supported']) || array_key_exists($version, $coreVersions['dev']))) {
+            if (!($version === 'all' || array_key_exists($version, $coreVersions['outdated']) || array_key_exists($version, $coreVersions['supported']) || array_key_exists($version, $coreVersions['dev']))) {
                 throw new NotFoundHttpException();
             }
             Util::setChosenCore($version);
