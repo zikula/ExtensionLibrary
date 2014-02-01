@@ -194,7 +194,6 @@ Version range descriptors may be any of the following styles, where "version" is
  - `range1 || range2` Passes if either range1 or range2 are satisfied.
  
 For example, these are all valid:
-<pre>
 ```json
 { "dependencies" :
     {
@@ -211,7 +210,6 @@ For example, these are all valid:
     }
 }
 ```
-</pre>
 
 <a name="tilde"></a>Tilde Version Ranges
 --------------------
