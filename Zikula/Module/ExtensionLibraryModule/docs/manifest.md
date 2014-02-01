@@ -195,6 +195,7 @@ Version range descriptors may be any of the following styles, where "version" is
  
 For example, these are all valid:
 <pre>
+```json
 { "dependencies" :
     {
         "foo" : "1.0.0 - 2.9999.9999",
@@ -209,6 +210,7 @@ For example, these are all valid:
         "thr" : "3.3.x"
     }
 }
+```
 </pre>
 
 <a name="tilde"></a>Tilde Version Ranges
