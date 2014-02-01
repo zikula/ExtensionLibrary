@@ -31,11 +31,21 @@ class Util {
         fclose($fd);
     }
 
+    /**
+     * Saves the chosen core version to a cookie. The cookie will be deleted after 24 hours.
+     * 
+     * @param string $version The core version, can be anything matching SemVer or 'all'.
+     */
     public static function setChosenCore($version)
     {
         \CookieUtil::setCookie('zikulaextensionslibrarymodule_chosenCore', $version, time() + 60*60*24, '/');
     }
 
+    /**
+     * Returns the chosen core version from cookie. If no cookie is set, it returns 'all'.
+     * 
+     * @return string The core version, can be anything matching SemVer or 'all'.
+     */
     public static function getChosenCore()
     {
         return \CookieUtil::getCookie('zikulaextensionslibrarymodule_chosenCore', true, 'all');
