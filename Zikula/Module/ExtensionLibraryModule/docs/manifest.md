@@ -51,7 +51,8 @@ The url to the homepage for your self, group or company. A Github page is suitab
 ----
 
 The url to your vendor logo (different from extension logo/icon). The image will be copied to our servers.
-Supported image types are `.jpg`, `.jpeg`, `.gif` and `.png`.
+Supported image types are `.jpg`, `.jpeg`, `.gif` and `.png`. Images MUST be less than 120px x 120px. Recommended
+size is 90px x 90px.
 
 <a name="vendor-owner"></a>owner
 -----
@@ -82,7 +83,8 @@ The url to the site for the extension. A Github page is suitable or any other pa
 ----
 
 The url to your extension icon (different from your vendor logo). The image will be copied to our servers.
-Supported image types are `.jpg`, `.jpeg`, `.gif` and `.png`.
+Supported image types are `.jpg`, `.jpeg`, `.gif` and `.png`. Images MUST be less than 120px x 120px. Recommended
+size is 90px x 90px.
 
 
 <a name="version"></a>Version
