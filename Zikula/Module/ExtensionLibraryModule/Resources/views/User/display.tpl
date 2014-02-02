@@ -61,3 +61,4 @@
     </div>
 {/foreach}
 </div>
+{include file='User/footer.tpl'}

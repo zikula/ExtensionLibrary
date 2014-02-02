@@ -7,3 +7,4 @@
         <li><a href="el/doc/sample">{gt text="Sample Manifest"}</a></li>
     </ul>
 </div>
+{include file='User/footer.tpl'}

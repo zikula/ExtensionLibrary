@@ -3,3 +3,4 @@
 <div>
     {$log}
 </div>
+{include file='User/footer.tpl'}

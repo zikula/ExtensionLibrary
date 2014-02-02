@@ -5,3 +5,4 @@
     {$docfile}
     {if $json}</code></pre>{/if}
 </div>
+{include file='User/footer.tpl'}

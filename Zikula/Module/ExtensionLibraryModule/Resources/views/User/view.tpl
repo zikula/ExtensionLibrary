@@ -26,10 +26,4 @@
         </div>
     {/foreach}
 </div>
-<div class="well well-sm" style="margin-top: 4em;">
-    <ul class="list-inline">
-        <li><a href="el/docs">{gt text="Documentation"}</a></li>
-        <li><a href="el/log">{gt text="Log file"}</a></li>
-        <li><a href="el/choose-your-core">{gt text="Choose a Core Version"}</a></li>
-    </ul>
-</div>
+{include file='User/footer.tpl'}
