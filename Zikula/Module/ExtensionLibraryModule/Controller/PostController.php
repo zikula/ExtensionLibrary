@@ -53,6 +53,15 @@ class PostController extends \Zikula_AbstractController
             return new PlainResponse();
         }
 
+        // @todo create schema.composer.json
+        //      require description, type, license, authors (at least 1, role='owner')
+        // @todo update manifest definition and schema.manifest.json to accommodate new information
+        //      require version.composerPath
+        //      remove vendor.owner, extension.title, extension.type, extension.contributors, version.licenses
+        // @todo pull composer.json relative path from manifest and load using ComposerManager
+        //      merge composer.json into manifest.json
+        //      update mergeManifest() methods to accommodate differences in data
+
         // check vendor exists, if not create new vendor
         $vendor = $this->entityManager
             ->getRepository('ZikulaExtensionLibraryModule:VendorEntity')
