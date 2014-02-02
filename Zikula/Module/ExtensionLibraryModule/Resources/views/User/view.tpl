@@ -7,7 +7,7 @@
         <div class="row">
         {/if}
         <div class="col-sm-4">
-            <div class="media">
+            <div class="media extension-display" data-content="{$extension.newestVersion.description|safehtml}">
                 <a class="pull-left" href="{modurl modname='ZikulaExtensionLibraryModule' type='user' func='display' id=$extension.id}">
                     <div class="iconStack">
                         <img class="media-object img-thumbnail" src="{$extension.icon}" alt="" width="90" height="90" />
@@ -27,3 +27,8 @@
     {/foreach}
 </div>
 {include file='User/footer.tpl'}
+<script>
+    jQuery(document).ready(function() {
+        jQuery(".extension-display").popover({container: "body", trigger: "hover", placement: "top"});
+    });
+</script>
