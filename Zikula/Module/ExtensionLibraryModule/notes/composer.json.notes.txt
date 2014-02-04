@@ -1,0 +1,13 @@
+
+In Zikula\Bundle\CoreBundle\Bundle\Scanner
+
+The core requires the following properties in an extension's composer.json file:
+
+
+name: must be set (core never checks for this actually) (string) used as array key
+
+type: must be set and must be zikula-module|zikula-theme|zikula-plugin (string)
+
+autoload: either 'psr-0' must be set OR 'psr-4' must be set (object)
+
+extra.zikula.class: must be set (string)

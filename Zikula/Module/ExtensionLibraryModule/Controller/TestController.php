@@ -14,6 +14,7 @@
 namespace Zikula\Module\ExtensionLibraryModule\Controller;
 
 use SecurityUtil;
+use ModUtil;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
 use Zikula\Core\Response\PlainResponse;
@@ -123,6 +124,36 @@ class TestController extends \Zikula_AbstractController
         }
 
         return $this->response($this->view->fetch('Test/image.tpl'));
+    }
+
+    /**
+     * @Route("/test/composer")
+     *
+     * Test if the schema properly validates the composer file
+     * @return PlainResponse
+     */
+    public function validateComposer() {
+        $module = ModUtil::getModule($this->name);
+
+        // Get the schema and data as objects
+        $retriever = new \JsonSchema\Uri\UriRetriever;
+        $schemaFile = $retriever->retrieve('file://' . realpath($module->getPath() . '/Schema/schema.composer.json'));
+        $data = json_decode(file_get_contents($module->getPath() . '/composer.json'));
+
+        // Validate
+        $validator = new \JsonSchema\Validator();
+        $validator->check($data, $schemaFile);
+
+        echo "<pre>";
+        if ($validator->isValid()) {
+            echo 'The file validated!';
+        } else {
+            echo 'The file DID NOT validate!';
+            $errors = $validator->getErrors();
+            var_dump($errors);
+        }
+
+        return new PlainResponse();
     }
 
 }
