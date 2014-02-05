@@ -21,6 +21,7 @@ use Zikula\Core\Response\PlainResponse;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Zikula\Module\ExtensionLibraryModule\Manager\ManifestManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\ImageManager;
+use Zikula\Module\ExtensionLibraryModule\Manager\ComposerManager;
 
 /**
  * UI operations executable by general users.
@@ -133,18 +134,24 @@ class TestController extends \Zikula_AbstractController
      * @return PlainResponse
      */
     public function validateComposer() {
+        echo "<pre>";
         $module = ModUtil::getModule($this->name);
 
         // Get the schema and data as objects
         $retriever = new \JsonSchema\Uri\UriRetriever;
         $schemaFile = $retriever->retrieve('file://' . realpath($module->getPath() . '/Schema/schema.composer.json'));
-        $data = json_decode(file_get_contents($module->getPath() . '/composer.json'));
 
-        // Validate
+        $composerManager = new ComposerManager('craigh', 'Nutin', 'refs/tags/0.0.24', 'composer.json');
         $validator = new \JsonSchema\Validator();
-        $validator->check($data, $schemaFile);
+        $data = $composerManager->getContent();
+        var_dump($data);
+        if (!empty($data)) {
+             // Validate
+            $validator->check($data, $schemaFile);
+        } else {
+            echo "Could not get composer content";
+        }
 
-        echo "<pre>";
         if ($validator->isValid()) {
             echo 'The file validated!';
         } else {
