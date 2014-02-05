@@ -20,6 +20,7 @@ use Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Zikula\Module\ExtensionLibraryModule\Manager\ManifestManager;
+use Zikula\Module\ExtensionLibraryModule\Manager\ComposerManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\PayloadManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\ImageManager;
 
@@ -46,16 +47,29 @@ class PostController extends \Zikula_AbstractController
         }
 
         // fetch the manifest, validate and get contents
-        $manifestManager = new ManifestManager($jsonPayload->repository->owner->name, $jsonPayload->repository->name, $jsonPayload->ref);
+        $manifestManager = new ManifestManager(
+            $jsonPayload->repository->owner->name,
+            $jsonPayload->repository->name,
+            $jsonPayload->ref
+        );
         $manifestContent = $manifestManager->getContent();
         if (empty($manifestContent)) {
             Util::log("processInboundAction aborted. The manifest was invalid.");
             return new PlainResponse();
         }
 
-        // @todo pull composer.json relative path from manifest and load using ComposerManager
-        //      merge composer.json into manifest.json
-        //      update mergeManifest() methods to accommodate differences in data
+        // fetch the composer.json file, validate and get contents
+        $composerManager = new ComposerManager(
+            $jsonPayload->repository->owner->name,
+            $jsonPayload->repository->name,
+            $jsonPayload->ref,
+            $manifestContent->version->composerpath
+        );
+        $composerContent = $composerManager->getContent();
+        if (empty($composerContent)) {
+            Util::log("processInboundAction aborted. The composer file was invalid.");
+            return new PlainResponse();
+        }
 
         // check vendor exists, if not create new vendor
         $vendor = $this->entityManager
@@ -75,6 +89,7 @@ class PostController extends \Zikula_AbstractController
             $manifestContent->vendor->logo = ($imageManager->import()) ? $imageManager->getName() : '';
         }
         $vendor->mergeManifest($manifestContent);
+        $vendor->mergeComposer($composerContent);
 
         // check extension exists, if not create new extension
         if ($vendor->hasExtensionById($jsonPayload->repository->id)) {
@@ -82,7 +97,14 @@ class PostController extends \Zikula_AbstractController
             $extension = $vendor->getExtensionById($jsonPayload->repository->id);
         } else {
             // not found, create new extension and assign to vendor
-            $extension = new ExtensionEntity($vendor, (int)$jsonPayload->repository->id, $jsonPayload->repository->name, $manifestContent->extension->title, $manifestContent->extension->type);
+            $extension = new ExtensionEntity(
+                $vendor,
+                (int)$jsonPayload->repository->id,
+                $jsonPayload->repository->name,
+                $manifestContent->extension->title,
+                $composerContent->description,
+                $composerContent->type
+            );
             $vendor->addExtension($extension);
             $this->entityManager->persist($extension);
             Util::log(sprintf('Extension (%s) created', $jsonPayload->repository->id));
@@ -92,16 +114,23 @@ class PostController extends \Zikula_AbstractController
             $manifestContent->extension->icon = ($imageManager->import()) ? $imageManager->getName() : '';
         }
         $extension->mergeManifest($manifestContent);
+        $extension->mergeComposer($composerContent);
 
         // compare version to newest available. If newer, add new version
         list(, , $semver) = explode('/', $jsonPayload->ref);
         $newestVersion = $extension->getNewestVersion();
         if (empty($newestVersion) || (version_compare($semver, $newestVersion->getSemver(), '>'))) {
             // add new version of extension
-            $version = new ExtensionVersionEntity($extension, $semver, $manifestContent->version->compatibility, $manifestContent->version->licenses);
+            $version = new ExtensionVersionEntity(
+                $extension,
+                $semver,
+                $manifestContent->version->compatibility,
+                $composerContent->license
+            );
             $this->entityManager->persist($version);
             $extension->addVersion($version);
             $version->mergeManifest($manifestContent);
+            $version->mergeComposer($composerContent);
             Util::log(sprintf('Version %s added to extension %s', $semver, $jsonPayload->repository->id));
         } else {
             Util::log("The version was not added because it was the same or older than the current version.");
