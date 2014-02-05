@@ -17,43 +17,44 @@ Fields
 **ALL fields are required.**
 
  - [name](#name)
- - [description](#description)
- - [type](#type)
- - [license](#license)
- - [authors](#authors)
+ - [description](#description) *
+ - [type](#type) *
+ - [license](#license) *
+ - [authors](#authors) *
  - [autoload](#autoload)
  - [require](#require)
  - [extra](#extra)
 
 Additional optional fields are allowed but not validated. Please see the entire spec at [the composer website](https://getcomposer.org/doc/04-schema.md#properties).
 
+* utilized by ExtensionLibrary
 
 <a name="name"></a>Name
 ------
 
 Package name, including 'vendor-name/' prefix.
 
-<a name="description"></a>Description
+<a name="description"></a>Description*
 ------
 
 A short (one sentence) package description.
 
-<a name="type"></a>Type
+<a name="type"></a>Type*
 ------
 
 Must be one of the following strings: "zikula-module", "zikula-theme", "zikula-plugin".
 
-<a name="license"></a>License
+<a name="license"></a>License*
 ------
 
 License name (string) or an array of license names (array of strings) under which the extension is provided. You must
 use the standardized identifier acronym for the license as defined by [Software Package Data Exchange](http://spdx.org/licenses/)
 
-<a name="authors"></a>Authors
+<a name="authors"></a>Authors*
 ------
 
-An array of people that have contributed to the project in some way. The array must have at least one person listed
-and that person's **name** is required and the role of "owner" is also required. See [People Fields](#people-fields)
+An array of people that have contributed to the project in some way. The array should have at least one person listed
+and that person's **name** is required. (The role of "owner" is suggested.) See [People Fields](#people-fields)
 
 <a name="autoload"></a>Autoload
 ------
@@ -90,4 +91,4 @@ A "person" is an object with a "name" field and optional "homepage", "email" and
 }
 </pre>
 
-note: there **must** be one (and only one) owner listed. Other suggested roles are `contributor`, `translator`, `manager`
+note: Suggested roles are `owner`, `contributor`, `translator`, `manager`, etc.

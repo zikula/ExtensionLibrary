@@ -33,7 +33,6 @@
                 },
                 "required": ["name"]
             },
-            "minItems": 1,
             "uniqueItems": true
         },
         "autoload": {

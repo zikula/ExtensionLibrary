@@ -23,7 +23,7 @@ Fields
  - [version](#version)
      - [semver](#version-semver) (required)
      - [compatibility](#version-compatibility) (required)
-     - [composer-path](#composer-path) (required)
+     - [composerpath](#version-composerpath) (required)
      - [description](#version-description)
      - [keywords](#version-keywords)
      - [urls](#version-urls)
@@ -88,7 +88,7 @@ changes to the version. See [Specifying Versions](#versions).
 
 A string defining Zikula Core version compatibility. See [Specifying Versions](#versions).
 
-<a name="composer-path"></a>composer-path (required)
+<a name="version-composerpath"></a>composerpath (required)
 -------------------
 
 A string defining the path the extension's `composer.json` file relative to the repository root.
