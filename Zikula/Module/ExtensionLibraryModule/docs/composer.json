@@ -1,0 +1,25 @@
+{
+    "name": "acme/super-widget",
+    "description": "Acme Super Widget that does something amazing.",
+    "type": "zikula-module",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "John Smith",
+            "homepage": "http://www.acme.com/jsmith",
+            "email": "jsmith@acme.com",
+            "role": "owner"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "Acme\\SuperWidgetModule\\": "" }
+    },
+    "require": {
+        "php": ">5.3.3"
+    },
+    "extra": {
+        "zikula": {
+            "class": "Acme\\SuperWidgetModule\\AcmeSuperWidgetModule"
+        }
+    }
+}

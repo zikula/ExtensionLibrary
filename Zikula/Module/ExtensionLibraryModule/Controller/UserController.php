@@ -149,7 +149,7 @@ class UserController extends \Zikula_AbstractController
     }
 
     /**
-     * @Route("/doc/{file}", requirements={"file" = "manifest|sample|instructions"})
+     * @Route("/doc/{file}", requirements={"file" = "manifest|sample-manifest|composer|sample-composer|instructions"})
      *
      * Display a requested doc file
      *
@@ -160,12 +160,14 @@ class UserController extends \Zikula_AbstractController
         $module = ModUtil::getModule($this->name);
         $docs = array(
             'manifest' => '/docs/manifest.md',
-            'sample' => '/docs/zikula.manifest.json',
+            'composer' => '/docs/composer.md',
             'instructions' => '/docs/instructions.md',
+            'sample-manifest' => '/docs/zikula.manifest.json',
+            'sample-composer' => '/docs/composer.json',
         );
         $docfile = file_get_contents($module->getPath() . $docs[$file]);
         $json = false;
-        if ($file != 'sample') {
+        if (substr($file, 0, 6) != "sample") {
             $docfile = StringUtil::getMarkdownExtraParser()->transform($docfile);
         } else {
             $json = true;
