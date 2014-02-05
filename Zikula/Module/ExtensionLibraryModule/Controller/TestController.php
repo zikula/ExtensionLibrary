@@ -134,31 +134,15 @@ class TestController extends \Zikula_AbstractController
      * @return PlainResponse
      */
     public function validateComposer() {
-        echo "<pre>";
-        $module = ModUtil::getModule($this->name);
-
-        // Get the schema and data as objects
-        $retriever = new \JsonSchema\Uri\UriRetriever;
-        $schemaFile = $retriever->retrieve('file://' . realpath($module->getPath() . '/Schema/schema.composer.json'));
-
         $composerManager = new ComposerManager('craigh', 'Nutin', 'refs/tags/0.0.24', 'composer.json');
-        $validator = new \JsonSchema\Validator();
         $data = $composerManager->getContent();
-        var_dump($data);
         if (!empty($data)) {
-             // Validate
-            $validator->check($data, $schemaFile);
+            echo "Composer content valid.";
         } else {
             echo "Could not get composer content";
         }
-
-        if ($validator->isValid()) {
-            echo 'The file validated!';
-        } else {
-            echo 'The file DID NOT validate!';
-            $errors = $validator->getErrors();
-            var_dump($errors);
-        }
+        echo "<pre>";
+        var_dump($data);
 
         return new PlainResponse();
     }
