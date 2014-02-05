@@ -53,8 +53,6 @@ class PostController extends \Zikula_AbstractController
             return new PlainResponse();
         }
 
-        // @todo create schema.composer.json
-        //      require description, type, license, authors (at least 1, role='owner')
         // @todo update manifest definition and schema.manifest.json to accommodate new information
         //      require version.composerPath
         //      remove vendor.owner, extension.type, extension.contributors, version.licenses
