@@ -53,9 +53,6 @@ class PostController extends \Zikula_AbstractController
             return new PlainResponse();
         }
 
-        // @todo update manifest definition and schema.manifest.json to accommodate new information
-        //      require version.composerPath
-        //      remove vendor.owner, extension.type, extension.contributors, version.licenses
         // @todo pull composer.json relative path from manifest and load using ComposerManager
         //      merge composer.json into manifest.json
         //      update mergeManifest() methods to accommodate differences in data

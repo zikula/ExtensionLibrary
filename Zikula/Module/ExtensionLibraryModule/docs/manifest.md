@@ -16,20 +16,17 @@ Fields
      - [title](#vendor-title)
      - [url](#vendor-url)
      - [logo](#vendor-logo)
-     - [owner](#vendor-owner)
  - [extension](#extension)
      - [title](#extension-title) (required)
-     - [type](#extension-type) (required)
      - [url](#extension-url)
      - [icon](#extension-icon)
  - [version](#version)
      - [semver](#version-semver) (required)
      - [compatibility](#version-compatibility) (required)
-     - [licenses](#version-licenses) (required)
+     - [composer-path](#composer-path) (required)
      - [description](#version-description)
      - [keywords](#version-keywords)
      - [urls](#version-urls)
-     - [contributors](#version-contributors)
      - [dependencies](#version-dependencies)
 
 
@@ -54,11 +51,6 @@ The url to your vendor logo (different from extension logo/icon). The image will
 Supported image types are `.jpg`, `.jpeg`, `.gif` and `.png`. All images MUST have one of those filename extensions.
 Images MUST be less than 120px x 120px. Recommended size is 90px x 90px.
 
-<a name="vendor-owner"></a>owner
------
-
-One person. See [People Fields](#people-fields).
-
 
 <a name="extension"></a>Extension
 =========
@@ -68,11 +60,6 @@ One person. See [People Fields](#people-fields).
 
 The display title of your extension. This will be used for the page title and top-level heading on your
 extension's page. Include spaces and mixed case as desired.
-
-<a name="extension-type"></a>type (required)
----------------
-
-A single character only: "m", "t" or "p" for module, theme or plugin, respectively.
 
 <a name="extension-url"></a>url
 ---
@@ -101,21 +88,11 @@ changes to the version. See [Specifying Versions](#versions).
 
 A string defining Zikula Core version compatibility. See [Specifying Versions](#versions).
 
-<a name="version-licenses"></a>licenses (required)
+<a name="composer-path"></a>composer-path (required)
 -------------------
 
-Array of licenses under which the extension is provided. Each license is a hash with a url property linking to the actual 
-text and a "type" property specifying the type of license. You must use the standardized identifier acronym for the
-license as defined by [Software Package Data Exchange](http://spdx.org/licenses/)
-
-<pre>
-"licenses": [
-    {
-        "type": "GPLv2",
-        "url": "http://www.example.com/licenses/gpl.html"
-    }
-]
-</pre>
+A string defining the path the extension's `composer.json` file relative to the repository root.
+MUST contain the file name at the end of the path (for example, at root level simply, `composer.json`)
 
 <a name="version-description"></a>description
 -----------
@@ -144,11 +121,6 @@ Zikula Extensions Library site. Keywords may only contain letters, numbers, hyph
  - issues
      - The url to the issue tracker for the version.
 
-<a name="version-contributors"></a>contributors
-------------
-
-An array of people. See [People Fields](#people-fields).
-
 <a name="version-dependencies"></a>dependencies
 ------------
 
@@ -163,18 +135,6 @@ tree won't be affected.
 
 Additional Details
 ==================
-
-<a name="people-fields"></a>People Fields
--------------
-A "person" is an object with a "name" field and optional "url" and "email", like this:
-
-<pre>
-{
-    "name" : "Susan Miller",
-    "email" : "smiller@acme.com",
-    "url" : "http://www.acme.com/smiller"
-}
-</pre>
 
 <a name="versions"></a>Specifying Versions
 -------------------
