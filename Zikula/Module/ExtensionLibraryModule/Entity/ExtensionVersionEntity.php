@@ -82,10 +82,10 @@ class ExtensionVersionEntity extends EntityAccess
     private $compatibility;
 
     /**
-     * json array of licenses
+     * array of licenses
      * supplied by vendor
      * 
-     * @ORM\Column(type="json_array")
+     * @ORM\Column(type="array")
      */
     private $licenses;
 
@@ -134,7 +134,7 @@ class ExtensionVersionEntity extends EntityAccess
         $this->extension = $extension;
         $this->semver = $semver;
         $this->compatibility = $compatibility;
-        $this->licenses = $licenses;
+        $this->licenses = (array)$licenses;
         $this->impressions = 0;
     }
 
@@ -235,15 +235,15 @@ class ExtensionVersionEntity extends EntityAccess
     }
 
     /**
-     * @param \stdClass $licenses from json
+     * @param array $licenses
      */
-    public function setLicenses(\stdClass $licenses)
+    public function setLicenses($licenses)
     {
-        $this->licenses = $licenses;
+        $this->licenses = (array)$licenses;
     }
 
     /**
-     * @return \stdClass from json
+     * @return array
      */
     public function getLicenses()
     {
@@ -309,15 +309,23 @@ class ExtensionVersionEntity extends EntityAccess
     }
 
     /**
-     * merge some properties of the manifest
-     * @param $manifest
+     * merge some properties of the manifest file
+     * @param \stdClass $manifest
      */
     public function mergeManifest($manifest)
     {
         $this->description = !empty($manifest->version->description) ? $manifest->version->description : null;
         $this->urls = !empty($manifest->version->urls) ? $manifest->version->urls : null;
-        $this->contributors = !empty($manifest->version->contributors) ? $manifest->version->contributors : null;
         $this->dependencies = !empty($manifest->version->dependencies) ? $manifest->version->dependencies : null;
+    }
+
+    /**
+     * merge some properties of the composer file
+     * @param \stdClass $composer
+     */
+    public function mergeComposer($composer)
+    {
+        $this->contributors = !empty($composer->authors) ? $composer->authors : null;
     }
 
     /**

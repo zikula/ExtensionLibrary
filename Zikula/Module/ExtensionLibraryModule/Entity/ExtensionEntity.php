@@ -29,9 +29,9 @@ class ExtensionEntity extends EntityAccess
     /**
      * constants defining the type of extension
      */
-    const TYPE_MODULE = 'm';
-    const TYPE_THEME = 't';
-    const TYPE_PLUGIN = 'p';
+    const TYPE_MODULE = 'zikula-module';
+    const TYPE_THEME = 'zikula-theme';
+    const TYPE_PLUGIN = 'zikula-plugin';
 
     /**
      * id field
@@ -58,6 +58,13 @@ class ExtensionEntity extends EntityAccess
      * @ORM\Column(type="string", length=128, unique=true)
      */
     private $name;
+
+    /**
+     * Short extension description
+     *
+     * @ORM\Column(type="string", length=128)
+     */
+    private $description;
 
     /**
      * @ORM\Column(type="datetime")
@@ -96,7 +103,7 @@ class ExtensionEntity extends EntityAccess
      * supplied by vendor
      * must be one of the TYPE_* constants above
      *
-     * @ORM\Column(type="string", length=1)
+     * @ORM\Column(type="string", length=13)
      */
     private $type = self::TYPE_MODULE;
 
@@ -133,12 +140,13 @@ class ExtensionEntity extends EntityAccess
     /**
      * Constructor
      */
-    public function __construct(VendorEntity $vendor, $id, $name, $title, $type = self::TYPE_MODULE)
+    public function __construct(VendorEntity $vendor, $id, $name, $title, $description, $type = self::TYPE_MODULE)
     {
         $this->vendor = $vendor;
         $this->repositoryId = $id;
         $this->name = $name;
         $this->title= $title;
+        $this->description = $description;
         $this->type = $type;
         $this->updated = new \DateTime();
         $this->versions = new ArrayCollection();
@@ -174,6 +182,22 @@ class ExtensionEntity extends EntityAccess
     public function getNameSlug()
     {
         return $this->nameSlug;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
     }
 
     /**
@@ -326,12 +350,22 @@ class ExtensionEntity extends EntityAccess
     }
 
     /**
-     * merge some properties of the manifest
-     * @param $manifest
+     * merge some properties of the manifest file
+     * @param \stdClass $manifest
      */
     public function mergeManifest($manifest)
     {
         $this->url = !empty($manifest->extension->url) ? $manifest->extension->url : null;
         $this->icon = !empty($manifest->extension->icon) ? $manifest->extension->icon : null;
+    }
+
+    /**
+     * merge some properties of the composer file
+     * @param \stdClass $composer
+     */
+    public function mergeComposer($composer)
+    {
+        $this->description = !empty($composer->description) ? $composer->description : 'Description unavailable.';
+        // @todo translate
     }
 }

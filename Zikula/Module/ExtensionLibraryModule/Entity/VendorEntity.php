@@ -386,8 +386,8 @@ class VendorEntity extends EntityAccess
     }
 
     /**
-     * merge some properties of the manifest
-     * @param $manifest
+     * merge some properties of the manifest file
+     * @param \stdClass $manifest
      */
     public function mergeManifest($manifest)
     {
@@ -395,10 +395,23 @@ class VendorEntity extends EntityAccess
             $this->title = !empty($manifest->vendor->title) ? $manifest->vendor->title : null;
             $this->url = !empty($manifest->vendor->url) ? $manifest->vendor->url : null;
             $this->logo = !empty($manifest->vendor->logo) ? $manifest->vendor->logo : null;
-            if (!empty($manifest->vendor->owner)) {
-                $this->ownerName = !empty($manifest->vendor->owner->name) ? $manifest->vendor->owner->name : null;
-                $this->ownerEmail = !empty($manifest->vendor->owner->email) ? $manifest->vendor->owner->email : null;
-                $this->ownerUrl = !empty($manifest->vendor->owner->url) ? $manifest->vendor->owner->url : null;
+        }
+    }
+
+    /**
+     * merge some properties of the composer file
+     * @param \stdClass $composer
+     */
+    public function mergeComposer($composer)
+    {
+        if (!empty($composer->authors)) {
+            foreach ($composer->authors as $author) {
+                if (!empty($author->role) && $author->role == "owner") {
+                    $this->ownerName = !empty($author->name) ? $author->name : null;
+                    $this->ownerEmail = !empty($$author->email) ? $author->email : null;
+                    $this->ownerUrl = !empty($author->homepage) ? $author->homepage : null;
+                    break;
+                }
             }
         }
     }
