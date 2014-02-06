@@ -7,7 +7,7 @@
         <div class="row">
         {/if}
         <div class="col-sm-4">
-            <div class="media extension-display" data-content="{$extension.newestVersion.description|safehtml}">
+            <div class="media extension-display" data-content="[version {$extension.newestVersion.semver}] {$extension.description|safehtml}">
                 <a class="pull-left" href="{modurl modname='ZikulaExtensionLibraryModule' type='user' func='display' id=$extension.id}">
                     <div class="iconStack">
                         <img class="media-object img-thumbnail" src="{$extension.icon}" alt="" width="90" height="90" />
@@ -18,8 +18,8 @@
                     <h4 class="media-heading"><a href="{modurl modname='ZikulaExtensionLibraryModule' type='user' func='display' id=$extension.id}">{$extension.title|safetext}</a></h4>
                     <em class="text-muted">{$extension.type}</em>
                     <ul class="list-unstyled">
-                        <li>{$extension.vendor.ownerName|default:''}</li>
-                        <li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.ownerUrl|default:''}">{gt text="Vendor Website"}</a></li>
+                        {if !empty($extension.vendor.title)}<li>{$extension.vendor.title|safehtml}</li>{/if}
+                        {if !empty($extension.vendor.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.url}">{gt text="Vendor Website"}</a></li>{/if}
                     </ul>
                 </div>
             </div>

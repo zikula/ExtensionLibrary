@@ -3,6 +3,9 @@
 <div style="min-height: 140px;">
     <div class="well well-sm pull-right">
         <h3 style="margin-top: 0">{$extension.vendor.title|safetext}</h3>
+        <ul class="list-unstyled">
+            {if !empty($extension.vendor.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.url}">{gt text="Vendor Website"}</a></li>{/if}
+        </ul>
         <div>
             <div class="iconStack pull-left">
                 <img class="media-object img-thumbnail" src="{$extension.vendor.logo}" alt="" width="90" height="90" />
@@ -12,9 +15,9 @@
             </div>
 
             <ul class="list-unstyled" style="padding-left: 100px">
-                <li>{$extension.vendor.ownerName|default:''}</li>
-                <li>{$extension.vendor.ownerEmail|default:''}</li>
-                <li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.ownerUrl|default:''}">{gt text="Vendor Website"}</a></li>
+                {if !empty($extension.vendor.ownerName)}<li>{$extension.vendor.ownerName}</li>{/if}
+                {if !empty($extension.vendor.ownerEmail)}<li>{$extension.vendor.ownerEmail}</li>{/if}
+                {if !empty($extension.vendor.ownerUrl)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.ownerUrl|default:''}">{gt text="Owner Website"}</a></li>{/if}
             </ul>
         </div>
     </div>
@@ -22,7 +25,8 @@
         <img class="media-object img-thumbnail pull-left" style='margin: 0 1em 1em 0' src="{$extension.icon}" alt="" width="90" height="90" />
         <h3>{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></h3>
         <ul class="list-unstyled">
-            <li><i class="fa fa-external-link"></i> <a href="{$extension.url|default:''}">{gt text="Extension Website"}</a></li>
+            {if !empty($extension.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.url}">{gt text="Extension Website"}</a></li>{/if}
+            {if !empty($extension.description)}<li>{$extension.description|safehtml}</li>{/if}
 
         </ul>
     </div>
@@ -41,21 +45,40 @@
             </em>
             <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#accordion" href="#version-{$version.id}">
-                    <strong>Version: {$version.semver|safetext}</strong>
+                    <strong>{gt text="Version"}: {$version.semver|safetext}</strong>
                 </a>
             </h4>
         </div>
         <div id="version-{$version.id}" class="panel-collapse collapse{if $version->matchesCoreChosen() && $firstMatchingVersion} in{assign var='firstMatchingVersion' value=false}{/if}">
             <div class="panel-body">
-                <ul>
-                    <li>Description: {$version.description|safetext}</li>
-                </ul>
-                {if isset($version.urls.download)}
-                    <a type="button" class="btn btn-success" href="{$version.urls.download}">Download</a>
-                {else}
-                    <a type="button" class="btn btn-success" href="{$version.urls.zipball_url}">Download Zipball</a>
-                    <a type="button" class="btn btn-success" href="{$version.urls.tarball_url}">Download Tarball</a>
-                {/if}
+                <div class="col-md-10">
+                    <ul>
+                        <li>{gt text="Description"}: {$version.description|safetext}</li>
+                        <li>{gt text="License" plural="Licenses" count=$version.licenses|count}: {", "|implode:$version.licenses|safetext}</li>
+                        {if !empty($version.dependencies)}
+                            <li>{gt text="Dependencies"}
+                                <ul>
+                                    {foreach from=$version.dependencies item="dependency"}
+                                        <li>{$dependency.name} ({$dependency.version})</li>
+                                    {/foreach}
+                                </ul>
+                            </li>
+                        {/if}
+                    </ul>
+                    {if isset($version.urls.download)}
+                        <a type="button" class="btn btn-success btn-lg" href="{$version.urls.download}"><i class="fa fa-cloud-download fa-lg"></i> Download</a>
+                    {else}
+                        <a type="button" class="btn btn-success" href="{$version.urls.zipball_url}">Download Zipball</a>
+                        <a type="button" class="btn btn-success" href="{$version.urls.tarball_url}">Download Tarball</a>
+                    {/if}
+                </div>
+                <div class="col-md-2 btn-group-vertical">
+                    {if !empty($version.contributors)}<a href="" id="contributors" data-version="{$version.semver}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Contributors"}</a>{/if}
+                    {if !empty($version.urls.version)}<a href="{$version.urls.version}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Version Site"}</a>{/if}
+                    {if !empty($version.urls.docs)}<a href="{$version.urls.docs}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Docs"}</a>{/if}
+                    {if !empty($version.urls.demo)}<a href="{$version.urls.demo}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Demo"}</a>{/if}
+                    {if !empty($version.urls.issues)}<a href="{$version.urls.issues}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Issues"}</a>{/if}
+                </div>
             </div>
         </div>
     </div>
