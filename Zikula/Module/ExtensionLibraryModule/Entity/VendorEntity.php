@@ -404,16 +404,16 @@ class VendorEntity extends EntityAccess
      */
     public function mergeComposer($composer)
     {
-//        if (!empty($composer->authors)) {
-//            foreach ($composer->authors as $author) {
-//                if (!empty($author->role) && $author->role == "owner") {
-//                    $this->ownerName = !empty($author->name) ? $author->name : null;
-//                    $this->ownerEmail = !empty($$author->email) ? $author->email : null;
-//                    $this->ownerUrl = !empty($author->homepage) ? $author->homepage : null;
-//                    break;
-//                }
-//            }
-//        }
+        if (!empty($composer->authors)) {
+            foreach ($composer->authors as $author) {
+                if (!empty($author->role) && ($author->role == "owner")) {
+                    $this->ownerName = !empty($author->name) ? $author->name : null;
+                    $this->ownerEmail = !empty($author->email) ? $author->email : null;
+                    $this->ownerUrl = !empty($author->homepage) ? $author->homepage : null;
+                    break;
+                }
+            }
+        }
     }
 
 }
