@@ -311,6 +311,7 @@ class ExtensionEntity extends EntityAccess
             self::TYPE_THEME => 'Theme',
             self::TYPE_PLUGIN => 'Plugin',
         );
+        // @todo translate
         return $types[$this->type];
     }
 
