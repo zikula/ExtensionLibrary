@@ -41,7 +41,7 @@
             "properties": {
                 "semver": {"type": "string"},
                 "compatibility": {"type": "string"},
-                "composer-path": {"type": "string"},
+                "composerpath": {"type": "string"},
                 "description": {"type": "string"},
                 "keywords": {
                     "type": "array",
@@ -90,7 +90,7 @@
                     "uniqueItems": true
                 }
             },
-            "required": ["semver", "compatibility", "composer-path"]
+            "required": ["semver", "compatibility", "composerpath"]
         }
     },
     "required": ["extension", "version"]
