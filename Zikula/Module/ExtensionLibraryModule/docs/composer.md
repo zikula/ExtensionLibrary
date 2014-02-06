@@ -27,7 +27,7 @@ Fields
 
 Additional optional fields are allowed but not validated. Please see the entire spec at [the composer website](https://getcomposer.org/doc/04-schema.md#properties).
 
-* utilized by ExtensionLibrary
+*utilized by ExtensionLibrary
 
 <a name="name"></a>Name
 ------
