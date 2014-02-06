@@ -84,7 +84,7 @@ class PostController extends \Zikula_AbstractController
             // found
             Util::log(sprintf('Vendor (%s) found', $jsonPayload->repository->owner->name));
         }
-        if (!empty($manifestContent->vendor->logo)) {
+        if (!empty($manifestContent->vendor) && !empty($manifestContent->vendor->logo)) {
             $imageManager = new ImageManager($manifestContent->vendor->logo);
             $manifestContent->vendor->logo = ($imageManager->import()) ? $imageManager->getName() : '';
         }
