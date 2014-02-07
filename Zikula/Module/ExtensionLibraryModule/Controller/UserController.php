@@ -226,16 +226,31 @@ class UserController extends \Zikula_AbstractController
             // @todo - getRelativePath() is deprecated
             $path = $module->getRelativePath() . '/Resources/public/images/zikula.png';
         }
-        if ($type = @exif_imagetype($path)) {
+
+        if (function_exists('exif_imagetype')) {
             // errors suppressed: only need true/false (without triggering E_NOTICE)
-            header('Content-Type: ' . image_type_to_mime_type($type));
-            header('Content-Length: ' . filesize($path));
-            readfile($path);
-            exit;
+            $type = @exif_imagetype($path);
+        } else {
+            // errors suppressed: only need true/false (without triggering E_NOTICE)
+            $type = @getimagesize($path);
+            $type = isset($type[2]) ? $type[2] : false;
+        }
+        if ($type) {
+            $response = new Response(readfile($path), Response::HTTP_OK, array(
+                'Content-Type' => image_type_to_mime_type($type),
+                'Content-Length' => filesize($path)
+            ));
+
+            $imageCacheTime = $this->getVar('image_cache_time', 0);
+            if ($imageCacheTime > 0) {
+                $response->setMaxAge($imageCacheTime);
+            }
+
+            return $response;
         } else {
             // return default image instead
             Util::log("could not retrieve image ($name)");
-            $this->getImage();
+            return $this->getImage();
         }
     }
 }

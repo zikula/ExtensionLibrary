@@ -85,7 +85,7 @@ class RemoteJsonManager {
         $module = ModUtil::getModule($this->name);
         $this->modulePath = $module->getPath();
 
-        $this->client = new \Github\Client();
+        $this->client = Util::getGitHubClient();
         try {
             $this->file = $this->client->api('repo')->contents()->show($owner, $repo, $remoteRelativePath, $ref);
         } catch (\Exception $e) {

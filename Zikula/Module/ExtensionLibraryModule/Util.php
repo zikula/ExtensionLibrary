@@ -50,4 +50,20 @@ class Util {
     {
         return \CookieUtil::getCookie('zikulaextensionslibrarymodule_chosenCore', true, 'all');
     }
+
+    /**
+     * Get an instance of the GitHub Client, authenticated with the admin's authentication token.
+     *
+     * @return \Github\Client
+     */
+    public static function getGitHubClient()
+    {
+        $client = new \Github\Client();
+        $token = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'github_token', null);
+        if ($token !== null) {
+            $client->authenticate($token, null, \Github\Client::AUTH_HTTP_TOKEN);
+        }
+
+        return $client;
+    }
 } 
