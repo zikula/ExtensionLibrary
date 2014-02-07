@@ -141,7 +141,11 @@ class UserController extends \Zikula_AbstractController
      */
     public function displayLog()
     {
-        $logfile = file_get_contents("app/logs/el.log");
+        if (file_exists("app/logs/el.log")) {
+            $logfile = file_get_contents("app/logs/el.log");
+        } else {
+            $logfile = $this->__('Nothing logged yet!');
+        }
         $this->view->assign('log', nl2br($logfile));
         $this->view->assign('breadcrumbs', array(array('title' => $this->__('Log'))));
 
