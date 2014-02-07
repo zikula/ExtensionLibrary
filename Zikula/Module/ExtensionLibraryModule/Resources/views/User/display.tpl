@@ -73,7 +73,7 @@
                     {/if}
                 </div>
                 <div class="col-md-2 btn-group-vertical">
-                    {if !empty($version.contributors)}<a href="" id="contributors" data-version="{$version.semver}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Contributors"}</a>{/if}
+                    {if !empty($version.contributors)}<a href="" data-toggle="modal" data-people='{$version.encodedContributors}' data-target="#contributorsModal" type="button" class="btn btn-default btn-info btn-sm">{gt text="Contributors"}</a>{/if}
                     {if !empty($version.urls.version)}<a href="{$version.urls.version}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Version Site"}</a>{/if}
                     {if !empty($version.urls.docs)}<a href="{$version.urls.docs}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Docs"}</a>{/if}
                     {if !empty($version.urls.demo)}<a href="{$version.urls.demo}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Demo"}</a>{/if}
@@ -85,3 +85,29 @@
 {/foreach}
 </div>
 {include file='User/footer.tpl'}
+<!-- Modal -->
+<div class="modal fade" id="contributorsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">{gt text="Contributors"}</h4>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    jQuery(document).ready(function() {
+        jQuery('#contributorsModal').on('show.bs.modal', function (e) {
+            var people = jQuery(e.relatedTarget).data('people');
+            var content = "<ul>";
+            jQuery.each(people, function(k, v) {
+               content = content + "<li><ul><li>{{gt text='Name'}}: " + v.name + "</li><li>{{gt text='Email'}}: " + v.email + "</li><li>{{gt text='Homepage'}}: " + v.homepage + "</li><li>{{gt text='Role'}}: " + v.role + "</li></ul></li>";
+            });
+            content = content + "</ul>";
+            jQuery(this).find(".modal-body").html(content);
+        });
+    });
+</script>

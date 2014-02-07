@@ -187,6 +187,14 @@ class ExtensionVersionEntity extends EntityAccess
     }
 
     /**
+     * @return mixed|string
+     */
+    public function getEncodedContributors()
+    {
+        return json_encode($this->contributors);
+    }
+
+    /**
      * @return \DateTime
      */
     public function getCreated()
