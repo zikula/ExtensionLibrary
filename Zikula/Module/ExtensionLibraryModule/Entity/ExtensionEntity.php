@@ -14,7 +14,6 @@
 namespace Zikula\Module\ExtensionLibraryModule\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use vierbergenlars\SemVer\Internal\SemVer;
 use Zikula\Core\Doctrine\EntityAccess;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -227,8 +226,7 @@ class ExtensionEntity extends EntityAccess
         if (!$this->versionsSorted) {
             $iterator = $this->versions->getIterator();
             $iterator->uasort(function (ExtensionVersionEntity $a, ExtensionVersionEntity $b) {
-                $a = new semver($a->getSemver());
-                return $a->compare(new semver($b->getSemver())) * -1;
+                return version_compare($a->getSemver(), $b->getSemver()) * -1;
             });
             $this->versions = new ArrayCollection(iterator_to_array($iterator));
             $this->versionsSorted = true;
