@@ -1,4 +1,9 @@
 {adminheader}
+    {if isset($storageDir)}
+        <div class="alert alert-danger">
+            {gt text='The image storage directory must be created at "%s" relative to the Zikula root.' tag1=$storageDir}
+        </div>
+    {/if}
     <div class="alert alert-info">
         {gt text='Rate limit remaining for the next %s minutes: %s / %s' tag1=$rate.minutesUntilReset tag2=$rate.remaining tag3=$rate.limit}
     </div>

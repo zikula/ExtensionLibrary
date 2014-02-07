@@ -59,7 +59,7 @@ class ImageManager {
      */
     public function __construct($url)
     {
-        if ($this->checkStorageDir()) {
+        if (self::checkStorageDir()) {
             $this->url = $url;
             if ($this->validateExtension($url)) {
                 $this->name = uniqid();
@@ -137,18 +137,22 @@ class ImageManager {
     }
 
     /**
-     * confirm storage directory is available or create
+     * confirm storage directory is available.
+     *
+     * @param bool $log Whether or not to log an error if the directory does not exist, default true.
      *
      * @return bool
      */
-    private function checkStorageDir()
+    public static function checkStorageDir($log = true)
     {
         if ($dh = @opendir(self::STORAGE_PATH)) {
             // errors suppressed: only need true/false (without triggering E_WARNING)
             closedir($dh);
             return true;
         } else {
-            Util::log("unable to find storage directory! You must manually create the directory.");
+            if ($log) {
+                Util::log("unable to find storage directory! You must manually create the directory.");
+            }
             return false;
         }
     }

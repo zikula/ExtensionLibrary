@@ -20,6 +20,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method; // used in annotations - do not remove
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Zikula\Module\ExtensionLibraryModule\Manager\ImageManager;
 use Zikula\Module\ExtensionLibraryModule\Util;
 
 /**
@@ -43,6 +44,7 @@ class AdminController extends \Zikula_AbstractController
             throw new AccessDeniedException();
         }
 
+        // Rate limit check
         $client = Util::getGitHubClient();
         $response = $client->getHttpClient()->get('rate_limit');
         $rate = ResponseMediator::getContent($response);
@@ -51,8 +53,15 @@ class AdminController extends \Zikula_AbstractController
         $now = new \DateTime('now');
         $reset = \DateTime::createFromFormat('U', $rate['reset']);
         $rate['minutesUntilReset'] = $now->diff($reset)->format('%i');
-        $this->view->assign('settings', $this->getVars())
-                   ->assign('rate', $rate);
+
+        $this->view->assign('rate', $rate);
+
+        // Storage directory check
+        if (!ImageManager::checkStorageDir(false)) {
+            $this->view->assign('storageDir', ImageManager::STORAGE_PATH);
+        }
+
+        $this->view->assign('settings', $this->getVars());
 
         return $this->response($this->view->fetch('Admin/modifyconfig.tpl'));
     }
