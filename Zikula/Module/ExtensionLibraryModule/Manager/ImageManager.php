@@ -66,6 +66,8 @@ class ImageManager {
             } else {
                 Util::log("could not validate image extension.");
             }
+        } else {
+            Util::log("could not validate storage directory.");
         }
     }
 
@@ -81,7 +83,12 @@ class ImageManager {
             return false;
         }
         // move the file to local directory
-        $r = copy($this->url, self::STORAGE_PATH . $this->name);
+        if (ini_get('allow_url_fopen')) {
+            $r = copy($this->url, self::STORAGE_PATH . $this->name);
+        } else {
+            $r = $this->curlDownload($this->url, self::STORAGE_PATH . $this->name);
+        }
+
         if ($r) {
             Util::log("file successfully copied to local directory.");
         } else {
@@ -89,7 +96,13 @@ class ImageManager {
             return false;
         }
         // confirm image type
-        $type = exif_imagetype(self::STORAGE_PATH . $this->name);
+        if (function_exists('exif_imagetype')) {
+            $type = exif_imagetype(self::STORAGE_PATH . $this->name);
+        } else {
+            $type = getimagesize(self::STORAGE_PATH . $this->name);
+            $type = isset($type[2]) ? $type[2] : false;
+        }
+
         if (!in_array($type, array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
             $this->removeFile("improper imagetype upload attempted. file removed.");
             return false;
@@ -145,9 +158,7 @@ class ImageManager {
      */
     public static function checkStorageDir($log = true)
     {
-        if ($dh = @opendir(self::STORAGE_PATH)) {
-            // errors suppressed: only need true/false (without triggering E_WARNING)
-            closedir($dh);
+        if (is_dir(self::STORAGE_PATH) && is_writable(self::STORAGE_PATH)) {
             return true;
         } else {
             if ($log) {
@@ -179,5 +190,57 @@ class ImageManager {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Download a file from the given $url and save it to $path.
+     *
+     * @param string $url
+     * @param string $path
+     * @return bool|void
+     *
+     * Taken from here: http://www.w3bees.com/2013/09/download-file-from-remote-server-with.html
+     */
+    private function curlDownload($url, $path)
+    {
+        // Check if file exists without downloading it.
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 3);
+        curl_exec($ch);
+        $headers = curl_getinfo($ch);
+        curl_close($ch);
+
+        if ($headers['http_code'] !== 200) {
+            return false;
+        }
+
+        // Now download the file.
+
+        // open file to write
+        $fp = fopen($path, 'w+');
+        // start curl
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        // set return transfer to false
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+        // write data to local file
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        // execute curl
+        curl_exec($ch);
+        // close curl
+        curl_close($ch);
+        // close local file
+        fclose($fp);
+
+        if (filesize($path) > 0) {
+            return true;
+        }
+
+        return false;
     }
 }
