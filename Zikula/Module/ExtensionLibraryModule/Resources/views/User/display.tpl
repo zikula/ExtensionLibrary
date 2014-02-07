@@ -104,7 +104,11 @@
             var people = jQuery(e.relatedTarget).data('people');
             var content = "<ul>";
             jQuery.each(people, function(k, v) {
-               content = content + "<li><ul><li>{{gt text='Name'}}: " + v.name + "</li><li>{{gt text='Email'}}: " + v.email + "</li><li>{{gt text='Homepage'}}: " + v.homepage + "</li><li>{{gt text='Role'}}: " + v.role + "</li></ul></li>";
+               content = content + "<li><strong>" + v.name + "</strong><ul>";
+               if (v.role) content = content + "<li><em>" + v.role + "</em></li>";
+               if (v.email) content = content + "<li>" + v.email + "</li>";
+               if (v. homepage) content = content + "<li><a href='"+ v.homepage+"'>" + v.homepage + "</a></li>";
+               content = content + "</ul></li>";
             });
             content = content + "</ul>";
             jQuery(this).find(".modal-body").html(content);
