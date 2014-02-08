@@ -17,6 +17,7 @@ use Zikula\Core\Doctrine\EntityAccess;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Zikula\Module\ExtensionLibraryModule\Util;
 
 /**
  * Vendor entity class
@@ -348,6 +349,18 @@ class VendorEntity extends EntityAccess
     public function getExtensions()
     {
         return $this->extensions;
+    }
+
+    /**
+     * Filter the extensions by core filter.
+     *
+     * @param null|string $filter The core version to filter, defaults to the user's selcted core version.
+     *
+     * @return ArrayCollection|\Zikula\ExtensionLibraryModule\Entity\ExtensionEntity[]
+     */
+    public function getExtensionsByCoreFilter($filter = null)
+    {
+        return Util::filterExtensionsByCore($this->extensions, $filter);
     }
 
     /**
