@@ -13,6 +13,12 @@
 
 namespace Zikula\Module\ExtensionLibraryModule;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use vierbergenlars\SemVer\expression;
+use vierbergenlars\SemVer\version;
+use Zikula\ExtensionLibraryModule\Entity\ExtensionEntity;
+use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
+
 class Util {
     /**
      * Log a message to a file
@@ -65,5 +71,36 @@ class Util {
         }
 
         return $client;
+    }
+
+    /**
+     * Filter the given extensions by core filter.
+     *
+     * @param ExtensionEntity[]|ArrayCollection $extensions
+     * @param string|null                       $filter The core version to filter. Defaults to the cookie value.
+     *
+     * @return ExtensionEntity[]|ArrayCollection
+     */
+    public static function filterExtensionsByCore($extensions, $filter = null)
+    {
+        if (!isset($filter)) {
+            $filter = self::getChosenCore();
+        }
+        if ($filter === 'all') {
+            return $extensions;
+        }
+
+        $userSelectedCoreVersion = new version($filter);
+
+        foreach ($extensions as $key => $extension) {
+            if ($extension->getVersions()->filter(function (ExtensionVersionEntity $version) use ($userSelectedCoreVersion) {
+                $requiredCoreVersion = new expression($version->getCompatibility());
+                return $requiredCoreVersion->satisfiedBy($userSelectedCoreVersion);
+            })->isEmpty()) {
+                unset($extensions[$key]);
+            }
+        }
+
+        return $extensions;
     }
 } 

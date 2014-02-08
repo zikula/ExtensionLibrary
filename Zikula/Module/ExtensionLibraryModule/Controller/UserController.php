@@ -21,13 +21,13 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter; // used in annotations - do not remove
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
+use Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Zikula\Module\UsersModule\Constant as UsersConstant;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use System;
 use StringUtil;
 use Zikula\Module\ExtensionLibraryModule\Manager\ImageManager;
-use Zikula\Core\Response\PlainResponse;
 
 /**
  * UI operations executable by general users.
@@ -45,54 +45,79 @@ class UserController extends \Zikula_AbstractController
 
     /**
      * @Route("")
-     * The default entry point.
+     *
+     * @Route("/v/{vendor_slug}", name="zikulaextensionlibrarymodule_user_filterbycore")
+     * @ParamConverter("vendorEntity",
+     *      class="ZikulaExtensionLibraryModule:VendorEntity",
+     *      options={"mapping": {"vendor_slug": "titleSlug"}}
+     * )
+     *
+     * The default entry point. Shows either all extensions or only the one's matching the specified vendor.
+     *
+     * @param VendorEntity $vendorEntity
      *
      * @return Response
      * @throws AccessDeniedException
      */
-    public function indexAction()
+    public function indexAction(VendorEntity $vendorEntity = null)
     {
         if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_READ)) {
             throw new AccessDeniedException();
         }
         $this->checkIfCoreChosen();
 
-        $extensions = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:ExtensionEntity')->findAllMatchingCoreFilter();
+        if ($vendorEntity === null) {
+            $extensions = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:ExtensionEntity')->findAllMatchingCoreFilter();
+        } else {
+            $extensions = $vendorEntity->getExtensionsbyCoreFilter();
+        }
+
         $this->view->assign('extensions', $extensions);
         $this->view->assign('gravatarDefaultPath', $this->request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
-        $this->view->assign('breadcrumbs', array());
+        if ($vendorEntity === null) {
+            $this->view->assign('breadcrumbs', array());
+        } else {
+            $this->view->assign('breadcrumbs', array(array('title' => $vendorEntity->getTitle())));
+        }
 
         return $this->response($this->view->fetch('User/view.tpl'));
     }
 
     /**
-     * @Route("/display/{id}")
-     * @ParamConverter("extension", class="ZikulaExtensionLibraryModule:ExtensionEntity")
+     * @Route("/e/{extension_slug}")
+     * @ParamConverter("extensionEntity",
+     *      class="ZikulaExtensionLibraryModule:ExtensionEntity",
+     *      options={"mapping": {"extension_slug": "titleSlug"}}
+     * )
      *
      * Displays the detail page for an extension.
      *
-     * @param int $id The extension id.
+     * @param ExtensionEntity $extensionEntity
+     *
+     * @throws AccessDeniedException
      *
      * @return Response
-     * @throws AccessDeniedException
      */
-    public function display(ExtensionEntity $extension)
+    public function display(ExtensionEntity $extensionEntity)
     {
         if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_READ)) {
             throw new AccessDeniedException();
         }
         $this->checkIfCoreChosen();
 
-        $this->view->assign('extension', $extension);
+        $this->view->assign('extension', $extensionEntity);
         $this->view->assign('gravatarDefaultPath', $this->request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
         $this->view->assign('breadcrumbs', array(
             array(
-                'title' => $extension->getVendor()->getTitle(),
-                'route' => 'el/' . $extension->getVendor()->getTitleSlug(),
+                'title' => $extensionEntity->getVendor()->getTitle(),
+                'route' => $this->get('router')->generate(
+                        'zikulaextensionlibrarymodule_user_filterbycore',
+                        array('vendor_slug' => $extensionEntity->getVendor()->getTitleSlug()
+                        )
+                    )
             ),
             array(
-                'title' => $extension->getName(),
-                'route' => 'el/display/' . $extension->getId(), // @todo change to $extension->getNameSlug
+                'title' => $extensionEntity->getName()
             ),
         ));
 
@@ -102,8 +127,12 @@ class UserController extends \Zikula_AbstractController
     /**
      * @Route("/choose-your-core/{version}")
      *
-     * @return Response
+     * @param string $version
+     *
      * @throws AccessDeniedException
+     * @throws NotFoundHttpException
+     *
+     * @return Response
      */
     public function chooseCore($version = null)
     {
@@ -156,6 +185,8 @@ class UserController extends \Zikula_AbstractController
      * @Route("/doc/{file}", requirements={"file" = "manifest|sample-manifest|composer|sample-composer|instructions"})
      *
      * Display a requested doc file
+     *
+     * @param string $file
      *
      * @return Response
      */
@@ -214,7 +245,9 @@ class UserController extends \Zikula_AbstractController
      *
      * retrieve an image
      *
-     * @param $name
+     * @param string $name
+     *
+     * @return Response
      */
     public function getImage($name = null)
     {
