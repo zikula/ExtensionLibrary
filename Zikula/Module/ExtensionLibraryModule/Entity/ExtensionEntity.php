@@ -225,8 +225,8 @@ class ExtensionEntity extends EntityAccess
     {
         if (!$this->versionsSorted) {
             $iterator = $this->versions->getIterator();
-            $iterator->uasort(function (ExtensionVersionEntity $a, ExtensionVersionEntity $b) {
-                return version_compare($a->getSemver(), $b->getSemver()) * -1;
+            $iterator->uksort(function ($a, $b) {
+                return version_compare($a, $b) * -1;
             });
             $this->versions = new ArrayCollection(iterator_to_array($iterator));
             $this->versionsSorted = true;
