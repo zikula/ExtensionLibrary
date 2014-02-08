@@ -1,12 +1,21 @@
 {include file='User/header.tpl' icon=$extension.icon}
 
 <div style="min-height: 140px;">
-    <div class="well well-sm pull-right">
+    <div class="col-md-8">
+        <img class="media-object img-thumbnail pull-left" style='margin: 0 1em 1em 0' src="{$extension.icon}" alt="" width="90" height="90" />
+        <h3 style="margin-top: 0">{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></h3>
+        <ul class="list-unstyled">
+            {if !empty($extension.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.url}">{gt text="Extension Website"}</a></li>{/if}
+            {if !empty($extension.description)}<li>{$extension.description|safehtml}</li>{/if}
+
+        </ul>
+    </div>
+    <div class="well well-sm col-md-4">
         <h3 style="margin-top: 0">{$extension.vendor.title|safetext}</h3>
         <ul class="list-unstyled">
             {if !empty($extension.vendor.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.url}">{gt text="Vendor Website"}</a></li>{/if}
         </ul>
-        <div>
+        <div style="min-height: 90px;">
             <div class="iconStack pull-left">
                 <img class="media-object img-thumbnail" src="{$extension.vendor.logo}" alt="" width="90" height="90" />
                 {if isset($extension.vendor.ownerEmail)}
@@ -21,17 +30,7 @@
             </ul>
         </div>
     </div>
-    <div>
-        <img class="media-object img-thumbnail pull-left" style='margin: 0 1em 1em 0' src="{$extension.icon}" alt="" width="90" height="90" />
-        <h3>{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></h3>
-        <ul class="list-unstyled">
-            {if !empty($extension.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.url}">{gt text="Extension Website"}</a></li>{/if}
-            {if !empty($extension.description)}<li>{$extension.description|safehtml}</li>{/if}
-
-        </ul>
-    </div>
 </div>
-<div class="clearfix"></div>
 <br />
 
 <div class="panel-group" id="accordion">
@@ -68,8 +67,8 @@
                     {if isset($version.urls.download)}
                         <a type="button" class="btn btn-success btn-lg" href="{$version.urls.download}"><i class="fa fa-cloud-download fa-lg"></i> Download</a>
                     {else}
-                        <a type="button" class="btn btn-success" href="{$version.urls.zipball_url}">Download Zipball</a>
-                        <a type="button" class="btn btn-success" href="{$version.urls.tarball_url}">Download Tarball</a>
+                        <a type="button" class="btn btn-success" href="{$version.urls.zipball_url}"><i class="fa fa-github fa-lg"></i> Download Zipball</a>
+                        <a type="button" class="btn btn-success" href="{$version.urls.tarball_url}"><i class="fa fa-github fa-lg"></i> Download Tarball</a>
                     {/if}
                 </div>
                 <div class="col-md-2 btn-group-vertical">
