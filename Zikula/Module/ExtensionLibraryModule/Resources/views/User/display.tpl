@@ -35,7 +35,7 @@
 </div>
 <br />
 
-<div class="panel-group" id="accordion">
+<div class="panel-group clearfix" id="accordion">
 {assign var='firstMatchingVersion' value=true}
 {foreach from=$extension.versions item="version" name="versionLoop"}
     <div class="panel {if $version->matchesCoreChosen()}{if $firstMatchingVersion}panel-primary{else}panel-default{/if}{else}panel-warning{/if}">
