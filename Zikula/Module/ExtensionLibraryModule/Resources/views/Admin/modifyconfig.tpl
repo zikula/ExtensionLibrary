@@ -1,4 +1,7 @@
 {adminheader}
+    <h3>
+        <span class="fa fa-wrench"></span>&nbsp;{gt text="Settings"}
+    </h3>
     {if isset($storageDir)}
         <div class="alert alert-danger">
             {gt text='The image storage directory must be created at "%s" relative to the Zikula root.' tag1=$storageDir}
