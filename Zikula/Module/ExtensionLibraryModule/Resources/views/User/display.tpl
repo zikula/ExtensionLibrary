@@ -1,14 +1,14 @@
 {include file='User/header.tpl' icon=$extension.icon}
 
-<div style="min-height: 140px;">
-    <div class="col-md-8">
+<div>
+    <div class="col-md-8" style="min-height: 140px; position:relative;">
         <img class="media-object img-thumbnail pull-left" style='margin: 0 1em 1em 0' src="{$extension.icon}" alt="" width="90" height="90" />
         <h3 style="margin-top: 0">{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></h3>
         <ul class="list-unstyled">
             {if !empty($extension.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.url}">{gt text="Extension Website"}</a></li>{/if}
             {if !empty($extension.description)}<li>{$extension.description|safehtml}</li>{/if}
         </ul>
-        <div>
+        <div style="position: absolute; bottom: -10px; left: 18px;">
             {notifydisplayhooks eventname='el.ui_hooks.extension.display_view' id=$extension.id}
         </div>
     </div>
