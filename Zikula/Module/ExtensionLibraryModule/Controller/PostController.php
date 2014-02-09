@@ -149,8 +149,6 @@ class PostController extends \Zikula_AbstractController
             $bindings = $hookDispatcher->getBindingsBetweenOwners($this->name, 'Tag');
             if (count($bindings) > 0) {
                 $areaId = $hookDispatcher->getAreaId('subscriber.el.ui_hooks.extension');
-                $klist = implode(", ", $manifestContent->version->keywords);
-                Util::log("keywords: $klist and extid=". $extension->getId());
                 $args = array(
                     'module' => $this->name,
                     'objectId' => $extension->getId(),
