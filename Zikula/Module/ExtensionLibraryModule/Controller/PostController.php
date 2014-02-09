@@ -146,13 +146,11 @@ class PostController extends \Zikula_AbstractController
         /** @var $hookDispatcher \Zikula\Component\HookDispatcher\StorageInterface */
         $hookDispatcher = \ServiceUtil::get('hook_dispatcher');
         if (ModUtil::available('Tag')) {
-            Util::log('Tag available.');
             $bindings = $hookDispatcher->getBindingsBetweenOwners($this->name, 'Tag');
-            $c = count($bindings);
-            Util::log("There are [$c] bindings.");
             if (count($bindings) > 0) {
                 $areaId = $hookDispatcher->getAreaId('subscriber.el.ui_hooks.extension');
-                Util::log("The areaId is $areaId.");
+                $klist = implode(", ", $manifestContent->version->keywords);
+                Util::log("keywords: $klist and extid=". $extension->getId());
                 $args = array(
                     'module' => $this->name,
                     'objectId' => $extension->getId(),
