@@ -24,7 +24,7 @@ class ZikulaExtensionLibraryModule extends \Tag_AbstractTaggedObjectMeta
     public function __construct($objectId, $areaId, $module, $urlString = null, ModUrl $urlObject = null)
     {
         parent::__construct($objectId, $areaId, $module, $urlString, $urlObject);
-        $entityManager = \ServiceUtil::get('entity_manager');
+        $entityManager = \ServiceUtil::get('doctrine.entitymanager');
         $extension = $entityManager->getRepository("ZikulaExtensionLibraryModule:ExtensionEntity")->findOne($objectId);
         $this->setObjectTitle($extension->getTitle());
         $this->setObjectDate($extension->getUpdated());
