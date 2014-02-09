@@ -20,6 +20,7 @@ use Zikula\Core\ModUrl;
 
 class ZikulaExtensionLibraryModule extends \Tag_AbstractTaggedObjectMeta
 {
+    private $type;
 
     public function __construct($objectId, $areaId, $module, $urlString = null, ModUrl $urlObject = null)
     {
@@ -28,6 +29,7 @@ class ZikulaExtensionLibraryModule extends \Tag_AbstractTaggedObjectMeta
         $extension = $entityManager->getRepository("ZikulaExtensionLibraryModule:ExtensionEntity")->find($objectId);
         $this->setObjectTitle($extension->getTitle());
         $this->setObjectDate($extension->getUpdated());
+        $this->type = $extension->getType();
     }
 
     public function setObjectTitle($title)
@@ -57,7 +59,7 @@ class ZikulaExtensionLibraryModule extends \Tag_AbstractTaggedObjectMeta
         if (!empty($title)) {
             $urlObject = $this->getUrlObject();
             $modinfo = ModUtil::getInfoFromName('ZikulaExtensionLibraryModule');
-            $link = "{$modinfo['displayname']}: <a href='{$urlObject->getUrl()}'>{$title}</a> ({$date})";
+            $link = "{$modinfo['displayname']} - {$this->type}: <a href='{$urlObject->getUrl()}'>{$title}</a> ({$date})";
         }
 
         return $link;
