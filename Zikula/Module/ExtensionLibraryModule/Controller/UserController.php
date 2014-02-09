@@ -46,7 +46,7 @@ class UserController extends \Zikula_AbstractController
     /**
      * @Route("")
      *
-     * @Route("/v/{vendor_slug}", name="zikulaextensionlibrarymodule_user_filterbycore")
+     * @Route("/v/{vendor_slug}", name="zikulaextensionlibrarymodule_user_filterbyvendor")
      * @ParamConverter("vendorEntity",
      *      class="ZikulaExtensionLibraryModule:VendorEntity",
      *      options={"mapping": {"vendor_slug": "titleSlug"}}
@@ -111,7 +111,7 @@ class UserController extends \Zikula_AbstractController
             array(
                 'title' => $extensionEntity->getVendor()->getTitle(),
                 'route' => $this->get('router')->generate(
-                        'zikulaextensionlibrarymodule_user_filterbycore',
+                        'zikulaextensionlibrarymodule_user_filterbyvendor',
                         array('vendor_slug' => $extensionEntity->getVendor()->getTitleSlug()
                         )
                     )
