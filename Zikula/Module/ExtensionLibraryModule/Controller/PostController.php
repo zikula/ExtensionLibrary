@@ -14,6 +14,7 @@
 namespace Zikula\Module\ExtensionLibraryModule\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
+use Zikula\Core\ModUrl;
 use Zikula\Core\Response\PlainResponse;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity;
@@ -23,6 +24,7 @@ use Zikula\Module\ExtensionLibraryModule\Manager\ManifestManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\ComposerManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\PayloadManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\ImageManager;
+use ModUtil;
 
 /**
  * UI operations executable by general users.
@@ -140,7 +142,23 @@ class PostController extends \Zikula_AbstractController
 
         $this->entityManager->flush();
 
-        // @todo handle the 'keywords' as tags or hooks?
+        // add keywords via the Tag module when hooked
+        /** @var $hookDispatcher \Zikula\Component\HookDispatcher\StorageInterface */
+        $hookDispatcher = \ServiceUtil::get('hook_dispatcher');
+        if (ModUtil::available('Tag')) {
+            $bindings = $hookDispatcher->getBindingsBetweenOwners($this->name, 'Tag');
+            if (count($bindings) > 0) {
+                $areaId = $hookDispatcher->getAreaId('subscriber.el.ui_hooks.extension');
+                $args = array(
+                    'module' => $this->name,
+                    'objectId' => $extension->getId(),
+                    'areaId' => $areaId,
+                    'objUrl' => new ModUrl($this->name, 'user', 'display', \ZLanguage::getLanguageCode(), array('extension_slug' => $extension->getTitleSlug())),
+                    'hookdata' => array('tags' => $manifestContent->version->keywords),
+                );
+                ModUtil::apiFunc('Tag', 'user', 'tagObject', $args);
+            }
+        }
 
         return new PlainResponse();
     }

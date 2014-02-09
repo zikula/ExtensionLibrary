@@ -14,6 +14,7 @@
 namespace Zikula\Module\ExtensionLibraryModule;
 
 use DoctrineHelper;
+use HookUtil;
 
 /**
  * ExtensionLibrary module installer.
@@ -39,6 +40,7 @@ class ExtensionLibraryModuleInstaller extends \Zikula_AbstractInstaller
             $this->request->getSession()->getFlashBag()->add('error', $e->getMessage());
             return false;
         }
+        HookUtil::registerSubscriberBundles($this->version->getHookSubscriberBundles());
 
         return true;
     }
@@ -55,6 +57,7 @@ class ExtensionLibraryModuleInstaller extends \Zikula_AbstractInstaller
     {
         switch ($oldversion) {
             case '1.0.0':
+                HookUtil::registerSubscriberBundles($this->version->getHookSubscriberBundles());
         }
 
         // Update successful
@@ -74,6 +77,7 @@ class ExtensionLibraryModuleInstaller extends \Zikula_AbstractInstaller
             $this->request->getSession()->getFlashBag()->add('error', $e->getMessage());
             return false;
         }
+        HookUtil::unregisterSubscriberBundles($this->version->getHookSubscriberBundles());
 
         return true;
     }

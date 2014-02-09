@@ -7,8 +7,10 @@
         <ul class="list-unstyled">
             {if !empty($extension.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.url}">{gt text="Extension Website"}</a></li>{/if}
             {if !empty($extension.description)}<li>{$extension.description|safehtml}</li>{/if}
-
         </ul>
+        <div>
+            {notifydisplayhooks eventname='el.ui_hooks.extension.display_view' id=$extension.id}
+        </div>
     </div>
     <div class="well well-sm col-md-4">
         <h3 style="margin-top: 0">{$extension.vendor.title|safetext}</h3>
