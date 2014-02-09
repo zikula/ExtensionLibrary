@@ -27,7 +27,7 @@ class AdminApi extends \Zikula_AbstractApi
     public function getlinks()
     {
         $links = array();
-        if (SecurityUtil::checkPermission('Dizkus::', '::', ACCESS_ADMIN)) {
+        if (SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_ADMIN)) {
             $links[] = array(
                 'url' => ModUtil::url($this->name, 'admin', 'index'),
                 'text' => $this->__('Settings'),
