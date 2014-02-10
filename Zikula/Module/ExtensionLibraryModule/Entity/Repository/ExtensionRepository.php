@@ -21,6 +21,13 @@ use Zikula\Module\ExtensionLibraryModule\Util;
  */
 class ExtensionRepository extends EntityRepository
 {
+
+    /**
+     * This is the docblock that Christian forgot to write. :-)
+     *
+     * @param null $filter
+     * @return array|\Doctrine\Common\Collections\ArrayCollection|\Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity[]
+     */
     public function findAllMatchingCoreFilter($filter = null)
     {
         if (!isset($filter)) {
@@ -31,5 +38,38 @@ class ExtensionRepository extends EntityRepository
         }
 
         return Util::filterExtensionsByCore($this->findAll(), $filter);
+    }
+
+    /**
+     * get Extension objects based on searching the title for fragment provided
+     *
+     * @param array $fragments
+     * @return array|null
+     */
+    public function getByFragment(array $fragments)
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('e, v')
+            ->from('Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity', 'e')
+            ->join('e.vendor', 'v');
+        $or = $qb->expr()->orX();
+        $i = 1;
+        foreach ($fragments as $fragment) {
+            $or->add($qb->expr()->like('e.title', '?' . $i));
+            $qb->setParameter($i, '%' . $fragment . '%');
+            $or->add($qb->expr()->like('v.title', '?' . ($i + 1)));
+            $qb->setParameter($i + 1, '%' . $fragment . '%');
+            $i = $i + 2;
+        }
+        $qb->where($or);
+        $query = $qb->getQuery();
+
+        try {
+            $result = $query->getResult();
+        } catch (\Exception $e) {
+            Util::log("could not get result from getByFragment query: " . $e->getMessage());
+            $result = null;
+        }
+        return $result;
     }
 }
