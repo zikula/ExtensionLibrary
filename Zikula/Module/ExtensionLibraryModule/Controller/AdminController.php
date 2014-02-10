@@ -82,6 +82,15 @@ class AdminController extends \Zikula_AbstractController
         $modvars = $this->request->request->get('settings');
         $this->setVars($modvars);
 
+        // Check if GitHub authentication works after changing
+        $client = Util::getGitHubClient();
+        try {
+            $client->getHttpClient()->get('rate_limit');
+        } catch (\RuntimeException $e) {
+            $this->setVar('github_token', null);
+            \LogUtil::registerError('GitHub token is invalid, authorization failed!');
+        }
+
         return new RedirectResponse($this->get('router')->generate('zikulaextensionlibrarymodule_admin_index'));
     }
 }
