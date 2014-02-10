@@ -1,14 +1,16 @@
 {include file='User/header.tpl' icon=$extension.icon}
 
-<div>
-    <div class="col-md-8" style="min-height: 140px; position:relative;">
-        <img class="media-object img-thumbnail pull-left" style='margin: 0 1em 1em 0' src="{$extension.icon}" alt="" width="90" height="90" />
-        <h3 style="margin-top: 0">{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></h3>
-        <ul class="list-unstyled">
-            {if !empty($extension.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.url}">{gt text="Extension Website"}</a></li>{/if}
-            {if !empty($extension.description)}<li>{$extension.description|safehtml}</li>{/if}
-        </ul>
-        <div style="position: absolute; bottom: -10px; left: 18px;">
+<div class="row">
+    <div class="col-md-8">
+        <div style="min-height: 90px;">
+            <img class="media-object img-thumbnail pull-left" style='margin: 0 1em 1em 0' src="{$extension.icon}" alt="" width="90" height="90" />
+            <h3 style="margin-top: 0">{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></h3>
+            <ul class="list-unstyled">
+                {if !empty($extension.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.url}">{gt text="Extension Website"}</a></li>{/if}
+                {if !empty($extension.description)}<li>{$extension.description|safehtml}</li>{/if}
+            </ul>
+        </div>
+        <div>
             {notifydisplayhooks eventname='el.ui_hooks.extension.display_view' id=$extension.id}
         </div>
     </div>
@@ -35,55 +37,57 @@
 </div>
 <br />
 
-<div class="panel-group clearfix" id="accordion">
-{assign var='firstMatchingVersion' value=true}
-{foreach from=$extension.versions item="version" name="versionLoop"}
-    <div class="panel {if $version->matchesCoreChosen()}{if $firstMatchingVersion}panel-primary{else}panel-default{/if}{else}panel-warning{/if}">
-        <div class="panel-heading">
-            <em class="pull-right">
-                <span class="label {if $version->matchesCoreChosen()}label-info{else}label-danger{/if} tooltips" title="{gt text='Zikula Core version compatibility'}">{$version.compatibility}</span>&nbsp;
-                {gt text='Released: %s' tag1=$version.created->format('j M Y')}
-            </em>
-            <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent="#accordion" href="#version-{$version.id}">
-                    <strong>{gt text="Version"}: {$version.semver|safetext}</strong>
-                </a>
-            </h4>
-        </div>
-        <div id="version-{$version.id}" class="panel-collapse collapse{if $version->matchesCoreChosen() && $firstMatchingVersion} in{assign var='firstMatchingVersion' value=false}{/if}">
-            <div class="panel-body">
-                <div class="col-md-10">
-                    <ul>
-                        <li>{gt text="Description"}: {$version.description|safetext}</li>
-                        <li>{gt text="License" plural="Licenses" count=$version.licenses|count}: {", "|implode:$version.licenses|safetext}</li>
-                        {if !empty($version.dependencies)}
-                            <li>{gt text="Dependencies"}
-                                <ul>
-                                    {foreach from=$version.dependencies item="dependency"}
-                                        <li>{$dependency.name} ({$dependency.version})</li>
-                                    {/foreach}
-                                </ul>
-                            </li>
+<div class="row">
+    <div class="panel-group clearfix" id="accordion">
+    {assign var='firstMatchingVersion' value=true}
+    {foreach from=$extension.versions item="version" name="versionLoop"}
+        <div class="panel {if $version->matchesCoreChosen()}{if $firstMatchingVersion}panel-primary{else}panel-default{/if}{else}panel-warning{/if}">
+            <div class="panel-heading">
+                <em class="pull-right">
+                    <span class="label {if $version->matchesCoreChosen()}label-info{else}label-danger{/if} tooltips" title="{gt text='Zikula Core version compatibility'}">{$version.compatibility}</span>&nbsp;
+                    {gt text='Released: %s' tag1=$version.created->format('j M Y')}
+                </em>
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion" href="#version-{$version.id}">
+                        <strong>{gt text="Version"}: {$version.semver|safetext}</strong>
+                    </a>
+                </h4>
+            </div>
+            <div id="version-{$version.id}" class="panel-collapse collapse{if $version->matchesCoreChosen() && $firstMatchingVersion} in{assign var='firstMatchingVersion' value=false}{/if}">
+                <div class="panel-body">
+                    <div class="col-md-10">
+                        <ul>
+                            <li>{gt text="Description"}: {$version.description|safetext}</li>
+                            <li>{gt text="License" plural="Licenses" count=$version.licenses|count}: {", "|implode:$version.licenses|safetext}</li>
+                            {if !empty($version.dependencies)}
+                                <li>{gt text="Dependencies"}
+                                    <ul>
+                                        {foreach from=$version.dependencies item="dependency"}
+                                            <li>{$dependency.name} ({$dependency.version})</li>
+                                        {/foreach}
+                                    </ul>
+                                </li>
+                            {/if}
+                        </ul>
+                        {if isset($version.urls.download)}
+                            <a type="button" class="btn btn-success btn-lg" href="{$version.urls.download}"><i class="fa fa-cloud-download fa-lg"></i> Download</a>
+                        {else}
+                            <a type="button" class="btn btn-success" href="{$version.urls.zipball_url}"><i class="fa fa-github fa-lg"></i> Download Zipball</a>
+                            <a type="button" class="btn btn-success" href="{$version.urls.tarball_url}"><i class="fa fa-github fa-lg"></i> Download Tarball</a>
                         {/if}
-                    </ul>
-                    {if isset($version.urls.download)}
-                        <a type="button" class="btn btn-success btn-lg" href="{$version.urls.download}"><i class="fa fa-cloud-download fa-lg"></i> Download</a>
-                    {else}
-                        <a type="button" class="btn btn-success" href="{$version.urls.zipball_url}"><i class="fa fa-github fa-lg"></i> Download Zipball</a>
-                        <a type="button" class="btn btn-success" href="{$version.urls.tarball_url}"><i class="fa fa-github fa-lg"></i> Download Tarball</a>
-                    {/if}
-                </div>
-                <div class="col-md-2 btn-group-vertical">
-                    {if !empty($version.contributors)}<a href="" data-toggle="modal" data-people='{$version.encodedContributors}' data-target="#contributorsModal" type="button" class="btn btn-default btn-info btn-sm">{gt text="Contributors"}</a>{/if}
-                    {if !empty($version.urls.version)}<a href="{$version.urls.version}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Version Site"}</a>{/if}
-                    {if !empty($version.urls.docs)}<a href="{$version.urls.docs}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Docs"}</a>{/if}
-                    {if !empty($version.urls.demo)}<a href="{$version.urls.demo}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Demo"}</a>{/if}
-                    {if !empty($version.urls.issues)}<a href="{$version.urls.issues}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Issues"}</a>{/if}
+                    </div>
+                    <div class="col-md-2 btn-group-vertical">
+                        {if !empty($version.contributors)}<a href="" data-toggle="modal" data-people='{$version.encodedContributors}' data-target="#contributorsModal" type="button" class="btn btn-default btn-info btn-sm">{gt text="Contributors"}</a>{/if}
+                        {if !empty($version.urls.version)}<a href="{$version.urls.version}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Version Site"}</a>{/if}
+                        {if !empty($version.urls.docs)}<a href="{$version.urls.docs}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Docs"}</a>{/if}
+                        {if !empty($version.urls.demo)}<a href="{$version.urls.demo}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Demo"}</a>{/if}
+                        {if !empty($version.urls.issues)}<a href="{$version.urls.issues}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Issues"}</a>{/if}
+                    </div>
                 </div>
             </div>
         </div>
+    {/foreach}
     </div>
-{/foreach}
 </div>
 {include file='User/footer.tpl'}
 <!-- Modal -->
