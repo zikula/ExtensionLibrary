@@ -2,7 +2,7 @@
 
 <div class="row">
     <div class="col-md-8">
-        <div style="min-height: 90px;">
+        <div style="min-height: 100px;">
             <img class="media-object img-thumbnail pull-left" style='margin: 0 1em 1em 0' src="{$extension.icon}" alt="" width="90" height="90" />
             <h3 style="margin-top: 0">{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></h3>
             <ul class="list-unstyled">
