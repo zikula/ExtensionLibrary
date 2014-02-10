@@ -16,7 +16,7 @@ namespace Zikula\Module\ExtensionLibraryModule;
 use Doctrine\Common\Collections\ArrayCollection;
 use vierbergenlars\SemVer\expression;
 use vierbergenlars\SemVer\version;
-use Zikula\ExtensionLibraryModule\Entity\ExtensionEntity;
+use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
 
 class Util {
