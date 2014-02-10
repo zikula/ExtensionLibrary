@@ -58,7 +58,14 @@
                     <div class="col-md-10">
                         <ul>
                             <li>{gt text="Description"}: {$version.description|safetext}</li>
-                            <li>{gt text="License" plural="Licenses" count=$version.licenses|count}: {", "|implode:$version.licenses|safetext}</li>
+                            <li>
+                                {gt text="License" plural="Licenses" count=$version.licenses|count}:
+                                <ul class="list-inline" style="display:inline;">
+                                    {foreach from=$version.licenses item="license" name="licenseLoop"}
+                                        <li><a href='http://spdx.org/licenses/{$license}#licenseText'>{$license|safetext}</a></li>
+                                    {/foreach}
+                                </ul>
+                            </li>
                             {if !empty($version.dependencies)}
                                 <li>{gt text="Dependencies"}
                                     <ul>
