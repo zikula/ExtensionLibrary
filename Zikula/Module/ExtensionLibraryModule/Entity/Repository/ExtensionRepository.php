@@ -23,10 +23,10 @@ class ExtensionRepository extends EntityRepository
 {
 
     /**
-     * This is the docblock that Christian forgot to write. :-)
+     * Get all extensions matching the provided $filter or the user's core filter otherwise.
      *
-     * @param null $filter
-     * @return array|\Doctrine\Common\Collections\ArrayCollection|\Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity[]
+     * @param null|string $filter The version to filter, defaults to the core selected by the user.
+     * @return \Doctrine\Common\Collections\ArrayCollection|\Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity[]
      */
     public function findAllMatchingCoreFilter($filter = null)
     {
