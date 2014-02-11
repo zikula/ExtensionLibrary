@@ -14,12 +14,14 @@
 namespace Zikula\Module\ExtensionLibraryModule;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Github\Client as GitHubClient;
 use vierbergenlars\SemVer\expression;
 use vierbergenlars\SemVer\version;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
 
-class Util {
+class Util
+{
     /**
      * Log a message to a file
      *
@@ -60,14 +62,34 @@ class Util {
     /**
      * Get an instance of the GitHub Client, authenticated with the admin's authentication token.
      *
-     * @return \Github\Client
+     * @param bool $fallBackToNonAuthenticatedClient Whether or not to fall back to a non-authenticated client if
+     * authentication fails, default true.
+     *
+     * @param bool $log Whether to log errors or not, default true.
+     *
+     * @return GitHubClient|bool The authenticated GitHub client, or false if $fallBackToNonAuthenticatedClient
+     * is false and the client could not be authenticated.
      */
-    public static function getGitHubClient()
+    public static function getGitHubClient($fallBackToNonAuthenticatedClient = true, $log = true)
     {
-        $client = new \Github\Client();
+        $client = new GitHubClient();
         $token = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'github_token', null);
-        if ($token !== null) {
-            $client->authenticate($token, null, \Github\Client::AUTH_HTTP_TOKEN);
+        if (!empty($token)) {
+            $client->authenticate($token, null, GitHubClient::AUTH_HTTP_TOKEN);
+            try {
+                $client->getHttpClient()->get('rate_limit');
+            } catch (\RuntimeException $e) {
+                // Authentication failed!
+                if ($fallBackToNonAuthenticatedClient) {
+                    // Replace client with one not using authentication.
+                    $client = new GitHubClient();
+                } else {
+                    $client = false;
+                }
+                if ($log) {
+                    self::log('GitHub token is invalid, authorization failed!');
+                }
+            }
         }
 
         return $client;

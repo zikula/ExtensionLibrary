@@ -82,11 +82,10 @@ class AdminController extends \Zikula_AbstractController
         $modvars = $this->request->request->get('settings');
         $this->setVars($modvars);
 
-        // Check if GitHub authentication works after changing
-        $client = Util::getGitHubClient();
-        try {
-            $client->getHttpClient()->get('rate_limit');
-        } catch (\RuntimeException $e) {
+        // Check if GitHub authentication works after changing token.
+        $client = Util::getGitHubClient(false, false);
+
+        if ($client === false) {
             $this->setVar('github_token', null);
             \LogUtil::registerError('GitHub token is invalid, authorization failed!');
         }
