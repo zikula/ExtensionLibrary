@@ -4,7 +4,7 @@
     <div class="col-md-8">
         <div style="min-height: 100px;">
             <img class="media-object img-thumbnail pull-left" style='margin: 0 1em 1em 0' src="{$extension.icon}" alt="" width="90" height="90" />
-            <h3 style="margin-top: 0">{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small>&nbsp;<i class="fa fa-wrench fa-lg text-info"></i></h3>
+            <h3 style="margin-top: 0">{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></h3>
             <ul class="list-unstyled">
                 {if !empty($extension.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.url}">{gt text="Extension Website"}</a></li>{/if}
                 {if !empty($extension.description)}<li>{$extension.description|safehtml}</li>{/if}
@@ -15,7 +15,7 @@
         </div>
     </div>
     <div class="well well-sm col-md-4">
-        <h3 style="margin-top: 0">{$extension.vendor.title|safetext}&nbsp;<i class="fa fa-wrench fa-lg text-info"></i></h3>
+        <h3 style="margin-top: 0">{$extension.vendor.title|safetext}</h3>
         <ul class="list-unstyled">
             {if !empty($extension.vendor.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.url}">{gt text="Vendor Website"}</a></li>{/if}
         </ul>
@@ -51,6 +51,9 @@
                     <a data-toggle="collapse" data-parent="#accordion" href="#version-{$version.id}">
                         <strong>{gt text="Version"}: {$version.semver|safetext}</strong>
                     </a>
+                    {checkpermissionblock component=$module|cat:"::" instance=".*" level="ACCESS_ADMIN"}
+                    &nbsp;<a class="administerVersion" href="" data-extension="{$extension.id}" data-version="{$version.semver}"><i class="fa fa-wrench fa-lg text-muted tooltips" title="{gt text='Administrate version %s' tag1=$version.semver|safetext}"></i></a>
+                    {/checkpermissionblock}
                 </h4>
             </div>
             <div id="version-{$version.id}" class="panel-collapse collapse{if $version->matchesCoreChosen() && $firstMatchingVersion} in{assign var='firstMatchingVersion' value=false}{/if}">
@@ -125,5 +128,6 @@
             content = content + "</ul>";
             jQuery(this).find(".modal-body").html(content);
         });
+        jQuery('.tooltips').tooltip();
     });
 </script>
