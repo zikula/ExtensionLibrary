@@ -237,7 +237,25 @@ class UserController extends \Zikula_AbstractController
                     'title' => $this->__('Docs'),
                 ),
             ));
-        return $this->response(($this->view->fetch('User/docs.tpl')));
+        return $this->response($this->view->fetch('User/docs.tpl'));
+    }
+
+    /**
+     * @Route("/validate")
+     *
+     * Display a form to validate a zikula.manifest.json file
+     * Handle form submission via ajax
+     *
+     * @return Response
+     */
+    public function validateManifest()
+    {
+        $this->view->assign('breadcrumbs', array(
+            array(
+                'title' => $this->__('Validate'),
+            ),
+        ));
+        return $this->response($this->view->fetch('User/validate.tpl'));
     }
 
     /**
