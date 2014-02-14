@@ -25,6 +25,8 @@ use Zikula\Module\ExtensionLibraryModule\Manager\ComposerManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\PayloadManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\ImageManager;
 use ModUtil;
+use Zikula\Core\Hook\ProcessHook;
+use ZLanguage;
 
 /**
  * UI operations executable by general users.
@@ -145,6 +147,7 @@ class PostController extends \Zikula_AbstractController
         // add keywords via the Tag module when hooked
         /** @var $hookDispatcher \Zikula\Component\HookDispatcher\StorageInterface */
         $hookDispatcher = \ServiceUtil::get('hook_dispatcher');
+        $url = new ModUrl($this->name, 'user', 'display', ZLanguage::getLanguageCode(), array('extension_slug' => $extension->getTitleSlug()));
         if (ModUtil::available('Tag')) {
             $bindings = $hookDispatcher->getBindingsBetweenOwners($this->name, 'Tag');
             if (count($bindings) > 0) {
@@ -153,12 +156,15 @@ class PostController extends \Zikula_AbstractController
                     'module' => $this->name,
                     'objectId' => $extension->getId(),
                     'areaId' => $areaId,
-                    'objUrl' => new ModUrl($this->name, 'user', 'display', \ZLanguage::getLanguageCode(), array('extension_slug' => $extension->getTitleSlug())),
+                    'objUrl' => $url,
                     'hookdata' => array('tags' => $manifestContent->version->keywords),
                 );
                 ModUtil::apiFunc('Tag', 'user', 'tagObject', $args);
             }
         }
+
+        $this->dispatchHooks('el.ui_hooks.community.process_edit', new ProcessHook($extension->getId(), $url));
+
 
         return new PlainResponse();
     }

@@ -32,7 +32,7 @@ class ExtensionLibraryModuleVersion extends \Zikula_AbstractVersion
             'displayname' => $this->__('Extension Library'),
             'description' => $this->__('Browseable Zikula extensions listing'),
             'url' => $this->__('library'),
-            'version' => '1.0.1',
+            'version' => '1.0.2',
             'core_min' => '1.3.7',
             'core_max' => '1.3.99',
             'securityschema' => array(
@@ -49,6 +49,11 @@ class ExtensionLibraryModuleVersion extends \Zikula_AbstractVersion
     {
         $bundle = new SubscriberBundle($this->name, 'subscriber.el.ui_hooks.extension', 'ui_hooks', $this->__('ExtensionLibrary Hooks'));
         $bundle->addEvent('display_view', 'el.ui_hooks.extension.display_view');
+        $this->registerHookSubscriberBundle($bundle);
+
+        $bundle = new SubscriberBundle($this->name, 'subscriber.el.ui_hooks.community', 'ui_hooks', $this->__('Community Tab Hooks'));
+        $bundle->addEvent('display_view', 'el.ui_hooks.community.display_view');
+        $bundle->addEvent('process_edit', 'el.ui_hooks.community.process_edit');
         $this->registerHookSubscriberBundle($bundle);
     }
 
