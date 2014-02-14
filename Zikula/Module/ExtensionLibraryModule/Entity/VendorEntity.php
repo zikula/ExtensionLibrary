@@ -28,13 +28,6 @@ use Zikula\Module\ExtensionLibraryModule\Util;
 class VendorEntity extends EntityAccess
 {
     /**
-     * constants defining verification status for vendor
-     */
-    const VERIFIED = 1;
-    const UNVERIFIED = 0;
-    const DENIED = -1;
-
-    /**
      * id field
      *
      * @ORM\Id
@@ -130,13 +123,6 @@ class VendorEntity extends EntityAccess
      * @Gedmo\Slug(fields={"title"})
      */
     private $titleSlug;
-
-    /**
-     * vendor verification status
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $verified = self::UNVERIFIED;
 
     /**
      * Collection of extensions provided by this vendor
@@ -323,26 +309,6 @@ class VendorEntity extends EntityAccess
         return $this->userIds;
     }
 
-    public function setVerified()
-    {
-        $this->verified = self::VERIFIED;
-    }
-
-    public function setDenied()
-    {
-        $this->verified = self::DENIED;
-    }
-
-    public function isVerified()
-    {
-        return ($this->verified == self::VERIFIED);
-    }
-
-    public function isDenied()
-    {
-        return ($this->verified == self::DENIED);
-    }
-
     /**
      * @return ArrayCollection
      */
@@ -356,7 +322,7 @@ class VendorEntity extends EntityAccess
      *
      * @param null|string $filter The core version to filter, defaults to the user's selcted core version.
      *
-     * @return ArrayCollection|\Zikula\ExtensionLibraryModule\Entity\ExtensionEntity[]
+     * @return ArrayCollection|\Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity[]
      */
     public function getExtensionsByCoreFilter($filter = null)
     {

@@ -29,10 +29,11 @@ use Zikula\Module\ExtensionLibraryModule\Util;
 class ExtensionVersionEntity extends EntityAccess
 {
     /**
-     * constants defining the status of this version
+     * constants defining verification status for vendor
      */
-    const ACTIVE = 1;
-    const INACTIVE = 0;
+    const VERIFIED = 1;
+    const UNVERIFIED = 0;
+    const DENIED = -1;
 
     /**
      * id field
@@ -106,11 +107,11 @@ class ExtensionVersionEntity extends EntityAccess
     private $dependencies;
 
     /**
-     * active status of version
+     * status of version
      * 
      * @ORM\Column(type="integer")
      */
-    private $status = self::ACTIVE;
+    private $status = self::UNVERIFIED;
 
     /**
      * the number of times this version has been viewed
@@ -361,4 +362,18 @@ class ExtensionVersionEntity extends EntityAccess
         return $range->satisfiedBy($coreVersion);
     }
 
+
+    /**
+     * generate html for verification icon based on status
+     *
+     * @return string
+     */
+    public function getVerifiedIcon()
+    {
+        if ($this->status == self::VERIFIED) {
+            return "<span title='Extension has been verified!' class='fa-stack fa-lg tooltips'><i class='fa fa-certificate fa-stack-2x text-success'></i><i class='fa fa-check fa-stack-1x fa-inverse'></i></span>";
+        } else {
+            return "<span title='Extension not yet tested.' class='fa-stack fa-lg tooltips'><i class='fa fa-certificate fa-stack-2x text-muted'></i><i class='fa fa-times fa-stack-1x fa-inverse'></i></span>";
+        }
+    }
 }

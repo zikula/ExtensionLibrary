@@ -61,7 +61,8 @@ class ExtensionLibraryModuleInstaller extends \Zikula_AbstractInstaller
             case '1.0.1':
                 HookUtil::unregisterSubscriberBundles($this->version->getHookSubscriberBundles());
                 HookUtil::registerSubscriberBundles($this->version->getHookSubscriberBundles());
-
+            case '1.0.2':
+                DoctrineHelper::updateSchema($this->entityManager, array('Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity'));
         }
 
         // Update successful
