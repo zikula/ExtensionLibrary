@@ -163,8 +163,13 @@ class PostController extends \Zikula_AbstractController
             }
         }
 
+        if (ModUtil::available('ZikulaDizkusModule')) {
+            $bindings = $hookDispatcher->getBindingsBetweenOwners($this->name, 'ZikulaDizkusModule');
+            if (count($bindings) > 0) {
+                $this->request->request->set('dizkus', array('createTopic' => 1));
+            }
+        }
         $this->dispatchHooks('el.ui_hooks.community.process_edit', new ProcessHook($extension->getId(), $url));
-
 
         return new PlainResponse();
     }
