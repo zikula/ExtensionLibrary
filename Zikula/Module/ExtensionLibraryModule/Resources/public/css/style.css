@@ -8,3 +8,9 @@
     width: 30px;
     height: 30px;
 }
+div.tab-pane {
+    border: 1px solid #DDD;
+    border-top: none;
+    padding: 1em;
+    margin-top: 0;
+}
