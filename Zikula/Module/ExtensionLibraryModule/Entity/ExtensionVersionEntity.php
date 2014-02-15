@@ -379,9 +379,9 @@ class ExtensionVersionEntity extends EntityAccess
     public function getVerifiedIcon()
     {
         if ($this->status == self::VERIFIED) {
-            return "<span title='Extension has been verified!' class='fa-stack fa-lg tooltips'><i class='fa fa-certificate fa-stack-2x text-success'></i><i class='fa fa-check fa-stack-1x fa-inverse'></i></span>";
+            return "<span title='Extension has been verified!' data-container='body' class='fa-stack fa-lg tooltips'><i class='fa fa-certificate fa-stack-2x text-success'></i><i class='fa fa-check fa-stack-1x fa-inverse'></i></span>";
         } else {
-            return "<span title='Extension not yet tested.' class='fa-stack fa-lg tooltips'><i class='fa fa-certificate fa-stack-2x text-muted'></i><i class='fa fa-times fa-stack-1x fa-inverse'></i></span>";
+            return "<span title='Extension not yet tested.' data-container='body' class='fa-stack fa-lg tooltips'><i class='fa fa-certificate fa-stack-2x text-muted'></i><i class='fa fa-times fa-stack-1x fa-inverse'></i></span>";
         }
     }
 }

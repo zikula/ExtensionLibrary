@@ -51,5 +51,5 @@ jQuery(document).ready(function() {
     /**
      * enable tooltips
      */
-    jQuery('.tooltips').tooltip({container: 'body'});
+    jQuery('.tooltips').tooltip();
 });
