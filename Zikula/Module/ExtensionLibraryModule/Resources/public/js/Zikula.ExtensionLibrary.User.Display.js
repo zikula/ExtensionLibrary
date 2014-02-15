@@ -26,6 +26,8 @@ jQuery(document).ready(function() {
      * update the database to reflect admin choice to verify/unverify a version
      */
     jQuery('.verify').change(function() {
+        var spinner = jQuery(this).parents('.checkbox').children('i');
+        spinner.fadeIn();
         var parentRow = jQuery(this).parents("tr");
         jQuery.ajax({
             type: "POST",
@@ -36,11 +38,13 @@ jQuery(document).ready(function() {
             },
             url: Zikula.Config.baseURL + "el/ajax/setVersionStatus",
             success: function(result) {
-                if (result.data.status == 1) {
-                    parentRow.removeClass("warning").addClass("success");
-                } else {
-                    parentRow.removeClass("success").addClass("warning");
-                }
+                spinner.fadeOut(400, function() {
+                    if (result.data.status == 1) {
+                        parentRow.removeClass("warning").addClass("success");
+                    } else {
+                        parentRow.removeClass("success").addClass("warning");
+                    }
+                });
             },
             error: function(result) {
                 alert(result.responseJSON.core.statusmsg);

@@ -127,6 +127,7 @@
                         <td>
                             <div class="checkbox">
                                 <label><input data-version="{$version.semver}" data-extid="{$extension.id}" class="verify" type="checkbox" {if $version.verified}checked="checked"{/if}></label>
+                                <i class="fa fa-cog fa-spin text-danger" style="display: none;"></i>
                             </div>
                         </td>
                     </tr>
