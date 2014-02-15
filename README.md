@@ -3,7 +3,7 @@ Zikula ExtensionsLibrary
 
 ExtensionsLibrary is an automated browesable/searchable extensions listing module for the Zikula Application Framework
 
-This version **requires** Zikula Core 1.3.7+
+This version **requires** Zikula Core 1.4.0+
 
 module development stage is ALPHA.
 
