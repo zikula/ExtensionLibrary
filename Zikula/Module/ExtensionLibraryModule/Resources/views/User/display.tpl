@@ -1,3 +1,4 @@
+{pageaddvar name='javascript' value=$moduleBundle->getRelativePath()|cat:'/Resources/public/js/Zikula.ExtensionLibrary.User.Display.js'}
 {include file='User/header.tpl' icon=$extension.icon}
 
 <div class="row">
@@ -40,6 +41,9 @@
 <ul class="nav nav-tabs row">
     <li class="active"><a href="#versions" data-toggle="tab"><i class="fa fa-bars"></i> {gt text="Available Versions"}</a></li>
     <li><a href="#community" data-toggle="tab"><i class="fa fa-comments"></i> {gt text="Community Feedback"}</a></li>
+    {checkpermissionblock component=$module|cat:"::" instance=".*" level="ACCESS_ADMIN"}
+        <li><a href="#admin" data-toggle="tab"><i class="fa fa-wrench"></i> {gt text="Administrate"}</a></li>
+    {/checkpermissionblock}
 </ul>
 
 <div class="tab-content">
@@ -57,9 +61,6 @@
                             <a data-toggle="collapse" data-parent="#accordion" href="#version-{$version.id}">
                                 <strong>{gt text="Version"}: {$version.semver|safetext}</strong>
                             </a>
-                            {checkpermissionblock component=$module|cat:"::" instance=".*" level="ACCESS_ADMIN"}
-                                &nbsp;<a class="administerVersion" href="" data-extension="{$extension.id}" data-version="{$version.semver}"><i class="fa fa-wrench fa-lg text-muted tooltips" title="{gt text='Administrate version %s' tag1=$version.semver|safetext}"></i></a>
-                            {/checkpermissionblock}
                         </h4>
                     </div>
                     <div id="version-{$version.id}" class="panel-collapse collapse{if $version->matchesCoreChosen() && $firstMatchingVersion} in{assign var='firstMatchingVersion' value=false}{/if}">
@@ -85,6 +86,7 @@
                                         </li>
                                     {/if}
                                 </ul>
+                                {$version.verifiedIcon}
                                 {if isset($version.urls.download)}
                                     <a type="button" class="btn btn-success btn-lg" href="{$version.urls.download}"><i class="fa fa-cloud-download fa-lg"></i> Download</a>
                                 {else}
@@ -111,6 +113,29 @@
             {notifydisplayhooks eventname='el.ui_hooks.community.display_view' id=$extension.id}
         </div>
     </div>
+    {checkpermissionblock component=$module|cat:"::" instance=".*" level="ACCESS_ADMIN"}
+        <div class="tab-pane row" id="admin">
+            <h3>{gt text="Administration"}</h3>
+            <form role="form">
+                <input type="hidden" name="csrftoken" value="{insert name='csrftoken'}" />
+                <table class="table table-bordered">
+                    <thead><tr><th>{gt text="Version"}</th><th>{gt text="Verified"}</th></tr></thead>
+                    <tbody>
+                    {foreach from=$extension.versions item="version" name="versionLoop2"}
+                    <tr class="{if $version.verified}success{else}warning{/if}">
+                        <td>{$version.semver}</td>
+                        <td>
+                            <div class="checkbox">
+                                <label><input data-version="{$version.semver}" data-extid="{$extension.id}" class="verify" type="checkbox" {if $version.verified}checked="checked"{/if}></label>
+                            </div>
+                        </td>
+                    </tr>
+                    {/foreach}
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    {/checkpermissionblock}
 </div>
 
 
@@ -128,21 +153,3 @@
         </div>
     </div>
 </div>
-<script>
-    jQuery(document).ready(function() {
-        jQuery('#contributorsModal').on('show.bs.modal', function (e) {
-            var people = jQuery(e.relatedTarget).data('people');
-            var content = "<ul>";
-            jQuery.each(people, function(k, v) {
-                content = content + "<li><strong>" + v.name + "</strong><ul>";
-                if (v.role) content = content + "<li><em>" + v.role + "</em></li>";
-                if (v.email) content = content + "<li>" + v.email + "</li>";
-                if (v. homepage) content = content + "<li><a href='"+ v.homepage+"'>" + v.homepage + "</a></li>";
-                content = content + "</ul></li>";
-            });
-            content = content + "</ul>";
-            jQuery(this).find(".modal-body").html(content);
-        });
-        jQuery('.tooltips').tooltip();
-    });
-</script>

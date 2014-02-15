@@ -276,6 +276,14 @@ class ExtensionVersionEntity extends EntityAccess
     }
 
     /**
+     * @return bool
+     */
+    public function getVerified()
+    {
+        return $this->status == self::VERIFIED;
+    }
+
+    /**
      * @param \stdClass $urls from json
      */
     public function setUrls(\stdClass $urls)

@@ -32,7 +32,7 @@ class AjaxController extends \Zikula_Controller_AbstractAjax
      *
      * @return AjaxResponse
      */
-    public function validateManifest()
+    public function validateManifestAction()
     {
         $this->checkAjaxToken();
         $content = $this->request->request->get('content', '');
@@ -61,5 +61,32 @@ class AjaxController extends \Zikula_Controller_AbstractAjax
             'content' => $content,
             'errors' => $errors,
             'valid' => $valid));
+    }
+
+    /**
+     * @Route("/setVersionStatus")
+     * @Method("POST")
+     *
+     * set the status of a version
+     *
+     * @return AjaxResponse
+     */
+    public function setVersionStatus()
+    {
+        $this->checkAjaxToken();
+        $checked = $this->request->request->get('checked', 1);
+        $extid = $this->request->request->get('extid');
+        $version = $this->request->request->get('version');
+        if (empty($extid) || empty($version)) {
+            return new BadDataResponse();
+        }
+
+        $version = $this->entityManager
+            ->getRepository('ZikulaExtensionLibraryModule:ExtensionVersionEntity')
+            ->findOneBy(array('extension' => $extid, 'semver' => $version));
+        $version->setStatus($checked);
+        $this->entityManager->flush();
+
+        return new AjaxResponse(array('status' => $version->getStatus()));
     }
 }
