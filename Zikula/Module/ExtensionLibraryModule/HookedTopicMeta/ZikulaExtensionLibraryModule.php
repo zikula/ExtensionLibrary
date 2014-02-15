@@ -38,7 +38,7 @@ class ZikulaExtensionLibraryModule extends AbstractHookedTopicMeta
 
     public function setTitle()
     {
-        $this->title = $this->extension->getTitle();
+        $this->title = $this->extension->getTitle() . __('from', $this->dom) . $this->extension->getVendor()->getTitle();
     }
 
     public function setContent()
