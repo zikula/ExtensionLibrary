@@ -64,7 +64,22 @@ class UserController extends \Zikula_AbstractController
         if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_READ)) {
             throw new AccessDeniedException();
         }
-        $this->checkIfCoreChosen();
+        // @todo Fetch from GitHub.
+        $coreVersions = array(
+            'outdated'  => array('1.3.5' => 'foo', '1.3.4' => 'foo', '1.3.3' => 'foo', '1.3.2' => 'foo', '1.3.1' => 'foo', '1.3.0' => 'foo'),
+            'supported' => array('1.3.6' => 'foo'),
+            'dev'       => array('1.4.0' => 'foo'),
+        );
+
+        $version = $this->request->request->get('version', 'all');
+        if (isset($version)) {
+            if (!($version === 'all' || array_key_exists($version, $coreVersions['outdated']) || array_key_exists($version, $coreVersions['supported']) || array_key_exists($version, $coreVersions['dev']))) {
+                throw new NotFoundHttpException();
+            }
+            Util::setChosenCore($version);
+//            return new RedirectResponse(System::normalizeUrl(ModUtil::url('ZikulaExtensionLibraryModule', 'user', 'index')));
+        }
+        $this->view->assign('coreVersions', array_reverse($coreVersions, true));
 
         if ($vendorEntity === null) {
             $extensions = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:ExtensionEntity')->findAllMatchingCoreFilter();

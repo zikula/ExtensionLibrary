@@ -1,4 +1,4 @@
-{include file='User/header.tpl'}
+{include file='User/header.tpl' displayFilter=true}
 <div class="row">
     {foreach from=$extensions item="extension" name='loop'}
         {if ($smarty.foreach.loop.iteration - 1) % 3 == 0 && $smarty.foreach.loop.iteration != 1}
