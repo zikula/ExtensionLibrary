@@ -56,6 +56,14 @@ class PostController extends \Zikula_AbstractController
             $jsonPayload->repository->name,
             $jsonPayload->ref
         );
+        if ($manifestManager->hasDecodingErrors()) {
+            Util::log("{$jsonPayload->repository->name}: Cannot decode manifest. Violations:", Util::LOG_PROD);
+            foreach ($manifestManager->getDecodingErrors() as $error) {
+                Util::log($error, Util::LOG_PROD);
+            }
+            return new PlainResponse();
+        }
+
         $manifestContent = $manifestManager->getContent();
         if (empty($manifestContent)) {
             Util::log("{$jsonPayload->repository->name}: Manifest file does not validate. Violations:", Util::LOG_PROD);

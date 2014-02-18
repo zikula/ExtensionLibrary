@@ -60,6 +60,11 @@ class RemoteJsonManager {
      */
     protected $validationErrors = array();
     /**
+     * Decoding error discovered in the decoding method
+     * @var array
+     */
+    protected $decodingErrors = array();
+    /**
      * Github api client
      * @var \Github\Client
      */
@@ -95,28 +100,31 @@ class RemoteJsonManager {
         $rateLimitRemaining = $this->client->getHttpClient()->getLastResponse()->getHeader('X-RateLimit-Remaining');
         Util::log('Rate limit remaining: ' . $rateLimitRemaining);
 
-        $this->decodeContent();
-        $this->validate();
+        if ($this->decodeContent()) {
+            $this->validate();
+        }
     }
 
     /**
      * Decode the content of the file
-     * @throws \InvalidArgumentException
+     *
+     * @return boolean
      */
     private function decodeContent()
     {
         $jsonEncodedContent = base64_decode($this->file["content"]); // returns false on failure
         if (!$jsonEncodedContent) {
-            Util::log("Unable to base64_decode file content. Be sure json is valid.");
-            throw new \InvalidArgumentException();
+            $this->decodingErrors[] = ("Unable to base64_decode file content. Be sure json is valid.");
+            return false;
         }
         $this->content = json_decode($jsonEncodedContent); // return null on failure
         if (empty($this->content)) {
             $error = $this->jsonErrorCodes[json_last_error()];
-            Util::log(sprintf("Unable to json_decode file content (%s). Be sure json is valid.", $error));
-            throw new \InvalidArgumentException();
+            $this->decodingErrors[] = (sprintf("Unable to json_decode file content (%s). Be sure json is valid.", $error));
+            return false;
         }
         Util::log("Content decoded!");
+        return true;
     }
 
     /**
@@ -171,5 +179,21 @@ class RemoteJsonManager {
     public function getValidationErrors()
     {
         return $this->validationErrors;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDecodingErrors()
+    {
+        return $this->decodingErrors;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasDecodingErrors()
+    {
+        return !empty($this->decodingErrors);
     }
 }
