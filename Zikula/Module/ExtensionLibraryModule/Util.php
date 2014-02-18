@@ -23,14 +23,24 @@ use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
 class Util
 {
     /**
+     * constants defining log paths
+     */
+    const LOG_DEV = './app/logs/el_dev.log';
+    const LOG_PROD = './app/logs/el.log';
+
+    /**
      * Log a message to a file
      *
      * @param $msg
+     * @param $logpath
      */
-    public static function log($msg)
+    public static function log($msg, $logpath = self::LOG_DEV)
     {
+        if (!in_array($logpath, array(self::LOG_DEV, self::LOG_PROD))) {
+            return;
+        }
         // open file
-        $fd = fopen('./app/logs/el.log', "a");
+        $fd = fopen($logpath, "a");
         // prepend date/time to message
         $str = "[" . date("Y/m/d h:i:s", time()) . "] " . $msg;
         // write string

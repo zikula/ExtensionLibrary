@@ -28,31 +28,33 @@ use Zikula\Module\ExtensionLibraryModule\Util;
  * security suggestions taken from http://blog.nic0.me/post/579191344/some-common-php-security-pitfalls
  *     and http://security.stackexchange.com/a/237
  */
-class ImageManager {
-
+class ImageManager
+{
     /**
      * the private directory all module images are stored in
      * include trailing slash
      */
     const STORAGE_PATH = "../extensionlibrary/images/";
-
     /**
      * the url of the image's initial location
      * @var string
      */
     private $url;
-
     /**
      * the local image filename
      * @var string
      */
     private $name = null;
-
     /**
      * maximum size of image
      * @var array
      */
     private $maxSize = array('height' => 120, 'width' => 120);
+    /**
+     * Validation error discovered in the validation method
+     * @var array
+     */
+    protected $validationErrors = array();
 
     /**
      * @param string $url location of the file
@@ -64,7 +66,7 @@ class ImageManager {
             if ($this->validateExtension($url)) {
                 $this->name = uniqid();
             } else {
-                Util::log("could not validate image extension.");
+                $this->addValidationError("Could not validate image extension.");
             }
         } else {
             Util::log("could not validate storage directory.");
@@ -92,7 +94,7 @@ class ImageManager {
         if ($r) {
             Util::log("file successfully copied to local directory.");
         } else {
-            Util::log("could not find file from url.");
+            $this->addValidationError("Could not find image file from url.");
             return false;
         }
         // confirm image type
@@ -146,7 +148,7 @@ class ImageManager {
     {
         unlink(self::STORAGE_PATH . $this->name);
         unset($this->name);
-        Util::log($logtext);
+        $this->addValidationError($logtext);
     }
 
     /**
@@ -242,5 +244,23 @@ class ImageManager {
         }
 
         return false;
+    }
+
+    /**
+     * Add an error
+     *
+     * @param string $error
+     */
+    private function addValidationError($error)
+    {
+        $this->validationErrors[] = $error;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValidationErrors()
+    {
+        return $this->validationErrors;
     }
 }

@@ -57,7 +57,6 @@ class PayloadManager {
         }
 
         // payload is valid
-        // Util::log($payload);
         try {
             $this->jsonPayload = json_decode($payload);
         } catch (\Exception $e) {

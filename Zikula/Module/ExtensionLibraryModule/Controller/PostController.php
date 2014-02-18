@@ -58,7 +58,10 @@ class PostController extends \Zikula_AbstractController
         );
         $manifestContent = $manifestManager->getContent();
         if (empty($manifestContent)) {
-            Util::log("processInboundAction aborted. The manifest was invalid.");
+            Util::log("{$jsonPayload->repository->name}: Manifest file does not validate. Violations:", Util::LOG_PROD);
+            foreach ($manifestManager->getValidationErrors() as $error) {
+                Util::log(sprintf("[%s] %s", $error['property'], $error['message']), Util::LOG_PROD);
+            }
             return new PlainResponse();
         }
 
@@ -71,7 +74,10 @@ class PostController extends \Zikula_AbstractController
         );
         $composerContent = $composerManager->getContent();
         if (empty($composerContent)) {
-            Util::log("processInboundAction aborted. The composer file was invalid.");
+            Util::log("{$jsonPayload->repository->name}: Composer file does not validate. Violations:", Util::LOG_PROD);
+            foreach ($composerManager->getValidationErrors() as $error) {
+                Util::log(sprintf("[%s] %s", $error['property'], $error['message']), Util::LOG_PROD);
+            }
             return new PlainResponse();
         }
 
@@ -90,7 +96,15 @@ class PostController extends \Zikula_AbstractController
         }
         if (!empty($manifestContent->vendor) && !empty($manifestContent->vendor->logo)) {
             $imageManager = new ImageManager($manifestContent->vendor->logo);
-            $manifestContent->vendor->logo = ($imageManager->import()) ? $imageManager->getName() : '';
+            if ($imageManager->import()) {
+                $manifestContent->vendor->logo = $imageManager->getName();
+            } else {
+                $manifestContent->vendor->logo = '';
+                Util::log("{$jsonPayload->repository->name}: Invalid vendor logo. Violations:", Util::LOG_PROD);
+                foreach ($imageManager->getValidationErrors() as $error) {
+                    Util::log($error, Util::LOG_PROD);
+                }
+            }
         }
         $vendor->mergeManifest($manifestContent);
         $vendor->mergeComposer($composerContent);
@@ -115,7 +129,15 @@ class PostController extends \Zikula_AbstractController
         }
         if (!empty($manifestContent->extension->icon)) {
             $imageManager = new ImageManager($manifestContent->extension->icon);
-            $manifestContent->extension->icon = ($imageManager->import()) ? $imageManager->getName() : '';
+            if ($imageManager->import()) {
+                $manifestContent->extension->icon = $imageManager->getName();
+            } else {
+                $manifestContent->extension->icon = '';
+                Util::log("{$jsonPayload->repository->name}: Invalid extension icon. Violations:", Util::LOG_PROD);
+                foreach ($imageManager->getValidationErrors() as $error) {
+                    Util::log($error, Util::LOG_PROD);
+                }
+            }
         }
         $extension->mergeManifest($manifestContent);
         $extension->mergeComposer($composerContent);
@@ -135,9 +157,14 @@ class PostController extends \Zikula_AbstractController
             $extension->addVersion($version);
             $version->mergeManifest($manifestContent);
             $version->mergeComposer($composerContent);
-            Util::log(sprintf('Version %s added to extension %s', $semver, $jsonPayload->repository->id));
+            Util::log(sprintf('Version %s added to extension %s',
+                $semver,
+                $extension->getTitle()), Util::LOG_PROD);
         } else {
-            Util::log("The version was not added because it was the same or older than the current version.");
+            Util::log(sprintf("(%s) The version %s was not added because it was the same or older than the current version (%s).",
+                $extension->getTitle(),
+                $semver,
+                $newestVersion->getSemver()), Util::LOG_PROD);
             // return without flushing since there should be no changes if version isn't new
             return new PlainResponse();
         }

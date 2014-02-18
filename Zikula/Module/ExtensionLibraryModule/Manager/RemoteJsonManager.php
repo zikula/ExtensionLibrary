@@ -153,10 +153,6 @@ class RemoteJsonManager {
         if ($this->isvalid()) {
             return $this->content;
         } else {
-            Util::log("json file does not validate. Violations:");
-            foreach ($this->validationErrors as $error) {
-                Util::log(sprintf("[%s] %s", $error['property'], $error['message']));
-            }
             return false;
         }
     }
