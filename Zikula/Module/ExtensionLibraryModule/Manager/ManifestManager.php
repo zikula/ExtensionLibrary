@@ -28,8 +28,10 @@ class ManifestManager extends RemoteJsonManager {
         $this->schema = 'schema.manifest.json';
         parent::__construct($owner, $repo, $ref, 'zikula.manifest.json');
 
-        $this->validateVersion($ref);
-        $this->appendLinks($owner, $repo);
+        if ($this->valid) {
+            $this->validateVersion($ref);
+            $this->appendLinks($owner, $repo);
+        }
     }
 
     /**

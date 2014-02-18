@@ -115,11 +115,13 @@ class RemoteJsonManager {
         Util::log("decoding content.");
         $jsonEncodedContent = base64_decode($this->file["content"]); // returns false on failure
         if (!$jsonEncodedContent) {
+            $this->valid = false;
             $this->decodingErrors[] = "Unable to base64_decode file content. Be sure json is valid.";
             return false;
         }
         $this->content = json_decode($jsonEncodedContent); // returns null on failure
         if (empty($this->content)) {
+            $this->valid = false;
             $error = $this->jsonErrorCodes[json_last_error()];
             $this->decodingErrors[] = sprintf("Unable to json_decode file content (%s). Be sure json is valid.", $error);
             return false;
