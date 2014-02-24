@@ -15,6 +15,7 @@ namespace Zikula\Module\ExtensionLibraryModule;
 
 use Zikula\Component\HookDispatcher\SubscriberBundle;
 use HookUtil;
+use Zikula\Module\SearchModule\AbstractSearchable;
 
 /**
  * ExtensionLibrary module version information and other metadata.
@@ -35,12 +36,10 @@ class ExtensionLibraryModuleVersion extends \Zikula_AbstractVersion
             'version' => '1.0.3',
             'core_min' => '1.4.0',
             'core_max' => '1.4.99',
-            'securityschema' => array(
-                $this->name.'::' => '::',
-            ),
+            'securityschema' => array($this->name . '::' => '::'),
             'capabilities' => array(
-                HookUtil::SUBSCRIBER_CAPABLE => array(
-                    'enabled' => true),
+                HookUtil::SUBSCRIBER_CAPABLE => array('enabled' => true),
+                AbstractSearchable::SEARCHABLE => array('class' => 'Zikula\Module\ExtensionLibraryModule\Helper\SearchHelper'),
             )
         );
     }
