@@ -50,23 +50,99 @@ class Util
     }
 
     /**
-     * Saves the chosen core version to a cookie. The cookie will be deleted after 24 hours.
-     * 
-     * @param string $version The core version, can be anything matching SemVer or 'all'.
+     * Get all available core versions.
+     *
+     * @return array An array of arrays providing "outdated", "supported" and "dev" core versions.
+     *
+     * @todo Fetch from GitHub.
      */
-    public static function setChosenCore($version)
+    public static function getAvailableCoreVersions()
     {
-        \CookieUtil::setCookie('zikulaextensionslibrarymodule_chosenCore', $version, time() + 60*60*24, '/');
+        return array(
+            'outdated'  => array('1.3.5' => 'foo', '1.3.4' => 'foo', '1.3.3' => 'foo', '1.3.2' => 'foo', '1.3.1' => 'foo', '1.3.0' => 'foo'),
+            'supported' => array('1.3.6' => 'foo'),
+            'dev'       => array('1.4.0' => 'foo'),
+        );
     }
 
     /**
-     * Returns the chosen core version from cookie. If no cookie is set, it returns 'all'.
+     * Get all available extension types.
+     *
+     * @return array An array of allowed extension types.
+     */
+    public static function getAvailableExtensionTypes()
+    {
+        $dom = \ZLanguage::getModuleDomain('ZikulaExtensionLibraryModule');
+
+        return array(
+            ExtensionEntity::TYPE_MODULE => __('Modules', $dom),
+            ExtensionEntity::TYPE_THEME => __('Themes', $dom),
+            ExtensionEntity::TYPE_PLUGIN => __('Plugins', $dom)
+        );
+    }
+
+    /**
+     * Saves the chosen core version to a session variable.
+     *
+     * @param string $filter The core version, can be anything matching SemVer or 'all'.
+     *
+     * @throws \InvalidArgumentException If $filter is invalid.
+     */
+    public static function setCoreFilter($filter)
+    {
+        $coreVersions = self::getAvailableCoreVersions();
+
+        if (!($filter === 'all' || array_key_exists($filter, $coreVersions['outdated']) || array_key_exists($filter, $coreVersions['supported']) || array_key_exists($filter, $coreVersions['dev']))) {
+            throw new \InvalidArgumentException();
+        }
+
+        /** @var \Symfony\Component\HttpFoundation\Request $request */
+        $request = \ServiceUtil::get('request');
+        $request->getSession()->set('zikulaextensionslibrarymodule_chosenCore', $filter);
+    }
+
+    /**
+     * Returns the chosen core version from session variable. Defaults to 'all'.
      * 
      * @return string The core version, can be anything matching SemVer or 'all'.
      */
-    public static function getChosenCore()
+    public static function getCoreVersionFilter()
     {
-        return \CookieUtil::getCookie('zikulaextensionslibrarymodule_chosenCore', true, 'all');
+        /** @var \Symfony\Component\HttpFoundation\Request $request */
+        $request = \ServiceUtil::get('request');
+        return $request->getSession()->get('zikulaextensionslibrarymodule_chosenCore', 'all');
+    }
+
+    /**
+     * Saves the chosen extension type to a session variable.
+     *
+     * @param string $filter The extension type to filter.
+     *
+     * @throws \InvalidArgumentException If $filter is invalid.
+     */
+    public static function setExtensionTypeFilter($filter)
+    {
+        $extensionTypes = self::getAvailableExtensionTypes();
+
+        if (!($filter === 'all' || array_key_exists($filter, $extensionTypes))) {
+            throw new \InvalidArgumentException();
+        }
+
+        /** @var \Symfony\Component\HttpFoundation\Request $request */
+        $request = \ServiceUtil::get('request');
+        $request->getSession()->set('zikulaextensionslibrarymodule_extensionType', $filter);
+    }
+
+    /**
+     * Returns the chosen extension type from session variable. Defaults to 'all'.
+     *
+     * @return string The chosen extension type.
+     */
+    public static function getExtensionTypeFilter()
+    {
+        /** @var \Symfony\Component\HttpFoundation\Request $request */
+        $request = \ServiceUtil::get('request');
+        return $request->getSession()->get('zikulaextensionslibrarymodule_extensionType', 'all');
     }
 
     /**
@@ -109,23 +185,36 @@ class Util
      * Filter the given extensions by core filter.
      *
      * @param ExtensionEntity[]|ArrayCollection $extensions
-     * @param string|null                       $filter The core version to filter. Defaults to the cookie value.
+     * @param null|string $coreVersion   The core version to filter, defaults to the core selected by the user.
+     * @param null|string $extensionType The extension type to filter, defaults to the extension type selected by the
+     * user.
      *
      * @return ExtensionEntity[]|ArrayCollection
      */
-    public static function filterExtensionsByCore($extensions, $filter = null)
+    public static function filterExtensions($extensions, $coreVersion = null, $extensionType = null)
     {
-        if (!isset($filter)) {
-            $filter = self::getChosenCore();
+        if (!isset($coreVersion)) {
+            $coreVersion = Util::getCoreVersionFilter();
         }
-        if ($filter === 'all') {
+        if (!isset($extensionType)) {
+            $extensionType = Util::getExtensionTypeFilter();
+        }
+        if ($coreVersion === 'all' && $extensionType === 'all') {
             return $extensions;
         }
 
-        $userSelectedCoreVersion = new version($filter);
+        if ($coreVersion !== 'all') {
+            $userSelectedCoreVersion = new version($coreVersion);
+        }
 
         foreach ($extensions as $key => $extension) {
-            if ($extension->getVersions()->filter(function (ExtensionVersionEntity $version) use ($userSelectedCoreVersion) {
+            if ($extensionType !== 'all') {
+                if ($extension->getType() !== $extensionType) {
+                    unset ($extensions[$key]);
+                    continue;
+                }
+            }
+            if ($coreVersion !== 'all' && $extension->getVersions()->filter(function (ExtensionVersionEntity $version) use ($userSelectedCoreVersion) {
                 $requiredCoreVersion = new expression($version->getCompatibility());
                 return $requiredCoreVersion->satisfiedBy($userSelectedCoreVersion);
             })->isEmpty()) {

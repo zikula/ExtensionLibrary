@@ -356,7 +356,7 @@ class ExtensionVersionEntity extends EntityAccess
     public function matchesCoreChosen($coreVersion = null)
     {
         if (!isset($coreVersion)) {
-            $coreVersion = Util::getChosenCore();
+            $coreVersion = Util::getCoreVersionFilter();
         }
 
         if ($coreVersion === 'all') {

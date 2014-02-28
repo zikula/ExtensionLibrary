@@ -5,7 +5,7 @@
     <div class="col-md-8">
         <div style="min-height: 100px;">
             <img class="media-object img-thumbnail pull-left" style='margin: 0 1em 1em 0' src="{$extension.icon}" alt="" width="90" height="90" />
-            <h3 style="margin-top: 0">{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.type}</small></h3>
+            <h3 style="margin-top: 0">{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.typeForDisplay}</small></h3>
             <ul class="list-unstyled">
                 {if !empty($extension.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.url}">{gt text="Extension Website"}</a></li>{/if}
                 {if !empty($extension.description)}<li>{$extension.description|safehtml}</li>{/if}

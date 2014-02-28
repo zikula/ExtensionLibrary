@@ -318,15 +318,17 @@ class VendorEntity extends EntityAccess
     }
 
     /**
-     * Filter the extensions by core filter.
+     * Filter the extensions by core version and extension type.
      *
-     * @param null|string $filter The core version to filter, defaults to the user's selcted core version.
+     * @param null|string $coreVersion      The core version to filter, defaults to the core selected by the user.
+     * @param null|string $extensionType The extension type to filter, defaults to the extension type selected by the
+     * user.
      *
      * @return ArrayCollection|\Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity[]
      */
-    public function getExtensionsByCoreFilter($filter = null)
+    public function getExtensionsByFilter($coreVersion = null, $extensionType = null)
     {
-        return Util::filterExtensionsByCore($this->extensions, $filter);
+        return Util::filterExtensions($this->extensions, $coreVersion, $extensionType);
     }
 
     /**

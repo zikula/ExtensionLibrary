@@ -13,26 +13,26 @@
 
 /**
  * Zikula_View|Smarty template plugin
- * Retrieve the currently selected core version
+ * Retrieve all available core versions.
  *
  * Available parameters:
  *   - assign:   If set, the results are assigned to the corresponding
  *               variable instead of printed out
  *
  * Example
- *   {elGetChosenCore|safetext}
+ *   {elGetAvailableCoreVersions assign='coreVersions'}
  *
  * @param $params
  * @param Zikula_View $view
- * @return void|string the selected core version string
+ * @return array the available core versions
  */
-function smarty_function_elGetChosenCore($params, Zikula_View $view)
+function smarty_function_elGetAvailableCoreVersions($params, Zikula_View $view)
 {
-    $version = \Zikula\Module\ExtensionLibraryModule\Util::getCoreVersionFilter();
+    $coreVersions = \Zikula\Module\ExtensionLibraryModule\Util::getAvailableCoreVersions();
 
     if (isset($params['assign']) && !empty($params['assign'])) {
-        $view->assign($params['assign'], $version);
+        $view->assign($params['assign'], $coreVersions);
     } else {
-        return $version;
+        return $coreVersions;
     }
 }
