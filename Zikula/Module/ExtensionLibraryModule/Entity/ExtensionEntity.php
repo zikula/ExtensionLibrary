@@ -316,10 +316,21 @@ class ExtensionEntity extends EntityAccess
      */
     public function getType()
     {
+        return $this->type;
+    }
+
+    /**
+     * Get the displayable extension type.
+     * @return string
+     */
+    public function getTypeForDisplay()
+    {
+        $dom = \ZLanguage::getModuleDomain('ZikulaExtensionLibraryModule');
+
         $types = array(
-            self::TYPE_MODULE => 'Module',
-            self::TYPE_THEME => 'Theme',
-            self::TYPE_PLUGIN => 'Plugin',
+            self::TYPE_MODULE => __('Module', $dom),
+            self::TYPE_THEME => __('Theme', $dom),
+            self::TYPE_PLUGIN => __('Plugin', $dom),
         );
         // @todo translate
         return $types[$this->type];

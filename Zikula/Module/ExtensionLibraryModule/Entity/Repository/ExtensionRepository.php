@@ -23,21 +23,17 @@ class ExtensionRepository extends EntityRepository
 {
 
     /**
-     * Get all extensions matching the provided $filter or the user's core filter otherwise.
+     * Get all extensions matching the provided $coreVersion and $extensionType or the user's core and extension
+     * filter otherwise.
      *
-     * @param null|string $filter The version to filter, defaults to the core selected by the user.
+     * @param null|string $coreVersion      The core version to filter, defaults to the core selected by the user.
+     * @param null|string $extensionType The extension type to filter, defaults to the extension type selected by the
+     * user.
      * @return \Doctrine\Common\Collections\ArrayCollection|\Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity[]
      */
-    public function findAllMatchingCoreFilter($filter = null)
+    public function findAllMatchingFilter($coreVersion = null, $extensionType = null)
     {
-        if (!isset($filter)) {
-            $filter = Util::getChosenCore();
-        }
-        if ($filter === 'all') {
-            return $this->findAll();
-        }
-
-        return Util::filterExtensionsByCore($this->findAll(), $filter);
+        return Util::filterExtensions($this->findAll(), $coreVersion, $extensionType);
     }
 
     /**

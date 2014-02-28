@@ -13,26 +13,26 @@
 
 /**
  * Zikula_View|Smarty template plugin
- * Retrieve the currently selected core version
+ * Retrieve all available extension types.
  *
  * Available parameters:
  *   - assign:   If set, the results are assigned to the corresponding
  *               variable instead of printed out
  *
  * Example
- *   {elGetChosenCore|safetext}
+ *   {elGetAvailableExtensionTypes assign='extensionTypes'}
  *
  * @param $params
  * @param Zikula_View $view
- * @return void|string the selected core version string
+ * @return array the available extension types.
  */
-function smarty_function_elGetChosenCore($params, Zikula_View $view)
+function smarty_function_elGetAvailableExtensionTypes($params, Zikula_View $view)
 {
-    $version = \Zikula\Module\ExtensionLibraryModule\Util::getCoreVersionFilter();
+    $extensionTypes = \Zikula\Module\ExtensionLibraryModule\Util::getAvailableExtensionTypes();
 
     if (isset($params['assign']) && !empty($params['assign'])) {
-        $view->assign($params['assign'], $version);
+        $view->assign($params['assign'], $extensionTypes);
     } else {
-        return $version;
+        return $extensionTypes;
     }
 }

@@ -34,15 +34,6 @@ use Zikula\Module\ExtensionLibraryModule\Manager\ImageManager;
  */
 class UserController extends \Zikula_AbstractController
 {
-    private function checkIfCoreChosen()
-    {
-        if (!Util::getChosenCore()) {
-            return new RedirectResponse(System::normalizeUrl(ModUtil::url('ZikulaExtensionLibraryModule', 'user', 'chooseCore')));
-        }
-
-        return true;
-    }
-
     /**
      * @Route("")
      *
@@ -56,35 +47,20 @@ class UserController extends \Zikula_AbstractController
      *
      * @param VendorEntity $vendorEntity
      *
-     * @return Response
      * @throws AccessDeniedException
+     *
+     * @return Response
      */
     public function indexAction(VendorEntity $vendorEntity = null)
     {
         if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_READ)) {
             throw new AccessDeniedException();
         }
-        // @todo Fetch from GitHub.
-        $coreVersions = array(
-            'outdated'  => array('1.3.5' => 'foo', '1.3.4' => 'foo', '1.3.3' => 'foo', '1.3.2' => 'foo', '1.3.1' => 'foo', '1.3.0' => 'foo'),
-            'supported' => array('1.3.6' => 'foo'),
-            'dev'       => array('1.4.0' => 'foo'),
-        );
-
-        $version = $this->request->request->get('version', 'all');
-        if (isset($version)) {
-            if (!($version === 'all' || array_key_exists($version, $coreVersions['outdated']) || array_key_exists($version, $coreVersions['supported']) || array_key_exists($version, $coreVersions['dev']))) {
-                throw new NotFoundHttpException();
-            }
-            Util::setChosenCore($version);
-//            return new RedirectResponse(System::normalizeUrl(ModUtil::url('ZikulaExtensionLibraryModule', 'user', 'index')));
-        }
-        $this->view->assign('coreVersions', array_reverse($coreVersions, true));
 
         if ($vendorEntity === null) {
-            $extensions = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:ExtensionEntity')->findAllMatchingCoreFilter();
+            $extensions = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:ExtensionEntity')->findAllMatchingFilter();
         } else {
-            $extensions = $vendorEntity->getExtensionsbyCoreFilter();
+            $extensions = $vendorEntity->getExtensionsbyFilter();
         }
 
         $this->view->assign('extensions', $extensions);
@@ -113,12 +89,11 @@ class UserController extends \Zikula_AbstractController
      *
      * @return Response
      */
-    public function display(ExtensionEntity $extensionEntity)
+    public function displayAction(ExtensionEntity $extensionEntity)
     {
         if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_READ)) {
             throw new AccessDeniedException();
         }
-        $this->checkIfCoreChosen();
 
         $this->view->assign('extension', $extensionEntity);
         $this->view->assign('gravatarDefaultPath', $this->request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
@@ -140,40 +115,43 @@ class UserController extends \Zikula_AbstractController
     }
 
     /**
-     * @Route("/choose-your-core/{version}")
+     * @Route("/filter/{filterType}/{filter}/{returnUrl}", requirements={"filterType" = "coreVersion|extensionType"}))
      *
-     * @param string $version
+     * @param $filterType Can be either "coreVersion" or "extensionType".
+     * @param $filter     The value to filter.
+     * @param $returnUrl  The return url to redirect to.
      *
-     * @throws AccessDeniedException
-     * @throws NotFoundHttpException
-     *
-     * @return Response
+     * @throws \NotFoundHttpException
+     * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
+     * @return RedirectResponse()
      */
-    public function chooseCore($version = null)
+    public function filterAction($filterType, $filter, $returnUrl)
     {
         if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_READ)) {
             throw new AccessDeniedException();
         }
 
-        // @todo Fetch from GitHub.
-        $coreVersions = array(
-            'outdated'  => array('1.3.5' => 'foo', '1.3.4' => 'foo', '1.3.3' => 'foo', '1.3.2' => 'foo', '1.3.1' => 'foo', '1.3.0' => 'foo'),
-            'supported' => array('1.3.6' => 'foo'),
-            'dev'       => array('1.4.0' => 'foo'),
-        );
-
-        if (isset($version)) {
-            if (!($version === 'all' || array_key_exists($version, $coreVersions['outdated']) || array_key_exists($version, $coreVersions['supported']) || array_key_exists($version, $coreVersions['dev']))) {
-                throw new NotFoundHttpException();
-            }
-            Util::setChosenCore($version);
-            return new RedirectResponse(System::normalizeUrl(ModUtil::url('ZikulaExtensionLibraryModule', 'user', 'index')));
+        switch ($filterType) {
+            case 'coreVersion':
+                try {
+                    Util::setCoreFilter($filter);
+                } catch (\InvalidArgumentException $e) {
+                    throw new \NotFoundHttpException('Invalid arguments received.');
+                }
+                break;
+            case 'extensionType':
+                try {
+                    Util::setExtensionTypeFilter($filter);
+                } catch (\InvalidArgumentException $e) {
+                    throw new \NotFoundHttpException('Invalid arguments received.');
+                }
+                break;
+            default:
+                // Should never happen due to the requirements set in the route.
+                throw new \NotFoundHttpException('Invalid arguments received.');
         }
 
-        $this->view->assign('coreVersions', array_reverse($coreVersions, true));
-        $this->view->assign('breadcrumbs', array(array('title' => $this->__('Choose a Core Version'))));
-
-        return $this->response($this->view->fetch('User/chooseCore.tpl'));
+        return new RedirectResponse(System::normalizeUrl(urldecode($returnUrl)));
     }
 
     /**
@@ -183,7 +161,7 @@ class UserController extends \Zikula_AbstractController
      *
      * @return Response
      */
-    public function displayLog()
+    public function displayLogAction()
     {
         if (file_exists("app/logs/el.log")) {
             $logfile = file_get_contents("app/logs/el.log");
@@ -205,7 +183,7 @@ class UserController extends \Zikula_AbstractController
      *
      * @return Response
      */
-    public function displayDocFile($file = 'instructions')
+    public function displayDocFileAction($file = 'instructions')
     {
         $module = ModUtil::getModule($this->name);
         $docs = array(
@@ -245,7 +223,7 @@ class UserController extends \Zikula_AbstractController
      *
      * @return Response
      */
-    public function displayDocindex()
+    public function displayDocindexAction()
     {
         $this->view->assign('breadcrumbs', array(
                 array(
@@ -263,7 +241,7 @@ class UserController extends \Zikula_AbstractController
      *
      * @return Response
      */
-    public function validateManifest()
+    public function validateManifestAction()
     {
         $this->view->assign('breadcrumbs', array(
             array(
@@ -282,7 +260,7 @@ class UserController extends \Zikula_AbstractController
      *
      * @return Response
      */
-    public function getImage($name = null)
+    public function getImageAction($name = null)
     {
         // only allow local request for images
 //        if (!($this->request->server->get("REMOTE_ADDR", 0) == $this->request->server->get('SERVER_ADDR', 1))) {
