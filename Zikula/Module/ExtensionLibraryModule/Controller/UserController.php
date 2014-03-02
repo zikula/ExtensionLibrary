@@ -117,11 +117,11 @@ class UserController extends \Zikula_AbstractController
     /**
      * @Route("/filter/{filterType}/{filter}/{returnUrl}", requirements={"filterType" = "coreVersion|extensionType"}))
      *
-     * @param $filterType Can be either "coreVersion" or "extensionType".
-     * @param $filter     The value to filter.
-     * @param $returnUrl  The return url to redirect to.
+     * @param $filterType string Can be either "coreVersion" or "extensionType".
+     * @param $filter     string The value to filter.
+     * @param $returnUrl  string The return url to redirect to.
      *
-     * @throws \NotFoundHttpException
+     * @throws NotFoundHttpException
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      * @return RedirectResponse()
      */
@@ -136,19 +136,19 @@ class UserController extends \Zikula_AbstractController
                 try {
                     Util::setCoreFilter($filter);
                 } catch (\InvalidArgumentException $e) {
-                    throw new \NotFoundHttpException('Invalid arguments received.');
+                    throw new NotFoundHttpException('Invalid arguments received.');
                 }
                 break;
             case 'extensionType':
                 try {
                     Util::setExtensionTypeFilter($filter);
                 } catch (\InvalidArgumentException $e) {
-                    throw new \NotFoundHttpException('Invalid arguments received.');
+                    throw new NotFoundHttpException('Invalid arguments received.');
                 }
                 break;
             default:
                 // Should never happen due to the requirements set in the route.
-                throw new \NotFoundHttpException('Invalid arguments received.');
+                throw new NotFoundHttpException('Invalid arguments received.');
         }
 
         return new RedirectResponse(System::normalizeUrl(urldecode($returnUrl)));
