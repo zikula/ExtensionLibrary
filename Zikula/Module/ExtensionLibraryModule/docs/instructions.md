@@ -5,14 +5,14 @@ Publishing your Extension
 Add a Post-Receive Hook
 ------------------------
 First, you'll need to create a post-receive hook on GitHub. ~~Just follow the [step-by-step guide for adding a webhook](https://help.github.com/articles/post-receive-hooks)~~
-and set the URL to `http://ntq.zikula.org/el/postreceive-hook`.
+and set the URL to `http://ntq.zikula.org/library/postreceive-hook`.
 
 Add a Manifest and Composer file to your Repository
 ---------------------------------------------------
 The Zikula Extensions Library will look in the root level of your repository for a file named `zikula.manifest.json`.
-You will need to create the file according to the [manifest specification](el/doc/manifest). The manifest specifies the
-location of the `composer.json` file which is also required (see [specification](/el/doc/composer)). Use an online
-JSON verifier such as [JSONlint](http://jsonlint.com/) to make sure both files are valid. Use our [online manifest validator](el/validate)
+You will need to create the file according to the [manifest specification](library/doc/manifest). The manifest specifies the
+location of the `composer.json` file which is also required (see [specification](/library/doc/composer)). Use an online
+JSON verifier such as [JSONlint](http://jsonlint.com/) to make sure both files are valid. Use our [online manifest validator](library/validate)
 to make sure your manifest validates against the required schema. You are now ready to publish your extension!
 
 Publishing a Version
@@ -41,7 +41,7 @@ push v1.7.1.
 
 Troubleshooting
 ---------------
-If you have problems with your extension not publishing you should check the [error log](/el/log) for hints on what the
+If you have problems with your extension not publishing you should check the [error log](/library/log) for hints on what the
 problem might be.
 
 If you still encounter trouble getting this process to work with your extension, please submit a support request on the
