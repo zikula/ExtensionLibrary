@@ -29,7 +29,7 @@ class AdminApi extends \Zikula_AbstractApi
         $links = array();
         if (SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_ADMIN)) {
             $links[] = array(
-                'url' => ModUtil::url($this->name, 'admin', 'index'),
+                'url' => $this->get('router')->generate('zikulaextensionlibrarymodule_admin_index'),
                 'text' => $this->__('Settings'),
                 'title' => $this->__('Edit settings'),
                 'icon' => 'wrench');

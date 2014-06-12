@@ -2,4 +2,4 @@ tested image
 <img src="{$src}" />
 
 default image
-<img src="library/getimage" />
+<img src="{modurl modname='ExtensionLibraryModule' type='user' func='getimage'}" />

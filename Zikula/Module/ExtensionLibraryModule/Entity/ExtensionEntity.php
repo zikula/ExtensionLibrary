@@ -366,9 +366,9 @@ class ExtensionEntity extends EntityAccess
     public function getIcon()
     {
         if (empty($this->icon)) {
-            return "library/getimage";
+            return \ServiceUtil::get('router')->generate('zikulaextensionlibrarymodule_user_getimage');
         }
-        return "library/getimage/" . $this->icon;
+        return \ServiceUtil::get('router')->generate('zikulaextensionlibrarymodule_user_getimage', array('name' => $this->icon));
     }
 
     /**

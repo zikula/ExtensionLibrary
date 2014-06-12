@@ -205,11 +205,11 @@ class UserController extends \Zikula_AbstractController
                 ->assign('breadcrumbs', array(
                     array(
                         'title' => $this->__('Docs'),
-                        'route' => 'library/docs',
+                        'route' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocindex'),
                     ),
                     array(
                         'title' => $file,
-                        'route' => 'library/' . $file,
+                        'route' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile', array('file' => $file)),
                     ),
             ));
 
