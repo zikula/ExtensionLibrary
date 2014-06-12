@@ -119,9 +119,9 @@ class TestController extends \Zikula_AbstractController
 
         $imageManager = new ImageManager($fileUrl[$type]);
         if ($imageManager->import()) {
-            $this->view->assign('src', "el/getimage/" . $imageManager->getName());
+            $this->view->assign('src', "library/getimage/" . $imageManager->getName());
         } else {
-            $this->view->assign('src', "el/getimage");
+            $this->view->assign('src', "library/getimage");
         }
 
         return $this->response($this->view->fetch('Test/image.tpl'));

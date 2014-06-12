@@ -2,4 +2,4 @@ tested image
 <img src="{$src}" />
 
 default image
-<img src="el/getimage" />
+<img src="library/getimage" />

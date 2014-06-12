@@ -4,7 +4,7 @@ Zikula Extension Manifest Specification
 
 This document is all you need to know about what's required in your `zikula.manifest.json` file(s).
 
-[View the sample](el/doc/sample) `zikula.manifest.json` file
+[View the sample](library/doc/sample) `zikula.manifest.json` file
 
 Manifest files must live in the root of your repository and exist in your tags. The files must be actual JSON, not just
 a JavaScript object literal.

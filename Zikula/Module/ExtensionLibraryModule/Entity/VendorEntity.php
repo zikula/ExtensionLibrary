@@ -247,9 +247,9 @@ class VendorEntity extends EntityAccess
     public function getLogo()
     {
         if (empty($this->logo)) {
-            return "el/getimage";
+            return "library/getimage";
         }
-        return "el/getimage/" . $this->logo;
+        return "library/getimage/" . $this->logo;
     }
 
     /**

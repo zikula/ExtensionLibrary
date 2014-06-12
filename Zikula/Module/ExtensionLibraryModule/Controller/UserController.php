@@ -205,11 +205,11 @@ class UserController extends \Zikula_AbstractController
                 ->assign('breadcrumbs', array(
                     array(
                         'title' => $this->__('Docs'),
-                        'route' => 'el/docs',
+                        'route' => 'library/docs',
                     ),
                     array(
                         'title' => $file,
-                        'route' => 'el/' . $file,
+                        'route' => 'library/' . $file,
                     ),
             ));
 

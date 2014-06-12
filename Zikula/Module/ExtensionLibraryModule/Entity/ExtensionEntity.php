@@ -366,9 +366,9 @@ class ExtensionEntity extends EntityAccess
     public function getIcon()
     {
         if (empty($this->icon)) {
-            return "el/getimage";
+            return "library/getimage";
         }
-        return "el/getimage/" . $this->icon;
+        return "library/getimage/" . $this->icon;
     }
 
     /**

@@ -36,7 +36,7 @@ jQuery(document).ready(function() {
                 extid: jQuery(this).data("extid"),
                 version: jQuery(this).data("version")
             },
-            url: Zikula.Config.baseURL + "el/ajax/setVersionStatus",
+            url: Zikula.Config.baseURL + "library/ajax/setVersionStatus",
             success: function(result) {
                 spinner.fadeOut(400, function() {
                     if (result.data.status == 1) {

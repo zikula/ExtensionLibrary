@@ -17,7 +17,7 @@ jQuery(document).ready(function() {
             data: {
                 content: content
             },
-            url: Zikula.Config.baseURL + "el/ajax/validateManifest",
+            url: Zikula.Config.baseURL + "library/ajax/validateManifest",
             success: function(result) {
                 renderResponse(result.data)
             },
