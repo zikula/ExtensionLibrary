@@ -17,7 +17,7 @@ jQuery(document).ready(function() {
             data: {
                 content: content
             },
-            url: Zikula.Config.baseURL + "library/ajax/validateManifest",
+            url: Routing.generate('zikulaextensionlibrarymodule_ajax_validatemanifest'),
             success: function(result) {
                 renderResponse(result.data)
             },
