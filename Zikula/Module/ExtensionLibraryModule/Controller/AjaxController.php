@@ -25,7 +25,7 @@ use ModUtil;
 class AjaxController extends \Zikula_Controller_AbstractAjax
 {
     /**
-     * @Route("/validateManifest")
+     * @Route("/validateManifest", options={"expose"=true})
      * @Method("POST")
      *
      * Validate a manifest
@@ -64,7 +64,7 @@ class AjaxController extends \Zikula_Controller_AbstractAjax
     }
 
     /**
-     * @Route("/setVersionStatus")
+     * @Route("/setVersionStatus", options={"expose"=true})
      * @Method("POST")
      *
      * set the status of a version
