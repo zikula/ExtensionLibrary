@@ -59,9 +59,18 @@ class Util
     public static function getAvailableCoreVersions()
     {
         return array(
-            'outdated'  => array('1.3.5' => 'foo', '1.3.4' => 'foo', '1.3.3' => 'foo', '1.3.2' => 'foo', '1.3.1' => 'foo', '1.3.0' => 'foo'),
-            'supported' => array('1.3.6' => 'foo'),
-            'dev'       => array('1.4.0' => 'foo'),
+            'outdated'  => array(
+                '1.3.6' => 'foo',
+                '1.3.5' => 'foo',
+                '1.3.4' => 'foo',
+                '1.3.3' => 'foo',
+                '1.3.2' => 'foo',
+                '1.3.1' => 'foo',
+                '1.3.0' => 'foo'),
+            'supported' => array(
+                '1.3.7' => 'foo'),
+            'dev'       => array(
+                '1.4.0' => 'foo'),
         );
     }
 
