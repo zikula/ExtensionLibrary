@@ -4,15 +4,15 @@ Publishing your Extension
 
 Add a Post-Receive Hook
 ------------------------
-First, you'll need to create a post-receive hook on GitHub. ~~Just follow the [step-by-step guide for adding a webhook](https://help.github.com/articles/post-receive-hooks)~~
+First, you'll need to create a post-receive hook on GitHub. Just follow the [step-by-step guide for adding a webhook](https://help.github.com/articles/post-receive-hooks)
 and set the URL to `http://ntq.zikula.org/library/postreceive-hook`.
 
 Add a Manifest and Composer file to your Repository
 ---------------------------------------------------
 The Zikula Extensions Library will look in the root level of your repository for a file named `zikula.manifest.json`.
-You will need to create the file according to the [manifest specification](library/doc/manifest). The manifest specifies the
-location of the `composer.json` file which is also required (see [specification](/library/doc/composer)). Use an online
-JSON verifier such as [JSONlint](http://jsonlint.com/) to make sure both files are valid. Use our [online manifest validator](library/validate)
+You will need to create the file according to the [manifest specification][manifest]. The manifest specifies the
+location of the `composer.json` file which is also required (see [specification][composer]). Use an online
+JSON verifier such as [JSONlint](http://jsonlint.com/) to make sure both files are valid. Use our [online manifest validator][validate]
 to make sure your manifest validates against the required schema. You are now ready to publish your extension!
 
 Publishing a Version
@@ -21,10 +21,10 @@ After the post-receive hook is setup and your manifest has been added, publishin
 the version in git and pushing the tag to GitHub. The post-receive hook will notify the extensions site that a new tag
 is available and the extensions site will take care of the rest!
 
-```
+<pre>
 $ git tag 0.1.0
 $ git push origin --tags
-```
+</pre>
 
 The name of the tag must be a valid [semver](http://semver.org/) value, but may contain an optional `v` prefix. The tag
 name must also match the version listed in the manifest file. So, if the version field in the manifest is "0.1.1" the
@@ -41,7 +41,7 @@ push v1.7.1.
 
 Troubleshooting
 ---------------
-If you have problems with your extension not publishing you should check the [error log](/library/log) for hints on what the
+If you have problems with your extension not publishing you should check the [error log][log] for hints on what the
 problem might be.
 
 If you still encounter trouble getting this process to work with your extension, please submit a support request on the
@@ -52,3 +52,6 @@ How long should the process take
 When everything works, this process is pretty close to instant. There are caches in place, etc, but in general, if you
 haven't seen your extension get updated on the site within 5 minutes, there is a good chance something went wrong. Going
 into your Web Hooks settings and hitting the "Test Hook" button (once) may help if you recently pushed a new tag.
+
+
+*NOTICE: the urls in this document are generated in the controller and are therefore not available if reading offline.*

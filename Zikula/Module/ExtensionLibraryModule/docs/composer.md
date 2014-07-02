@@ -4,7 +4,7 @@ Zikula Extension Composer Specification
 
 This document is all you need to know about what's required in your `composer.json` file(s).
 
-[View the sample](library/doc/sample-composer) `composer.json` file
+[View the sample][sample-composer] `composer.json` file
 
 The `composer.json` file is required by the [core specification](https://github.com/zikula/core/blob/1.3/UPGRADE-1.3.7.md#module-composerjson).
 The `composer.json` file typically lives at the 'namespace' level of the extension. The files must be actual JSON, not
@@ -92,3 +92,6 @@ A "person" is an object with a "name" field and optional "homepage", "email" and
 </pre>
 
 note: Suggested roles are `owner`, `contributor`, `translator`, `manager`, etc.
+
+
+*NOTICE: the urls in this document are generated in the controller and are therefore not available if reading offline.*

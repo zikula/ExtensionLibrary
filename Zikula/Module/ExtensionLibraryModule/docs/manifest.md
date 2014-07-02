@@ -4,7 +4,7 @@ Zikula Extension Manifest Specification
 
 This document is all you need to know about what's required in your `zikula.manifest.json` file(s).
 
-[View the sample](library/doc/sample) `zikula.manifest.json` file
+[View the sample][sample] `zikula.manifest.json` file
 
 Manifest files must live in the root of your repository and exist in your tags. The files must be actual JSON, not just
 a JavaScript object literal.
@@ -199,3 +199,6 @@ The following are equivalent:
  - `"1" = "1.x.x"`
 
 You may not supply a comparator with a version containing an x. Any digits after the first "x" are ignored.
+
+
+*NOTICE: the urls in this document are generated in the controller and are therefore not available if reading offline.*

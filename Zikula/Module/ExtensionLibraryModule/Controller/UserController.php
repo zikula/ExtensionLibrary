@@ -187,15 +187,33 @@ class UserController extends \Zikula_AbstractController
     {
         $module = ModUtil::getModule($this->name);
         $docs = array(
-            'manifest' => '/docs/manifest.md',
-            'composer' => '/docs/composer.md',
-            'instructions' => '/docs/instructions.md',
-            'sample-manifest' => '/docs/zikula.manifest.json',
-            'sample-composer' => '/docs/composer.json',
+            'manifest' => array(
+                'file' => '/docs/manifest.md',
+                'urls' => array(
+                    'sample' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile', array('file' => 'sample-manifest')),
+                )),
+            'composer' => array(
+                'file' => '/docs/composer.md',
+                'urls' => array(
+                    'sample' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile', array('file' => 'sample-composer')),
+                )),
+            'instructions' => array(
+                'file' => '/docs/instructions.md',
+                'urls' => array(
+                    'manifest' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile', array('file' => 'manifest')),
+                    'composer' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile', array('file' => 'composer')),
+                    'validate' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_validatemanifest'),
+                    'log' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_displaylog'),
+                    'postreceive-hook' => $this->get('router')->generate('zikulaextensionlibrarymodule_post_processinbound'),
+                )),
+            'sample-manifest' => array('file' => '/docs/zikula.manifest.json'),
+            'sample-composer' => array('file' => '/docs/composer.json'),
         );
-        $docfile = file_get_contents($module->getPath() . $docs[$file]);
+        $docfile = file_get_contents($module->getPath() . $docs[$file]['file']);
         $json = false;
         if (substr($file, 0, 6) != "sample") {
+            $parser = StringUtil::getMarkdownExtraParser();
+            $parser->predef_urls = $docs[$file]['urls'];
             $docfile = StringUtil::getMarkdownExtraParser()->transform($docfile);
         } else {
             $json = true;
