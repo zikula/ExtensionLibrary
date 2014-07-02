@@ -4,7 +4,7 @@ Publishing your Extension
 
 Add a Post-Receive Hook
 ------------------------
-First, you'll need to create a post-receive hook on GitHub. Just follow the [step-by-step guide for adding a webhook](https://help.github.com/articles/post-receive-hooks)
+First, you'll need to create a post-receive hook on GitHub. Just follow the [step-by-step guide for adding a webhook][webhook]
 and set the URL to `http://ntq.zikula.org/library/postreceive-hook`.
 
 Add a Manifest and Composer file to your Repository

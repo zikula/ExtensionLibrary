@@ -175,7 +175,7 @@ class UserController extends \Zikula_AbstractController
     }
 
     /**
-     * @Route("/doc/{file}", requirements={"file" = "manifest|sample-manifest|composer|sample-composer|instructions"})
+     * @Route("/doc/{file}", requirements={"file" = "manifest|sample-manifest|composer|sample-composer|instructions|webhook"})
      *
      * Display a requested doc file
      *
@@ -205,6 +205,17 @@ class UserController extends \Zikula_AbstractController
                     'validate' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_validatemanifest'),
                     'log' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_displaylog'),
                     'postreceive-hook' => $this->get('router')->generate('zikulaextensionlibrarymodule_post_processinbound'),
+                    'webhook' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile', array('file' => 'webhook')),
+                )),
+            'webhook' => array(
+                'file' => '/docs/webhookGuide.md',
+                'urls' => array(
+                    // @todo - getRelativePath() is deprecated
+                    'img1' => $module->getRelativePath() . '/docs/images/shots1.png',
+                    'img2' => $module->getRelativePath() . '/docs/images/shots2.png',
+                    'img3' => $module->getRelativePath() . '/docs/images/shots3.png',
+                    'img4' => $module->getRelativePath() . '/docs/images/shots4.png',
+                    'img5' => $module->getRelativePath() . '/docs/images/shots5.png',
                 )),
             'sample-manifest' => array('file' => '/docs/zikula.manifest.json'),
             'sample-composer' => array('file' => '/docs/composer.json'),
