@@ -111,17 +111,17 @@ class RepoTest extends TestCase
     /**
      * @test
      */
-    public function shouldGetRepositoryWatchers()
+    public function shouldGetRepositorySubscribers()
     {
         $expectedArray = array(array('id' => 1, 'username' => 'l3l0'));
 
         $api = $this->getApiMock();
         $api->expects($this->once())
             ->method('get')
-            ->with('repos/KnpLabs/php-github-api/watchers', array('page' => 2))
+            ->with('repos/KnpLabs/php-github-api/subscribers', array('page' => 2))
             ->will($this->returnValue($expectedArray));
 
-        $this->assertEquals($expectedArray, $api->watchers('KnpLabs', 'php-github-api', 2));
+        $this->assertEquals($expectedArray, $api->subscribers('KnpLabs', 'php-github-api', 2));
     }
 
     /**
@@ -415,6 +415,22 @@ class RepoTest extends TestCase
         $api = $this->getApiMock();
 
         $this->assertInstanceOf('Github\Api\Repository\Releases', $api->releases());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldGetCommitActivity()
+    {
+	$expectedArray = array(array('days' => array(0, 3, 26, 20, 39, 1, 0), 'total' => 89, 'week' => 1336280400));
+
+	$api = $this->getApiMock();
+	$api->expects($this->once())
+	    ->method('get')
+	    ->with('repos/KnpLabs/php-github-api/stats/commit_activity')
+	    ->will($this->returnValue($expectedArray));
+
+	$this->assertEquals($expectedArray, $api->activity('KnpLabs', 'php-github-api'));
     }
 
     protected function getApiClass()

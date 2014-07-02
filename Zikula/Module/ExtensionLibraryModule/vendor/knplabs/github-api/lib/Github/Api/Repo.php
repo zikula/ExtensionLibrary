@@ -33,24 +33,38 @@ class Repo extends AbstractApi
      *
      * @return array list of found repositories
      */
-    public function find($keyword, array $params)
+    public function find($keyword, array $params = array())
     {
         return $this->get('legacy/repos/search/'.rawurlencode($keyword), array_merge(array('start_page' => 1), $params));
     }
     
     /**
-     * Get contributor commit statistics for a repository
-     * @link http://developer.github.com/v3/repos/statistics/#contributors
+     * Get the last year of commit activity for a repository grouped by week
+     * @link http://developer.github.com/v3/repos/statistics/#commit-activity
      * 
      * @param string $username   the user who owns the repository
      * @param string $repository the name of the repository
      * 
-     * @return array list of contributors and their commit statistics
+     * @return array commit activity grouped by week
      */
-    public function statistics($username, $repository)
+    public function activity($username, $repository)
     {
-	    return $this->get('repos/'.rawurlencode($username).'/'.rawurlencode($repository).'/stats/contributors');
+	    return $this->get('repos/'.rawurlencode($username).'/'.rawurlencode($repository).'/stats/commit_activity');
     }
+
+	/**
+	 * Get contributor commit statistics for a repository
+	 * @link http://developer.github.com/v3/repos/statistics/#contributors
+	 *
+	 * @param string $username   the user who owns the repository
+	 * @param string $repository the name of the repository
+	 *
+	 * @return array list of contributors and their commit statistics
+	 */
+	public function statistics($username, $repository)
+	{
+		return $this->get('repos/'.rawurlencode($username).'/'.rawurlencode($repository).'/stats/contributors');
+	}
 
     /**
      * List all repositories for an organization
@@ -373,6 +387,7 @@ class Repo extends AbstractApi
     }
 
     /**
+     * @deprecated see subscribers method
      * @param string  $username
      * @param string  $repository
      * @param integer $page
@@ -382,6 +397,20 @@ class Repo extends AbstractApi
     public function watchers($username, $repository, $page = 1)
     {
         return $this->get('repos/'.rawurlencode($username).'/'.rawurlencode($repository).'/watchers', array(
+            'page' => $page
+        ));
+    }
+
+    /**
+     * @param string  $username
+     * @param string  $repository
+     * @param integer $page
+     *
+     * @return array
+     */
+    public function subscribers($username, $repository, $page = 1)
+    {
+        return $this->get('repos/'.rawurlencode($username).'/'.rawurlencode($repository).'/subscribers', array(
             'page' => $page
         ));
     }

@@ -2,6 +2,7 @@
 
 namespace Github\HttpClient;
 
+use Github\Exception\TwoFactorAuthenticationRequiredException;
 use Guzzle\Http\Client as GuzzleClient;
 use Guzzle\Http\ClientInterface;
 use Guzzle\Http\Message\Request;
@@ -11,6 +12,7 @@ use Github\Exception\ErrorException;
 use Github\Exception\RuntimeException;
 use Github\HttpClient\Listener\AuthListener;
 use Github\HttpClient\Listener\ErrorListener;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Performs requests on GitHub API. API documentation should be self-explanatory.
@@ -82,6 +84,11 @@ class HttpClient implements HttpClientInterface
         $this->client->getEventDispatcher()->addListener($eventName, $listener);
     }
 
+    public function addSubscriber(EventSubscriberInterface $subscriber)
+    {
+        $this->client->addSubscriber($subscriber);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -128,14 +135,15 @@ class HttpClient implements HttpClientInterface
     public function request($path, $body = null, $httpMethod = 'GET', array $headers = array(), array $options = array())
     {
         $request = $this->createRequest($httpMethod, $path, $body, $headers, $options);
-        $request->addHeaders($headers);
 
         try {
             $response = $this->client->send($request);
         } catch (\LogicException $e) {
-            throw new ErrorException($e->getMessage());
+            throw new ErrorException($e->getMessage(), $e->getCode(), $e);
+        } catch (TwoFactorAuthenticationRequiredException $e) {
+            throw $e;
         } catch (\RuntimeException $e) {
-            throw new RuntimeException($e->getMessage());
+            throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
         }
 
         $this->lastRequest  = $request;
