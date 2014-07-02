@@ -41,7 +41,7 @@ class Util
         if (!in_array($logpath, array(self::LOG_DEV, self::LOG_PROD))) {
             return;
         }
-        $logger = new Logger('mailer');
+        $logger = new Logger('extensionLibrary');
         $logger->pushHandler(new StreamHandler($logpath, Logger::INFO));
         $logger->addInfo($msg);
     }
