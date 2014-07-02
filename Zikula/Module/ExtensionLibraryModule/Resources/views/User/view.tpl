@@ -8,14 +8,14 @@
         {/if}
         <div class="col-sm-4">
             <div class="media extension-display" data-content="[version {$extension.newestVersion.semver}] {$extension.description|safehtml}">
-                <a class="pull-left" href="{modurl modname='ZikulaExtensionLibraryModule' type='user' func='display' extension_slug=$extension.titleSlug}">
+                <a class="pull-left" href="{route name='zikulaextensionlibrarymodule_user_display' extension_slug=$extension.titleSlug}">
                     <div class="iconStack">
                         <img class="media-object img-thumbnail" src="{$extension.icon}" alt="" width="90" height="90" />
                         <img class="img-thumbnail vendorIcon" src="{$extension.vendor.logo}" alt="">
                     </div>
                 </a>
                 <div class="media-body">
-                    <h4 class="media-heading"><a href="{modurl modname='ZikulaExtensionLibraryModule' type='user' func='display' extension_slug=$extension.titleSlug}">{$extension.title|safetext}</a></h4>
+                    <h4 class="media-heading"><a href="{route name='zikulaextensionlibrarymodule_user_display' extension_slug=$extension.titleSlug}">{$extension.title|safetext}</a></h4>
                     <em class="text-muted">{$extension.typeForDisplay}</em>
                     <ul class="list-unstyled">
                         {if !empty($extension.vendor.title)}<li>{$extension.vendor.title|safehtml}</li>{/if}

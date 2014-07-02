@@ -2,4 +2,4 @@ tested image
 <img src="{$src}" />
 
 default image
-<img src="{modurl modname='ExtensionLibraryModule' type='user' func='getimage'}" />
+<img src="{route name='zikulaextensionlibrarymodule_user_getimage'}" />

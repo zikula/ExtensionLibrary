@@ -10,7 +10,7 @@
     <div class="alert alert-info">
         {gt text='Rate limit remaining for the next %s minutes: %s / %s' tag1=$rate.minutesUntilReset tag2=$rate.remaining tag3=$rate.limit}
     </div>
-    <form class="form-horizontal" role="form" action="{modurl modname='ZikulaExtensionLibraryModule' type='admin' func='modifyConfig'}" method="post" enctype="application/x-www-form-urlencoded" autocomplete="off">
+    <form class="form-horizontal" role="form" action="{route name='zikulaextensionlibrarymodule_admin_modifyconfig'}" method="post" enctype="application/x-www-form-urlencoded" autocomplete="off">
         <div>
             <fieldset>
                 <legend>{gt text='GitHub authentication'}</legend>
@@ -36,7 +36,7 @@
                     <button class="btn btn-success" title="{gt text='Save'}">
                         {gt text="Save"}
                     </button>
-                    <a class="btn btn-danger" href="{modurl modname='ZikulaExtensionLibraryModule' type='admin' func='index'}" title="{gt text="Cancel"}">{gt text="Cancel"}</a>
+                    <a class="btn btn-danger" href="{route name='zikulaextensionlibrarymodule_admin_index'}" title="{gt text="Cancel"}">{gt text="Cancel"}</a>
                 </div>
             </div>
         </div>
