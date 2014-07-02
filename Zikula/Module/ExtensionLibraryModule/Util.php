@@ -19,14 +19,16 @@ use vierbergenlars\SemVer\expression;
 use vierbergenlars\SemVer\version;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 class Util
 {
     /**
      * constants defining log paths
      */
-    const LOG_DEV = './app/logs/el_dev.log';
-    const LOG_PROD = './app/logs/el.log';
+    const LOG_DEV = 'app/logs/el_dev.log';
+    const LOG_PROD = 'app/logs/el.log';
 
     /**
      * Log a message to a file
@@ -39,14 +41,9 @@ class Util
         if (!in_array($logpath, array(self::LOG_DEV, self::LOG_PROD))) {
             return;
         }
-        // open file
-        $fd = fopen($logpath, "a");
-        // prepend date/time to message
-        $str = "[" . date("Y/m/d h:i:s", time()) . "] " . $msg;
-        // write string
-        fwrite($fd, $str . "\n");
-        // close file
-        fclose($fd);
+        $logger = new Logger('mailer');
+        $logger->pushHandler(new StreamHandler($logpath, Logger::INFO));
+        $logger->addInfo($msg);
     }
 
     /**
