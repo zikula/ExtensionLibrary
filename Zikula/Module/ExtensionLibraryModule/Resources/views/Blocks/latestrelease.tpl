@@ -1,15 +1,8 @@
-<script type="text/javascript">
-    (function($) {
-        $(function(){
-
-        });
-    })(jQuery);
-</script>
-<a class="btn btn-success btn-lg" role="button" href="http://go.zikula.org/download_latest" style="white-space: normal" data-toggle="modal" data-target="#el-block-latest-release-modal-{$id}">
+<a class="btn btn-success btn-lg" role="button" href="#" style="white-space: normal" data-toggle="modal" data-target="#el-block-latest-release-modal-{$id}">
     <i class="fa fa-cloud-download fa-3x pull-left"></i> {gt text='Download Zikula'} {$release->getSemver()}
 </a>
-<div class="modal fade" id="el-block-latest-release-modal-{$id}">
-    <div class="modal-dialog">
+<div class="modal fade text-left" id="el-block-latest-release-modal-{$id}">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{gt text='Close'}</span></button>
