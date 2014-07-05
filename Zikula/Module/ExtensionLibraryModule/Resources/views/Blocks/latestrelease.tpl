@@ -13,7 +13,7 @@
             </div>
             <div class="modal-footer">
                 {foreach from=$release.assets item='asset'}
-                    <a href="{$asset.download_url}" class="btn btn-success" data-dismiss="modal">{$asset.name}</a>
+                    <a href="{$asset.download_url}" class="btn btn-success">{$asset.name}</a>
                 {foreachelse}
                     <div class="alert alert-warning">{gt text='Direct download link not yet available!'}</div>
                 {/foreach}
