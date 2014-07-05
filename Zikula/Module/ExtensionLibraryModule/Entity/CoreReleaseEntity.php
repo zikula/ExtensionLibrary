@@ -98,10 +98,10 @@ class CoreReleaseEntity extends EntityAccess
     {
         $dom = \ZLanguage::getModuleDomain('ZikulaExtensionLibraryModule');
         $translation = array (
-            self::STATE_OUTDATED => __('Outdated version', $dom),
-            self::STATE_DEVELOPMENT => __('Development version', $dom),
-            self::STATE_PRERELEASE => __('Prerelease', $dom),
-            self::STATE_SUPPORTED => __('Supported version', $dom)
+            self::STATE_OUTDATED => __('Outdated versions', $dom),
+            self::STATE_DEVELOPMENT => __('Development versions', $dom),
+            self::STATE_PRERELEASE => __('Prereleases', $dom),
+            self::STATE_SUPPORTED => __('Supported versions', $dom)
         );
 
         return $translation[$status];

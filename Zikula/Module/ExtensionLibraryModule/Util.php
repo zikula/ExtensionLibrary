@@ -63,7 +63,7 @@ class Util
         foreach ($dbReleases as $dbRelease) {
             $releases[CoreReleaseEntity::statusToText($dbRelease->getStatus())][$dbRelease->getSemver()] = '';
         }
-        ksort($releases);
+        krsort($releases);
 
         return $releases;
     }
