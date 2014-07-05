@@ -22,6 +22,7 @@ use Zikula\Core\Response\PlainResponse;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
+use Zikula\Module\ExtensionLibraryModule\ReleaseManager;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Zikula\Module\ExtensionLibraryModule\Manager\ManifestManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\ComposerManager;
@@ -224,47 +225,76 @@ class PostController extends \Zikula_AbstractController
         if (!empty($securityToken)) {
             $signature = $request->headers->get('X-Hub-Signature');
             if (empty($signature)) {
-                return new Response('Missing security token!', 400);
+                return new PlainResponse('Missing security token!', 400);
             }
             $computedSignature = $this->computeSignature($jsonPayload, $securityToken);
 
             if (!$this->secure_equals($computedSignature, $signature)) {
-                return new Response('Signature did not match!', 400);
+                return new PlainResponse('Signature did not match!', 400);
             }
         }
 
         $event = $this->request->headers->get('X-Github-Event');
         if (empty($event)) {
-            return new Response('"X-Github-Event" header is missing!', 400);
+            return new PlainResponse('"X-Github-Event" header is missing!', 400);
         }
         $useragent = $request->headers->get('User-Agent');
         if (strpos($useragent, 'GitHub Hookshot') !== 0) {
             // User agent does not match "GitHub Hookshot*"
-            return new Response('User-Agent not allowed!', 400);
+            return new PlainResponse('User-Agent not allowed!', 400);
         }
 
         switch ($event) {
             case 'ping':
-                return new Response('Ping successful!');
+                return new PlainResponse('Ping successful!');
             case 'release':
-            case 'create':
-                // @todo Handle created tag / release!
-                return new Response('Everything ok!');
+                break;
             default:
                 // We do not listen to that event.
-                return new Response('Event ignored!');
+                return new PlainResponse('Event ignored!');
         }
+
+        $json = json_decode($jsonPayload, true);
+        // See https://developer.github.com/v3/activity/events/types/#releaseevent
+        if ($json['action'] != 'published') {
+            return new PlainResponse('Release event ignored (action != "published")!');
+        }
+
+        $repo = $this->getVar('github_core_repo', 'zikula/core');
+        if ($json['repository']['full_name'] != $repo) {
+            return new PlainResponse('Release event ignored (repository != "' . $repo . '")!');
+        }
+
+        /** @var ReleaseManager $releaseManager */
+        $releaseManager = $this->get('zikulaextensionlibrarymodule.releasemanager');
+        $releaseManager->updateRelease($json['release']);
+
+        return new PlainResponse('Release list reloaded!');
     }
 
+    /**
+     * Compute signature from payload using the security token.
+     *
+     * @param $payload
+     * @param $securityToken
+     *
+     * @return string
+     */
     private function computeSignature($payload, $securityToken)
     {
-        $hash = 'sha1=' . hash_hmac('sha1', $payload, $securityToken);
-
-        return $hash;
+        return 'sha1=' . hash_hmac('sha1', $payload, $securityToken);
     }
 
-    // Compares two strings $a and $b in length-constant time.
-    // https://crackstation.net/hashing-security.htm#slowequals
+    /**
+     * Compares two strings $a and $b in length-constant time.
+     *
+     * @param $a
+     * @param $b
+     *
+     * @return bool
+     *
+     * https://crackstation.net/hashing-security.htm#slowequals
+     */
     private function secure_equals($a, $b)
     {
         $diff = strlen($a) ^ strlen($b);

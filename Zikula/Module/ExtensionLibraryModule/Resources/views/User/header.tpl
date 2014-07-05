@@ -25,20 +25,12 @@
                 </button>
                 <ul class="dropdown-menu" role="menu" id="el-core-version-filter">
                     <li><a href="{route name='zikulaextensionlibrarymodule_user_filter' filterType="coreVersion" filter="all" returnUrl=$request->getRequestUri()|urlencode}">{gt text='All versions'}</a></li>
-                    <li role="presentation"  class="divider"></li>
-                    <li role="presentation" class="dropdown-header">Current versions</li>
-                    {foreach from=$coreVersions.supported key="version" item="foo"}
-                        <li><a href="{route name='zikulaextensionlibrarymodule_user_filter' filterType="coreVersion" filter=$version returnUrl=$request->getRequestUri()|urlencode}">{$version}</a></li>
-                    {/foreach}
-                    <li role="presentation"  class="divider"></li>
-                    <li role="presentation" class="dropdown-header">Outdated versions</li>
-                    {foreach from=$coreVersions.outdated key="version" item="foo"}
-                        <li><a href="{route name='zikulaextensionlibrarymodule_user_filter' filterType="coreVersion" filter=$version returnUrl=$request->getRequestUri()|urlencode}">{$version}</a></li>
-                    {/foreach}
-                    <li role="presentation"  class="divider"></li>
-                    <li role="presentation" class="dropdown-header">Developmental versions</li>
-                    {foreach from=$coreVersions.dev key="version" item="foo"}
-                        <li><a href="{route name='zikulaextensionlibrarymodule_user_filter' filterType="coreVersion" filter=$version returnUrl=$request->getRequestUri()|urlencode}">{$version}</a></li>
+                    {foreach from=$coreVersions key="type" item="versions"}
+                        <li role="presentation"  class="divider"></li>
+                        <li role="presentation" class="dropdown-header">{$type}</li>
+                        {foreach from=$versions key='version' item='foo'}
+                            <li><a href="{route name='zikulaextensionlibrarymodule_user_filter' filterType="coreVersion" filter=$version returnUrl=$request->getRequestUri()|urlencode}">{$version}</a></li>
+                        {/foreach}
                     {/foreach}
                 </ul>
             </div>

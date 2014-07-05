@@ -13,9 +13,9 @@
     <form class="form-horizontal" role="form" action="{route name='zikulaextensionlibrarymodule_admin_modifyconfig'}" method="post" enctype="application/x-www-form-urlencoded" autocomplete="off">
         <div>
             <fieldset>
-                <legend>{gt text='GitHub authentication'}</legend>
+                <legend>{gt text='GitHub'}</legend>
                 <div class="form-group">
-                    <label class="col-lg-3 control-label" for="settings_github_token">{gt text="GitHub Access Token"}</label>
+                    <label class="col-lg-3 control-label" for="settings_github_token">{gt text="Access Token"}</label>
                     <div class="col-lg-9">
                         <input id="settings_github_token" type="password" class="form-control" name="settings[github_token]" value="{$settings.github_token|default:''|safetext}" maxlength="100" autocomplete="off" />
                         <p class="help-block">{gt text='Create a personal access token at %s to raise your api limits.' tag1='<a href="https://github.com/settings/applications">https://github.com/settings/applications</a>'}</p>
@@ -26,6 +26,13 @@
                     <div class="col-lg-9">
                         <input id="settings_github_webhook_token" type="password" class="form-control" name="settings[github_webhook_token]" value="{$settings.github_webhook_token|default:''|safetext}" maxlength="100" autocomplete="off" />
                         <p class="help-block">{gt text='Create a secrete webhook token at %s to verify payloads from the Zikula Core repository.' tag1='<a href="https://developer.github.com/webhooks/securing">https://developer.github.com/webhooks/securing/</a>'}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label" for="settings_github_core_repo">{gt text="Core repository"}</label>
+                    <div class="col-lg-9">
+                        <input id="settings_github_core_repo" type="text" class="form-control" name="settings[github_core_repo]" value="{$settings.github_core_repo|default:''|safetext}" maxlength="100" />
+                        <p class="help-block">{gt text='Fill in the name of the core repository. This should always be "zikula/core"'}</p>
                     </div>
                 </div>
             </fieldset>

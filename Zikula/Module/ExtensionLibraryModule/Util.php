@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Github\Client as GitHubClient;
 use vierbergenlars\SemVer\expression;
 use vierbergenlars\SemVer\version;
+use Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
 use Monolog\Logger;
@@ -55,20 +56,16 @@ class Util
      */
     public static function getAvailableCoreVersions()
     {
-        return array(
-            'outdated'  => array(
-                '1.3.6' => 'foo',
-                '1.3.5' => 'foo',
-                '1.3.4' => 'foo',
-                '1.3.3' => 'foo',
-                '1.3.2' => 'foo',
-                '1.3.1' => 'foo',
-                '1.3.0' => 'foo'),
-            'supported' => array(
-                '1.3.7' => 'foo'),
-            'dev'       => array(
-                '1.4.0' => 'foo'),
-        );
+        $em = \ServiceUtil::get('doctrine.orm.entity_manager');
+        /** @var \Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity[] $dbReleases */
+        $dbReleases = $em->getRepository('Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity')->findAll();
+        $releases = array();
+        foreach ($dbReleases as $dbRelease) {
+            $releases[CoreReleaseEntity::statusToText($dbRelease->getStatus())][$dbRelease->getSemver()] = '';
+        }
+        ksort($releases);
+
+        return $releases;
     }
 
     /**
