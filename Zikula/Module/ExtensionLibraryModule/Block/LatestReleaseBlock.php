@@ -61,7 +61,7 @@ class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
             $a = new version($a->getSemver());
             $b = new version($b->getSemver());
 
-            return version::compare($a, $b);
+            return version::compare($b, $a);
         });
 
         $this->view->assign('release', $supportedReleases[0]);
