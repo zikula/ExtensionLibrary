@@ -21,6 +21,13 @@
                         <p class="help-block">{gt text='Create a personal access token at %s to raise your api limits.' tag1='<a href="https://github.com/settings/applications">https://github.com/settings/applications</a>'}</p>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label" for="settings_github_webhook_token">{gt text="Webhook Security Token"}</label>
+                    <div class="col-lg-9">
+                        <input id="settings_github_webhook_token" type="password" class="form-control" name="settings[github_webhook_token]" value="{$settings.github_webhook_token|default:''|safetext}" maxlength="100" autocomplete="off" />
+                        <p class="help-block">{gt text='Create a secrete webhook token at %s to verify payloads from the Zikula Core repository.' tag1='<a href="https://developer.github.com/webhooks/securing">https://developer.github.com/webhooks/securing/</a>'}</p>
+                    </div>
+                </div>
             </fieldset>
             <fieldset>
                 <legend>{gt text='Image caching'}</legend>
