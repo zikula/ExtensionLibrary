@@ -13,7 +13,10 @@
 
 namespace Zikula\Module\ExtensionLibraryModule\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Zikula\Core\ModUrl;
 use Zikula\Core\Response\PlainResponse;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
@@ -29,7 +32,7 @@ use Zikula\Core\Hook\ProcessHook;
 use ZLanguage;
 
 /**
- * UI operations executable by general users.
+ * GitHub Webhook access points.
  */
 class PostController extends \Zikula_AbstractController
 {
@@ -207,6 +210,70 @@ class PostController extends \Zikula_AbstractController
         $this->dispatchHooks('el.ui_hooks.community.process_edit', new ProcessHook($extension->getId(), $url));
 
         return new PlainResponse();
+    }
+
+    /**
+     * @Route("/core-endpoint")
+     * @Method("POST")
+     */
+    public function coreHookEndpoint(Request $request)
+    {
+        $payloadManager = new PayloadManager($this->request);
+        $jsonPayload = $payloadManager->getJsonPayload();
+
+        $securityToken = $this->getVar('github_webhook_token');
+        if (!empty($securityToken)) {
+            $signature = $request->headers->get('X-Hub-Signature');
+            if (empty($signature)) {
+                return new Response('Missing security token!', 400);
+            }
+            $computetSignature = $this->computeSignature($jsonPayload, $securityToken);
+
+            if (!$this->secure_equals($computetSignature, $signature)) {
+                return new Response('Signature did not match!', 400);
+            }
+        }
+
+        $event = $this->request->headers->get('X-Github-Event');
+        if (empty($event)) {
+            return new Response('"X-Github-Event" header is missing!', 400);
+        }
+        $useragent = $request->headers->get('User-Agent');
+        if (strpos($useragent, 'GitHub Hookshot') !== 0) {
+            // User agent does not match "GitHub Hookshot*"
+            return new Response('User-Agent not allowed!', 400);
+        }
+
+        switch ($event) {
+            case 'ping':
+                return new Response('Ping successful!');
+            case 'release':
+            case 'create':
+                // @todo Handle created tag / release!
+                return new Response('Everything ok!');
+            default:
+                // We do not listen to that event.
+                return new Response('Event ignored!');
+        }
+    }
+
+    private function computeSignature($payload, $securityToken)
+    {
+        $hash = 'sha1=' . hash_hmac('sha1', $payload, $securityToken);
+
+        return $hash;
+    }
+
+    // Compares two strings $a and $b in length-constant time.
+    // https://crackstation.net/hashing-security.htm#slowequals
+    private function secure_equals($a, $b)
+    {
+        $diff = strlen($a) ^ strlen($b);
+        for($i = 0; $i < strlen($a) && $i < strlen($b); $i++) {
+            $diff |= ord($a[$i]) ^ ord($b[$i]);
+        }
+
+        return $diff === 0;
     }
 
 }
