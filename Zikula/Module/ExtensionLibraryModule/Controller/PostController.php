@@ -227,9 +227,9 @@ class PostController extends \Zikula_AbstractController
             if (empty($signature)) {
                 return new Response('Missing security token!', 400);
             }
-            $computetSignature = $this->computeSignature($jsonPayload, $securityToken);
+            $computedSignature = $this->computeSignature($jsonPayload, $securityToken);
 
-            if (!$this->secure_equals($computetSignature, $signature)) {
+            if (!$this->secure_equals($computedSignature, $signature)) {
                 return new Response('Signature did not match!', 400);
             }
         }
