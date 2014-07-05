@@ -95,7 +95,7 @@ class Util
     {
         $coreVersions = self::getAvailableCoreVersions();
 
-        if (!($filter === 'all' || array_key_exists($filter, $coreVersions['outdated']) || array_key_exists($filter, $coreVersions['supported']) || array_key_exists($filter, $coreVersions['dev']))) {
+        if (!($filter === 'all' || array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_SUPPORTED]) || array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_OUTDATED]) || array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_PRERELEASE]) || array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_DEVELOPMENT]))) {
             throw new \InvalidArgumentException();
         }
 
