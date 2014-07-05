@@ -11,14 +11,6 @@
     <services>
         <service id="zikulaextensionlibrarymodule.releasemanager" class="%zikulaextensionlibrarymodule.releasemanager.class%">
             <argument type="service" id="doctrine.orm.entity_manager" />
-            <!-- argument type="service" id="service_id" />
-            <argument>plain_value</argument>
-            <argument>%parameter_name%</argument>
-            <call method="setService">
-                <argument type="service" id="service_id" />
-            </call>
-            <tag name="twig.extension" />
-            <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" / -->
         </service>
     </services>
 </container>
