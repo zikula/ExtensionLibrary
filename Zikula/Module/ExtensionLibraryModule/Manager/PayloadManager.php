@@ -13,6 +13,7 @@
 
 namespace Zikula\Module\ExtensionLibraryModule\Manager;
 
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -43,6 +44,10 @@ class PayloadManager {
 
         // github is guaranteed to send via POST and param is 'payload'
         if (!isset($payload)) {
+            if ($request->headers->get('X-GitHub-Event') == 'ping') {
+                Util::log('Ping event received.');
+                throw new HttpException(200, 'Ping event received.');
+            }
             Util::log('ExtensionLibraryModule::payload was null.');
             throw new NotFoundHttpException('Sorry! Page not found.', null, 404);
         }
