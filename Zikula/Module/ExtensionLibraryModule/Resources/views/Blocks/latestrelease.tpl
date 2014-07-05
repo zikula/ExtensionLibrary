@@ -1,5 +1,5 @@
 <a class="btn btn-success btn-lg" role="button" href="#" style="white-space: normal" data-toggle="modal" data-target="#el-block-latest-release-modal-{$id}">
-    <i class="fa fa-cloud-download fa-3x pull-left"></i> {gt text='Download Zikula'} {$release->getSemver()}
+    <i class="fa fa-cloud-download fa-3x pull-left"></i> {gt text='Download Zikula'}<br />{$release->getSemver()}
 </a>
 <div class="modal fade text-left" id="el-block-latest-release-modal-{$id}">
     <div class="modal-dialog modal-lg">
