@@ -95,7 +95,30 @@ class Util
     {
         $coreVersions = self::getAvailableCoreVersions();
 
-        if (!($filter === 'all' || array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_SUPPORTED]) || array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_OUTDATED]) || array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_PRERELEASE]) || array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_DEVELOPMENT]))) {
+        // @todo Simplify this :/
+        if (!(
+            $filter === 'all'
+            || (
+                isset($coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_SUPPORTED)])
+                &&
+                array_key_exists($filter, $coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_SUPPORTED)])
+            )
+            || (
+                isset($coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_OUTDATED)])
+                &&
+                array_key_exists($filter, $coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_OUTDATED)])
+            )
+            || (
+                isset($coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_PRERELEASE)])
+                &&
+                array_key_exists($filter, $coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_PRERELEASE)])
+            )
+            || (
+                isset($coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_DEVELOPMENT)])
+                &&
+                array_key_exists($filter, $coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_DEVELOPMENT)])
+            )
+        )) {
             throw new \InvalidArgumentException();
         }
 
