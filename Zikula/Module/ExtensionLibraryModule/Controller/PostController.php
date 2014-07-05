@@ -218,8 +218,7 @@ class PostController extends \Zikula_AbstractController
      */
     public function coreHookEndpoint(Request $request)
     {
-        $payloadManager = new PayloadManager($this->request);
-        $jsonPayload = $payloadManager->getJsonPayload();
+        $jsonPayload = $request->getContent();
 
         $securityToken = $this->getVar('github_webhook_token');
         if (!empty($securityToken)) {
