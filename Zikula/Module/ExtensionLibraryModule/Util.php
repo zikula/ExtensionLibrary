@@ -15,6 +15,8 @@ namespace Zikula\Module\ExtensionLibraryModule;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Github\Client as GitHubClient;
+use Github\HttpClient\Cache\FilesystemCache;
+use Github\HttpClient\CachedHttpClient;
 use vierbergenlars\SemVer\expression;
 use vierbergenlars\SemVer\version;
 use Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity;
@@ -184,7 +186,12 @@ class Util
      */
     public static function getGitHubClient($fallBackToNonAuthenticatedClient = true, $log = true)
     {
-        $client = new GitHubClient();
+        $cacheDir = \CacheUtil::getLocalDir('el/github-api');
+
+        $httpClient = new CachedHttpClient();
+        $httpClient->setCache(new FilesystemCache($cacheDir));
+        $client = new GitHubClient($httpClient);
+
         $token = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'github_token', null);
         if (!empty($token)) {
             $client->authenticate($token, null, GitHubClient::AUTH_HTTP_TOKEN);
@@ -194,7 +201,9 @@ class Util
                 // Authentication failed!
                 if ($fallBackToNonAuthenticatedClient) {
                     // Replace client with one not using authentication.
-                    $client = new GitHubClient();
+                    $httpClient = new CachedHttpClient();
+                    $httpClient->setCache(new FilesystemCache($cacheDir));
+                    $client = new GitHubClient($httpClient);
                 } else {
                     $client = false;
                 }
