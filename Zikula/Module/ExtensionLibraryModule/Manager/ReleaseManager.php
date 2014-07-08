@@ -12,12 +12,13 @@
  * information regarding copyright and licensing.
  */
 
-namespace Zikula\Module\ExtensionLibraryModule;
+namespace Zikula\Module\ExtensionLibraryModule\Manager;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Github\HttpClient\Message\ResponseMediator;
 use Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity;
+use Zikula\Module\ExtensionLibraryModule\Util;
 
 
 /**

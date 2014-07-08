@@ -25,7 +25,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method; // used in annotati
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity;
 use Zikula\Module\ExtensionLibraryModule\Manager\ImageManager;
-use Zikula\Module\ExtensionLibraryModule\ReleaseManager;
+use Zikula\Module\ExtensionLibraryModule\Manager\ReleaseManager;
 use Zikula\Module\ExtensionLibraryModule\Util;
 
 /**

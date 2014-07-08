@@ -22,7 +22,7 @@ use Zikula\Core\Response\PlainResponse;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
-use Zikula\Module\ExtensionLibraryModule\ReleaseManager;
+use Zikula\Module\ExtensionLibraryModule\Manager\ReleaseManager;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Zikula\Module\ExtensionLibraryModule\Manager\ManifestManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\ComposerManager;
