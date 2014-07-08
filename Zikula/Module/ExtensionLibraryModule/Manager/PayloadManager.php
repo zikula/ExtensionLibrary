@@ -13,6 +13,8 @@
 
 namespace Zikula\Module\ExtensionLibraryModule\Manager;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -23,31 +25,40 @@ class PayloadManager {
      */
     private $payload;
     /**
-     * @var \Zikula_Request_Http
+     * @var Request
      */
     private $request;
     /**
-     * @var \stdClass
+     * @var \stdClass|array
      */
     private $jsonPayload;
 
     /**
      * Constructor
      *
-     * @param \Zikula_Request_Http $request
+     * @param Request $request
+     * @param bool    $payloadToArray Whether or not to json_decode into an array or object.
      *
      * @throws NotFoundHttpException
      */
-    public function __construct(\Zikula_Request_Http $request)
+    public function __construct(Request $request, $payloadToArray = false)
     {
-        $payload = $request->request->get('payload', null);
+        if ($request->headers->get('X-GitHub-Event') == 'ping') {
+            Util::log('Ping event received.');
+            throw new HttpException(200, 'Ping event received.');
+        }
 
-        // github is guaranteed to send via POST and param is 'payload'
-        if (!isset($payload)) {
-            if ($request->headers->get('X-GitHub-Event') == 'ping') {
-                Util::log('Ping event received.');
-                throw new HttpException(200, 'Ping event received.');
-            }
+        $contentType = $request->headers->get('content-type');
+        if ($contentType == 'application/json') {
+            $payload = $request->getContent();
+        } else if ($contentType == 'application/x-www-form-urlencoded') {
+            $payload = $request->request->get('payload', null);
+        } else {
+            Util::log('ExtensionLibraryModule::payload was null.');
+            throw new HttpException(Response::HTTP_BAD_REQUEST, '"content-type" header must be either "application/json" or "application/x-www-form-urlencoded".');
+        }
+
+        if (empty($payload)) {
             Util::log('ExtensionLibraryModule::payload was null.');
             throw new NotFoundHttpException('Sorry! Page not found.', null, 404);
         }
@@ -63,7 +74,7 @@ class PayloadManager {
 
         // payload is valid
         try {
-            $this->jsonPayload = json_decode($payload);
+            $this->jsonPayload = json_decode($payload, $payloadToArray);
         } catch (\Exception $e) {
             Util::log('ExtensionLibraryModule::unable to decode json payload.');
             throw new \InvalidArgumentException();
@@ -109,7 +120,7 @@ class PayloadManager {
     }
 
     /**
-     * @return \stdClass
+     * @return \stdClass|array
      */
     public function getJsonPayload()
     {

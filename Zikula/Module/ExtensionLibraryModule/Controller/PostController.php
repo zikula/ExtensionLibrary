@@ -219,29 +219,30 @@ class PostController extends \Zikula_AbstractController
      */
     public function coreHookEndpoint(Request $request)
     {
-        $jsonPayload = $request->getContent();
+        $payloadManager = new PayloadManager($request, true);
+        $jsonPayload = $payloadManager->getJsonPayload();
 
         $securityToken = $this->getVar('github_webhook_token');
         if (!empty($securityToken)) {
             $signature = $request->headers->get('X-Hub-Signature');
             if (empty($signature)) {
-                return new PlainResponse('Missing security token!', 400);
+                return new PlainResponse('Missing security token!', Response::HTTP_BAD_REQUEST);
             }
             $computedSignature = $this->computeSignature($jsonPayload, $securityToken);
 
             if (!$this->secure_equals($computedSignature, $signature)) {
-                return new PlainResponse('Signature did not match!', 400);
+                return new PlainResponse('Signature did not match!', Response::HTTP_BAD_REQUEST);
             }
         }
 
         $event = $this->request->headers->get('X-Github-Event');
         if (empty($event)) {
-            return new PlainResponse('"X-Github-Event" header is missing!', 400);
+            return new PlainResponse('"X-Github-Event" header is missing!', Response::HTTP_BAD_REQUEST);
         }
         $useragent = $request->headers->get('User-Agent');
         if (strpos($useragent, 'GitHub Hookshot') !== 0) {
             // User agent does not match "GitHub Hookshot*"
-            return new PlainResponse('User-Agent not allowed!', 400);
+            return new PlainResponse('User-Agent not allowed!', Response::HTTP_BAD_REQUEST);
         }
 
         switch ($event) {
@@ -262,7 +263,7 @@ class PostController extends \Zikula_AbstractController
 
         $repo = $this->getVar('github_core_repo', 'zikula/core');
         if ($json['repository']['full_name'] != $repo) {
-            return new PlainResponse('Release event ignored (repository != "' . $repo . '")!');
+            return new PlainResponse('Release event ignored (repository != "' . $repo . '")!', Response::HTTP_BAD_REQUEST);
         }
 
         /** @var ReleaseManager $releaseManager */
