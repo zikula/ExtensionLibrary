@@ -95,7 +95,9 @@ class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
 
 
         $this->view->assign('release', $supportedReleases[0]);
-        $this->view->assign('preRelease', $preReleases[0]);
+        if (!empty($preReleases)) {
+            $this->view->assign('preRelease', $preReleases[0]);
+        }
         $this->view->assign('id', uniqid());
         $blockinfo['content'] = $this->view->fetch('Blocks/latestrelease.tpl');
 
