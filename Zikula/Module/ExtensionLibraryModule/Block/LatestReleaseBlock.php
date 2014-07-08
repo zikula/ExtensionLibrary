@@ -47,6 +47,14 @@ class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
         );
     }
 
+    private function majorMinorPatchEqual(version $v1, version $v2)
+    {
+        $v1 = $v1->getMajor() . "." . $v1->getMinor() . "." . $v1->getPatch();
+        $v2 = $v2->getMajor() . "." . $v2->getMinor() . "." . $v2->getPatch();
+
+        return $v1 === $v2;
+    }
+
     /**
      * display block
      */
@@ -56,6 +64,8 @@ class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
             return;
         }
 
+        $outdatedReleases = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('status' => CoreReleaseEntity::STATE_OUTDATED));
+
         $supportedReleases = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('status' => CoreReleaseEntity::STATE_SUPPORTED));
         usort($supportedReleases, function (CoreReleaseEntity $a, CoreReleaseEntity $b) {
             $a = new version($a->getSemver());
@@ -64,7 +74,28 @@ class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
             return version::compare($b, $a);
         });
 
+        $preReleases = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('status' => CoreReleaseEntity::STATE_PRERELEASE));
+        foreach ($preReleases as $key => $preRelease) {
+            $preReleaseVersion = new version($preRelease->getSemver());
+            foreach ($supportedReleases as $supportedRelease) {
+                $supportedReleaseVersion = new version($supportedRelease->getSemver());
+                if ($this->majorMinorPatchEqual($preReleaseVersion, $supportedReleaseVersion)) {
+                    // There already is a supported release. Hide the prerelease.
+                    unset($preReleases[$key]);
+                }
+            }
+            foreach ($outdatedReleases as $outdatedRelease) {
+                $outdatedReleaseVersion = new version($outdatedRelease->getSemver());
+                if ($this->majorMinorPatchEqual($preReleaseVersion, $outdatedReleaseVersion)) {
+                    // There already is an outdated release. Hide the prerelease.
+                    unset($preReleases[$key]);
+                }
+            }
+        }
+
+
         $this->view->assign('release', $supportedReleases[0]);
+        $this->view->assign('preRelease', $preReleases[0]);
         $this->view->assign('id', uniqid());
         $blockinfo['content'] = $this->view->fetch('Blocks/latestrelease.tpl');
 
