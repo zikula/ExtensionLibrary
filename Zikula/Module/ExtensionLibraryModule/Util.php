@@ -63,7 +63,7 @@ class Util
         $dbReleases = $em->getRepository('Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity')->findAll();
         $releases = array();
         foreach ($dbReleases as $dbRelease) {
-            $releases[CoreReleaseEntity::statusToText($dbRelease->getStatus())][$dbRelease->getSemver()] = '';
+            $releases[CoreReleaseEntity::statusToText($dbRelease->getStatus(), 'plural')][$dbRelease->getSemver()] = '';
         }
         krsort($releases);
 

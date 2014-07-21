@@ -12,10 +12,10 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{gt text='Close'}</span></button>
-                    <h4 class="modal-title"><strong>{$release->getName()|safetext}</strong></h4>
+                    <h4 class="modal-title"><strong>{$release->getNameI18n()|safetext}</strong></h4>
                 </div>
                 <div class="modal-body">
-                    {$release->getDescription()}
+                    {$release->getDescriptionI18n()}
                 </div>
                 <div class="modal-footer">
                     {foreach from=$release.assets item='asset'}
@@ -33,11 +33,11 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{gt text='Close'}</span></button>
-                        <h4 class="modal-title">{$preRelease->getName()|safetext}</h4>
+                        <h4 class="modal-title">{$preRelease->getNameI18n()|safetext}</h4>
                     </div>
                     <div class="modal-body">
                         <div class="alert alert-danger"><strong>{gt text='Danger: Do not use on production sites! Download the latest release instead.'}</strong></div>
-                        {$preRelease->getDescription()}
+                        {$preRelease->getDescriptionI18n()}
                     </div>
                     <div class="modal-footer">
                         {foreach from=$preRelease.assets item='asset'}

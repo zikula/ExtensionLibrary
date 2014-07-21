@@ -58,12 +58,24 @@ class CoreReleaseEntity extends EntityAccess
     private $name = '';
 
     /**
+     * Array of release names indexed by locale.
+     * @var array
+     */
+    private $namesI18n = array();
+
+    /**
      * Release description.
      *
      * @ORM\Column(type="text")
      * @var string
      */
     private $description = '';
+
+    /**
+     * Array of release descriptions indexed by locale.
+     * @var array
+     */
+    private $descriptionsI18n = array();
 
     /**
      * Core status (supported, outdated, development)
@@ -94,15 +106,25 @@ class CoreReleaseEntity extends EntityAccess
         $this->id = $id;
     }
 
-    public static function statusToText($status)
+    public static function statusToText($status, $singularPlural = 'singular')
     {
         $dom = \ZLanguage::getModuleDomain('ZikulaExtensionLibraryModule');
-        $translation = array (
-            self::STATE_OUTDATED => __('Outdated versions', $dom),
-            self::STATE_DEVELOPMENT => __('Development versions', $dom),
-            self::STATE_PRERELEASE => __('Prereleases', $dom),
-            self::STATE_SUPPORTED => __('Supported versions', $dom)
-        );
+
+        if ($singularPlural == 'singular') {
+            $translation = array (
+                self::STATE_OUTDATED => __('Outdated version', $dom),
+                self::STATE_DEVELOPMENT => __('Development version', $dom),
+                self::STATE_PRERELEASE => __('Prerelease', $dom),
+                self::STATE_SUPPORTED => __('Supported version', $dom)
+            );
+        } else {
+            $translation = array (
+                self::STATE_OUTDATED => __('Outdated versions', $dom),
+                self::STATE_DEVELOPMENT => __('Development versions', $dom),
+                self::STATE_PRERELEASE => __('Prereleases', $dom),
+                self::STATE_SUPPORTED => __('Supported versions', $dom)
+            );
+        }
 
         return $translation[$status];
     }
@@ -204,6 +226,25 @@ class CoreReleaseEntity extends EntityAccess
     }
 
     /**
+     * Get the release description in the user's or given language. Defaults to English.
+     *
+     * @param null $lang The language to use (default: user's language)
+     *
+     * @return string
+     */
+    public function getDescriptionI18n($lang = null)
+    {
+        $lang = $lang !== null ? $lang : \ZLanguage::getLocale();
+        $this->extractI18n();
+
+        if (isset($this->descriptionsI18n[$lang])) {
+            return $this->descriptionsI18n[$lang];
+        }
+
+        return $this->descriptionsI18n['en'];
+    }
+
+    /**
      * @param string $name
      */
     public function setName($name)
@@ -217,5 +258,48 @@ class CoreReleaseEntity extends EntityAccess
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Get the release name in the user's or given language. Defaults to English.
+     *
+     * @param null $lang The language to use (default: user's language)
+     *
+     * @return string
+     */
+    public function getNameI18n($lang = null)
+    {
+        $lang = $lang !== null ? $lang : \ZLanguage::getLocale();
+        $this->extractI18n();
+
+        if (isset($this->namesI18n[$lang])) {
+            return $this->namesI18n[$lang];
+        }
+
+        return $this->namesI18n['en'];
+    }
+
+    /**
+     * Extracts the multilingual names and descriptions.
+     *
+     * @param null $lang The language to use (default: user's language)
+     *
+     * @return string
+     */
+    private function extractI18n()
+    {
+        if (count($this->namesI18n) > 0) {
+            // Already extracted.
+            return;
+        }
+
+        $tmpArr = preg_split('/<h1>(\s*)(.*?){2,5}:(.*)<\/h1>/', $this->description, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        array_unshift($tmpArr, $this->name);
+        array_unshift($tmpArr, 'en');
+
+        for ($i = 0; $i < count($tmpArr); $i += 3) {
+            $this->descriptionsI18n[$tmpArr[$i]] = $tmpArr[$i + 2];
+            $this->namesI18n[$tmpArr[$i]] = $tmpArr[$i + 1];
+        }
     }
 }

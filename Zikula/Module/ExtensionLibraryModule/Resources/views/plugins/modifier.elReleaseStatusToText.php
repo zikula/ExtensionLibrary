@@ -22,7 +22,7 @@
  * @param $status
  * @return string The release status.
  */
-function smarty_modifier_elReleaseStatusToText($status)
+function smarty_modifier_elReleaseStatusToText($status, $singularPlural = 'singular')
 {
-    return \Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity::statusToText($status);
+    return \Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity::statusToText($status, $singularPlural);
 }

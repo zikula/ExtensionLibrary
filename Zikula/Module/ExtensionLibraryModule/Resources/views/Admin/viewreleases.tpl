@@ -21,10 +21,10 @@
         <tr class="{if $release->getStatus() == $outdated}danger{elseif $release->getStatus() == $supported}success{else}warning{/if}">
             <td>{$release->getId()}</td>
             <td>{$release->getSemver()|safetext}</td>
-            <td>{$release->getName()|safetext}</td>
-            <td>{$release->getStatus()|elReleaseStatusToText|safetext}</td>
+            <td>{$release->getNameI18n()|safetext}</td>
+            <td>{$release->getStatus()|elReleaseStatusToText:'singular'|safetext}</td>
             <td class="text-right">
-                <div class="hidden">{$release->getDescription()}</div>
+                <div class="hidden">{$release->getDescriptionI18n()}</div>
                 <a href="#" title="{gt text='View release description'}" data-toggle="modal" data-target="#el-modal-release-description" onclick="jQuery('#el-modal-release-description .modal-body').html(jQuery(this).prev().html())">
                     <i class="fa fa-comments-o"></i>
                 </a>
@@ -44,6 +44,17 @@
     {/foreach}
     </tbody>
 </table>
+
+<hr />
+<div class="alert alert-info">
+    {gt text='The release names and descriptions can be made multilingual, if the correct format is used at GitHub:'}
+</div>
+<pre>...English release descripion...
+# LOCALE:LOCALISED RELEASE NAME
+...LOCALISED RELEASE DESCRIPTION...
+# LOCALE:LOCALISED RELEASE NAME
+...LOCALISED RELEASE DESCRIPTION...</pre>
+
 {adminfooter}
 
 <div class="modal fade" id="el-modal-release-description">
