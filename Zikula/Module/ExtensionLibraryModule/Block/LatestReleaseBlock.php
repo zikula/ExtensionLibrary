@@ -92,11 +92,40 @@ class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
                 }
             }
         }
+        $developmentReleases = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('status' => CoreReleaseEntity::STATE_DEVELOPMENT));
+        foreach ($developmentReleases as $key => $developmentRelease) {
+            $developmentReleasesVersion = new version($developmentRelease->getSemver());
+            foreach ($supportedReleases as $supportedRelease) {
+                $supportedReleaseVersion = new version($supportedRelease->getSemver());
+                if ($this->majorMinorPatchEqual($developmentReleasesVersion, $supportedReleaseVersion)) {
+                    // There already is a supported release. Hide the prerelease.
+                    unset($developmentReleases[$key]);
+                }
+            }
+            foreach ($outdatedReleases as $outdatedRelease) {
+                $outdatedReleaseVersion = new version($outdatedRelease->getSemver());
+                if ($this->majorMinorPatchEqual($developmentReleasesVersion, $outdatedReleaseVersion)) {
+                    // There already is an outdated release. Hide the prerelease.
+                    unset($developmentReleases[$key]);
+                }
+            }
+            foreach ($preReleases as $preRelease) {
+                $preReleaseVersion = new version($preRelease->getSemver());
+                if ($this->majorMinorPatchEqual($developmentReleasesVersion, $preReleaseVersion)) {
+                    // There already is an outdated release. Hide the prerelease.
+                    unset($developmentReleases[$key]);
+                }
+            }
+        }
 
-
-        $this->view->assign('release', $supportedReleases[0]);
+        if (!empty($supportedReleases)) {
+            $this->view->assign('supportedRelease', $supportedReleases[0]);
+        }
         if (!empty($preReleases)) {
             $this->view->assign('preRelease', $preReleases[0]);
+        }
+        if (!empty($developmentReleases)) {
+            $this->view->assign('developmentRelease', $developmentReleases[0]);
         }
         $this->view->assign('id', uniqid());
         $blockinfo['content'] = $this->view->fetch('Blocks/latestrelease.tpl');

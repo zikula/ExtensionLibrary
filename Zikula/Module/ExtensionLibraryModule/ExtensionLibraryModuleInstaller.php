@@ -66,6 +66,8 @@ class ExtensionLibraryModuleInstaller extends \Zikula_AbstractInstaller
                 DoctrineHelper::updateSchema($this->entityManager, array('Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity'));
             case '1.0.3':
                 DoctrineHelper::createSchema($this->entityManager, array('Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity'));
+            case '1.0.4':
+                DoctrineHelper::updateSchema($this->entityManager, array('Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity'));
         }
 
         // Update successful

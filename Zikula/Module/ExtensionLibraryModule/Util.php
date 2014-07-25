@@ -24,6 +24,8 @@ use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use CarlosIO\Jenkins\Dashboard;
+use CarlosIO\Jenkins\Source;
 
 class Util
 {
@@ -258,5 +260,23 @@ class Util
         }
 
         return $extensions;
+    }
+
+    public static function getJenkinsClient()
+    {
+        $jenkinsServer = trim(\ModUtil::getVar('ZikulaExtensionLibraryModule', 'jenkins_server', ''), '/');
+        if (empty($jenkinsServer)) {
+            return false;
+        }
+        $jenkinsUser = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'jenkins_user', '');
+        $jenkinsPassword = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'jenkins_password', '');
+        if (!empty($jenkinsUser) && !empty($jenkinsPassword)) {
+            $jenkinsServer = str_replace('://', "://" . urlencode($jenkinsUser) . ":" . urlencode($jenkinsPassword), $jenkinsServer);
+        }
+
+        $dashboard = new Dashboard();
+        $dashboard->addSource(new Source($jenkinsServer . '/view/All/api/json/?depth=2'));
+
+        return $dashboard;
     }
 } 

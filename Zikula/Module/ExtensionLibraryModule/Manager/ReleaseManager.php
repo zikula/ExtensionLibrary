@@ -14,6 +14,8 @@
 
 namespace Zikula\Module\ExtensionLibraryModule\Manager;
 
+use CarlosIO\Jenkins\Build;
+use CarlosIO\Jenkins\Job;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Github\HttpClient\Message\ResponseMediator;
@@ -36,15 +38,21 @@ class ReleaseManager
      */
     private $repo;
 
+    private $client;
+
+    private $jenkinsClient;
+
     public function __construct($em)
     {
         $this->client = Util::getGitHubClient();
+        $this->jenkinsClient = Util::getJenkinsClient();
         $this->em = $em;
         $this->repo = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'github_core_repo', 'zikula/core');
     }
 
-    public function reloadAllReleases()
+    public function reloadAllReleases($includeJenkinsBuilds = false)
     {
+        // GitHub releases
         $repo = explode('/', $this->repo);
         $releases = $this->client->api('repo')->releases()->all($repo[0], $repo[1]);
         /** @var CoreReleaseEntity[] $dbReleases */
@@ -74,6 +82,82 @@ class ReleaseManager
         }
 
         $this->em->flush();
+
+        // Jenkins builds
+        if ($includeJenkinsBuilds && $this->jenkinsClient) {
+            $oldJenkinsBuilds = $this->em->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('status' => CoreReleaseEntity::STATE_DEVELOPMENT));
+            foreach ($oldJenkinsBuilds as $oldJenkinsBuild) {
+                $this->em->remove($oldJenkinsBuild);
+            }
+            $this->em->flush();
+
+            /** @var Job $job */
+            foreach ($this->jenkinsClient->getJobs() as $job) {
+                if (!$job->isDisabled()) {
+                    $name = $job->getName();
+                    if (!preg_match('#Zikula(_Core|)-([0-9]\.[0-9]\.[0-9])#', $name, $matches)) {
+                        continue;
+                    }
+                    $version = $matches[2];
+
+                    /** @var Build[] $builds */
+                    $builds = $job->getBuilds();
+                    foreach ($builds as $key => $build) {
+                        if ($build->isBuilding() || $build->getResult() != "SUCCESS") {
+                            unset($builds[$key]);
+                        }
+                    }
+                    usort($builds, function (Build $a, Build $b) {
+                        $a = $a->getNumber();
+                        $b = $b->getNumber();
+                        if ($a === $b) {
+                            return 0;
+                        }
+
+                        return ($a > $b) ? -1 : 1;
+                    });
+
+                    $build = $builds[0];
+
+                    $jenkinsBuild = new CoreReleaseEntity($job->getName() . '#' . $build->getNumber());
+                    $jenkinsBuild->setName($job->getDisplayName() . '#' . $build->getNumber());
+                    $jenkinsBuild->setStatus(CoreReleaseEntity::STATE_DEVELOPMENT);
+                    $jenkinsBuild->setSemver($version);
+
+                    $description = $job->getDescription() ? $job->getDescription() : $job->getDisplayName();
+                    $changeSet = $build->getChangeSet()->toArray();
+                    if ($changeSet['kind'] == 'git' && !empty($changeSet['items'][0]->msg)) {
+                        $description .= "<br /><br />" . $this->markdown($changeSet['items'][0]->msg);
+                    }
+                    $jenkinsBuild->setDescription($description);
+
+                    $assets = array();
+                    $server = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'jenkins_server');
+                    foreach ($build->getArtifacts() as $artifact) {
+                        $downloadUrl = $server . '/job/' . urlencode($job->getName()) . '/' . $build->getNumber() . '/artifact/' . $artifact->relativePath;
+                        $assets[] = array (
+                            'name' => $artifact->fileName,
+                            'download_url' => $downloadUrl,
+                            'size' => null,
+                            'content_type' => null
+                        );
+                    }
+                    $jenkinsBuild->setAssets($assets);
+
+                    $sourceUrls = array();
+                    if ($changeSet['kind'] == 'git') {
+                        $sha = $changeSet['items'][0]->commitId;
+                        $sourceUrls['zip'] = 'https://github.com/' . urlencode($this->repo) . "/archive/$sha.zip";
+                        $sourceUrls['tar'] = 'https://github.com/' . urlencode($this->repo) . "/archive/$sha.tar";
+                    }
+                    $jenkinsBuild->setSourceUrls($sourceUrls);
+
+                    $this->em->persist($jenkinsBuild);
+                }
+            }
+
+            $this->em->flush();
+        }
 
         return true;
     }

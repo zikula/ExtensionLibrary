@@ -29,7 +29,7 @@ class AdminApi extends \Zikula_AbstractApi
         $links = array();
         if (SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_ADMIN)) {
             $links[] = array(
-                'url' => $this->get('router')->generate('zikulaextensionlibrarymodule_admin_viewcorereleases'),
+                'url' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_viewcorereleases'),
                 'text' => $this->__('Core releases'),
                 'title' => $this->__('View core releases'),
                 'icon' => 'th-list');
