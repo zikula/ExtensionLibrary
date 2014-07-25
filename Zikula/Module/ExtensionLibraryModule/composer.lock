@@ -4,8 +4,50 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8c404c034f7b77ee6510c40bb42846c3",
+    "hash": "f17b3ccb6e5223abc50c460994291a2f",
     "packages": [
+        {
+            "name": "carlosio/jenkins",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/carlosbuenosvinos/php-jenkins-api.git",
+                "reference": "dbd432962c2175ccc3b18f75101462038b389afd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/carlosbuenosvinos/php-jenkins-api/zipball/dbd432962c2175ccc3b18f75101462038b389afd",
+                "reference": "dbd432962c2175ccc3b18f75101462038b389afd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "CarlosIO": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Carlos Buenosvinos",
+                    "email": "hi@carlos.io",
+                    "homepage": "http://carlosbuenosvinos.com"
+                }
+            ],
+            "description": "Jenkins API",
+            "homepage": "https://github.com/carlosbuenosvinos/php-jenkins-api",
+            "keywords": [
+                "api",
+                "jenkins"
+            ],
+            "time": "2014-04-22 10:41:36"
+        },
         {
             "name": "guzzle/guzzle",
             "version": "v3.9.1",
@@ -229,17 +271,17 @@
         },
         {
             "name": "symfony/event-dispatcher",
-            "version": "v2.5.0",
+            "version": "v2.5.2",
             "target-dir": "Symfony/Component/EventDispatcher",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/EventDispatcher.git",
-                "reference": "cb62ec8dd05893fc8e4f0e6e21e326e1fc731fe8"
+                "reference": "2215d2ef6fd7ab24d55576a3d924df575c741762"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/EventDispatcher/zipball/cb62ec8dd05893fc8e4f0e6e21e326e1fc731fe8",
-                "reference": "cb62ec8dd05893fc8e4f0e6e21e326e1fc731fe8",
+                "url": "https://api.github.com/repos/symfony/EventDispatcher/zipball/2215d2ef6fd7ab24d55576a3d924df575c741762",
+                "reference": "2215d2ef6fd7ab24d55576a3d924df575c741762",
                 "shasum": ""
             },
             "require": {
@@ -284,7 +326,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "http://symfony.com",
-            "time": "2014-04-29 10:13:57"
+            "time": "2014-07-09 09:05:48"
         },
         {
             "name": "vierbergenlars/php-semver",

@@ -1,0 +1,23 @@
+{
+    "name": "carlosio/jenkins",
+    "type": "library",
+    "description": "Jenkins API",
+    "keywords": ["jenkins", "api"],
+    "homepage": "https://github.com/carlosbuenosvinos/php-jenkins-api",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Carlos Buenosvinos",
+            "email": "hi@carlos.io",
+            "homepage": "http://carlosbuenosvinos.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-0": {
+            "CarlosIO": "src"
+        }
+    }
+}

@@ -14,4 +14,5 @@ return array(
     'Guzzle\\Tests' => array($vendorDir . '/guzzle/guzzle/tests'),
     'Guzzle' => array($vendorDir . '/guzzle/guzzle/src'),
     'Github\\' => array($vendorDir . '/knplabs/github-api/lib'),
+    'CarlosIO' => array($vendorDir . '/carlosio/jenkins/src'),
 );
