@@ -9,3 +9,7 @@ This version **requires** Zikula Core 1.4.0+
 for how to do so.**
 
 *Requires MANUAL setup of image storage directory*
+
+Use this command to update composer dependencies (if needed):
+
+    composer update --prefer-dist --no-dev -o
