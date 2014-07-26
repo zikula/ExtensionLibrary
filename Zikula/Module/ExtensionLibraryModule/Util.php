@@ -60,14 +60,13 @@ class Util
      */
     public static function getAvailableCoreVersions()
     {
-        $em = \ServiceUtil::get('doctrine.orm.entity_manager');
-        /** @var \Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity[] $dbReleases */
-        $dbReleases = $em->getRepository('Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity')->findAll();
+        $releaseManager = \ServiceUtil::get('zikulaextensionlibrarymodule.releasemanager');
+        $dbReleases = $releaseManager->getSignificantReleases(false);
+
         $releases = array();
         foreach ($dbReleases as $dbRelease) {
             $releases[CoreReleaseEntity::stateToText($dbRelease->getState(), 'plural')][$dbRelease->getSemver()] = '';
         }
-        krsort($releases);
 
         return $releases;
     }

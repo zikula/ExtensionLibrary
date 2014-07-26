@@ -341,7 +341,10 @@ class UserController extends \Zikula_AbstractController
                 'title' => 'Core Releases'
             )
         ));
-        $this->view->assign('releases', $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array(), array('state' => 'ASC', 'id' => 'ASC')));
+
+        $releaseManager = $this->get('zikulaextensionlibrarymodule.releasemanager');
+        $releases = $releaseManager->getSignificantReleases(false);
+        $this->view->assign('releases', $releases);
 
         return $this->response($this->view->fetch('User/viewreleases.tpl'));
     }

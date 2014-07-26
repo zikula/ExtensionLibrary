@@ -1,8 +1,8 @@
 {include file='User/header.tpl'}
+{checkpermission component="ZikulaExtensionLibraryModule::" instance="::" level="ACCESS_MODERATE" assign="admin"}
 <h3>
     <span class="fa fa-th-list"></span>&nbsp;{gt text="Core releases"}
 </h3>
-{checkpermission component="ZikulaExtensionLibraryModule::" instance="::" level="ACCESS_MODERATE" assign="admin"}
 <table class="table table-striped table-hover">
     <thead>
     <tr>

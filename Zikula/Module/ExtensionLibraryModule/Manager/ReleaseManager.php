@@ -19,6 +19,7 @@ use CarlosIO\Jenkins\Job;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Github\HttpClient\Message\ResponseMediator;
+use vierbergenlars\SemVer\version;
 use Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity;
 use Zikula\Module\ExtensionLibraryModule\Util;
 
@@ -48,6 +49,113 @@ class ReleaseManager
         $this->jenkinsClient = Util::getJenkinsClient();
         $this->em = $em;
         $this->repo = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'github_core_repo', 'zikula/core');
+    }
+
+    /**
+     * This returns "significant" releases only. They are sorted by (1) state ASC and (2) version DESC.
+     *
+     * Example given there is
+     * - a prerelease 1.3.5-rc1
+     * - an outdated release 1.3.5
+     *
+     * Only the outdated release will be returned as it "overweights" the prerelease.
+     */
+    public function getSignificantReleases($onlyNewestVersion = true)
+    {
+        // Get all the releases.
+        $releases = $this->em->getRepository('Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity')->findAll();
+
+        // Create a version map. This makes it possible to check what kind of releases are available for one specific
+        // version.
+        $versionMap = array();
+        foreach ($releases as $release) {
+            // As the version could be 1.3.5-rc1, we need to transform them into x.y.z to be able to compare.
+            $version = new version($release->getSemver());
+            $version = $version->getMajor() . "." . $version->getMinor() . "." . $version->getPatch();
+            $versionMap[$version][$release->getState()][] = $release->getId();
+        }
+
+        // This array will hold all the ids of versions we want to return.
+        $ids = array();
+        foreach ($versionMap as $version => $stateReleaseMap) {
+            // Now check if there is a supported version. If so, ignore all the outdated versions, prereleases and
+            // development versions.. We only want to serve the supported version. If there isn't a supported version
+            // but an outdated version, serve the outdated version but ignore all prereleases and development versions
+            // and so on.
+            if (isset($stateReleaseMap[CoreReleaseEntity::STATE_SUPPORTED])) {
+                // There is a supported core release for version x.y.z
+                $ids[CoreReleaseEntity::STATE_SUPPORTED][$version][] = $stateReleaseMap[CoreReleaseEntity::STATE_SUPPORTED][0];
+            } else if (isset($stateReleaseMap[CoreReleaseEntity::STATE_OUTDATED])) {
+                // There is an outdated core release for version x.y.z
+                $ids[CoreReleaseEntity::STATE_OUTDATED][$version][] = $stateReleaseMap[CoreReleaseEntity::STATE_OUTDATED][0];
+            } else if (isset($stateReleaseMap[CoreReleaseEntity::STATE_PRERELEASE])) {
+                // There is at least one prerelease core for version x.y.z
+                // There might be multiple prereleases. Sort them by id and use the latest one.
+                rsort($stateReleaseMap[CoreReleaseEntity::STATE_PRERELEASE]);
+                $ids[CoreReleaseEntity::STATE_PRERELEASE][$version][] = $stateReleaseMap[CoreReleaseEntity::STATE_PRERELEASE][0];
+            } else if (isset($stateReleaseMap[CoreReleaseEntity::STATE_DEVELOPMENT])) {
+                // There is at least one development core for version x.y.z
+                // There might be multiple development cores. Sort them by id and use the latest one.
+                rsort($stateReleaseMap[CoreReleaseEntity::STATE_DEVELOPMENT]);
+                $ids[CoreReleaseEntity::STATE_DEVELOPMENT][$version][] = $stateReleaseMap[CoreReleaseEntity::STATE_DEVELOPMENT][0];
+            }
+        }
+
+        if ($onlyNewestVersion) {
+            // Make sure the newest core versions are at the first position in the arrays.
+            foreach ($ids as $state => $versions) {
+                krsort($ids[$state]);
+            }
+        }
+
+        // Now filter out all the releases.
+        $releases = array_filter($releases, function (CoreReleaseEntity $release) use ($ids, $onlyNewestVersion) {
+            // Check if we want core releases with the state of the current release.
+            if (!isset($ids[$release->getState()])) {
+                return false;
+            }
+            // This is all the ids of releases we want for that specific state.
+            $idList = $ids[$release->getState()];
+
+            if ($onlyNewestVersion) {
+                // We only want the newest version.
+                $idList = current($idList);
+
+                return in_array($release->getId(), $idList);
+            }
+
+            foreach ($idList as $version => $ids) {
+                if (in_array($release->getId(), $ids)) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        // Finally, sort all releases by (1) state ASC (meaning supported first, development last) and (2) by version
+        // DESC  and (3) by release DESC.
+        usort($releases, function (CoreReleaseEntity $a, CoreReleaseEntity $b) {
+            $states = array($a->getState(), $b->getState());
+            if ($states[0] !== $states[1]) {
+                return ($states[0] > $states[1]) ? 1 : -1;
+            }
+            $v1 = new version($a->getSemver());
+            $v2 = new version($b->getSemver());
+            $v1 = $v1->getMajor() . "." . $v1->getMinor() . "." . $v1->getPatch();
+            $v2 = $v2->getMajor() . "." . $v2->getMinor() . "." . $v2->getPatch();
+            if ($v1 !== $v2) {
+                return version_compare($v2, $v1);
+            }
+            $ids = array($a->getId(), $b->getId());
+            if ($ids[0] !== $ids[1]) {
+                return ($ids[0] > $ids[1]) ? -1 : 1;
+            }
+
+            return 0;
+        });
+
+        return $releases;
     }
 
     public function reloadAllReleases($includeJenkinsBuilds = false)
