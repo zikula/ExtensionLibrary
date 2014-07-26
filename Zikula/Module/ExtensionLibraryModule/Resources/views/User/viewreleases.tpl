@@ -1,5 +1,6 @@
+{include file='User/header.tpl'}
 <h3>
-    <span class="fa fa-th-list"></span>&nbsp;{gt text="View core releases"}
+    <span class="fa fa-th-list"></span>&nbsp;{gt text="Core releases"}
 </h3>
 {checkpermission component="ZikulaExtensionLibraryModule::" instance="::" level="ACCESS_MODERATE" assign="admin"}
 <table class="table table-striped table-hover">
@@ -42,7 +43,7 @@
                 </td>
             </tr>
         {/if}
-        <tr class="{if $release->getStatus() == $outdated || $release->getStatus() == $development}danger{elseif $release->getStatus() == $supported}success{else}warning{/if}">
+        <tr class="{if $release->getStatus() == $prerelease || $release->getStatus() == $development}danger{elseif $release->getStatus() == $supported}success{else}warning{/if}">
             {if $admin}<td>{$release->getId()}</td>{/if}
             <td>{$release->getStatus()|elReleaseStatusToText:'singular'|safetext}</td>
             <td>{$release->getNameI18n()|safetext}</td>
@@ -82,6 +83,8 @@
     # LOCALE:LOCALISED RELEASE NAME
     ...LOCALISED RELEASE DESCRIPTION...</pre>
 {/if}
+
+{include file='User/footer.tpl'}
 
 <div class="modal fade" id="el-modal-release-description">
     <div class="modal-dialog">

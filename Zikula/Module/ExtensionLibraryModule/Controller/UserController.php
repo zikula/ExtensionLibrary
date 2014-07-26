@@ -331,12 +331,16 @@ class UserController extends \Zikula_AbstractController
         }
     }
 
-
     /**
      * @Route("/releases")
      */
     public function viewCoreReleasesAction()
     {
+        $this->view->assign('breadcrumbs', array (
+            array (
+                'title' => 'Core Releases'
+            )
+        ));
         $this->view->assign('releases', $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array(), array('status' => 'ASC', 'id' => 'ASC')));
 
         return $this->response($this->view->fetch('User/viewreleases.tpl'));
