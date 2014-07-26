@@ -268,7 +268,7 @@ class PostController extends \Zikula_AbstractController
 
         /** @var ReleaseManager $releaseManager */
         $releaseManager = $this->get('zikulaextensionlibrarymodule.releasemanager');
-        $releaseManager->updateRelease($json['release']);
+        $releaseManager->updateGitHubRelease($json['release']);
 
         return new PlainResponse('Release list reloaded!');
     }

@@ -147,7 +147,7 @@ class AdminController extends \Zikula_AbstractController
 
         /** @var ReleaseManager $releaseManager */
         $releaseManager = $this->get('zikulaextensionlibrarymodule.releasemanager');
-        $releaseManager->reloadAllReleases(true);
+        $releaseManager->reloadReleases('all');
 
         $request->getSession()->getFlashBag()->add('state', $this->__('Reloaded all core releases from GitHub.'));
 

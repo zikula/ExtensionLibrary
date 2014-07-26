@@ -158,9 +158,68 @@ class ReleaseManager
         return $releases;
     }
 
-    public function reloadAllReleases($includeJenkinsBuilds = false)
+    public function reloadReleases($source = 'all')
     {
+        $newReleases = array();
         // GitHub releases
+        if ($source == 'all' || $source == 'github') {
+            $newReleases = $this->reloadReleasesFromGitHub();
+        }
+
+        // Jenkins builds
+        if ($source == 'all' || $source == 'jenkins') {
+            $this->reloadReleasesFromJenkins();
+        }
+
+        if (!empty($newReleases) && \ModUtil::available('News')) {
+            $dom = \ZLanguage::getModuleDomain('ZikulaExtensionLibraryModule');
+            foreach ($newReleases as $newRelease) {
+                switch ($newRelease->getState()) {
+                    case CoreReleaseEntity::STATE_DEVELOPMENT:
+                    case CoreReleaseEntity::STATE_OUTDATED:
+                    default:
+                        // Do not create news post.
+                        continue;
+                    case CoreReleaseEntity::STATE_SUPPORTED:
+                        $title = __f('%s released!', array($newRelease->getNameI18n()), $dom);
+                        $teaser = '<p>' . __f('The core development team is proud to anounce the availabilty of %s.', array($newRelease->getNameI18n())) . '</p>';
+                        break;
+                    case CoreReleaseEntity::STATE_PRERELEASE:
+                        $title = __f('%s ready for testing!', array($newRelease->getNameI18n()), $dom);
+                        $teaser = '<p>' . __f('The core development team is proud to anounce a pre release of %s. Please help testing and report bugs!', array($newRelease->getNameI18n())) . '</p>';
+                        break;
+                }
+
+                $downloadLinkTpl = '<a href="%link%" class="btn btn-success btn-md">%text%</a>';
+                $downloadLinks = array();
+                foreach ($newRelease->getAssets() as $asset) {
+                    $downloadLinks[] = str_replace('%link%', $asset['download_url'], str_replace('%text%', $asset['name'], $downloadLinkTpl));
+                }
+
+                $args = array();
+                $args['title'] = $title;
+                $args['hometext'] = $teaser;
+                $args['hometextcontenttype'] = 0;
+                $args['bodytextcontenttype'] = 0;
+                $args['bodytext'] = $newRelease->getDescriptionI18n() . implode(' ', $downloadLinks);
+                $args['notes'] = '';
+                $args['published_status'] = \News_Api_User::STATUS_PENDING;
+                $args['displayonindex'] = 1;
+                $args['allowcomments'] = 1;
+                $args['from'] = \DateUtil::getDatetime();
+
+                $id = \ModUtil::apiFunc('News', 'user', 'create', $args);
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return CoreReleaseEntity[]
+     */
+    private function reloadReleasesFromGitHub()
+    {
         $repo = explode('/', $this->repo);
         $releases = $this->client->api('repo')->releases()->all($repo[0], $repo[1]);
         /** @var CoreReleaseEntity[] $dbReleases */
@@ -173,9 +232,13 @@ class ReleaseManager
 
         // Make sure to always have at least the id "0" in the array, as the IN() SQL statement fails otherwise.
         $ids = array(0);
+        $newReleases = array();
         foreach ($releases as $release) {
             $ids[] = $release['id'];
-            $this->updateRelease($release, $dbReleases);
+            $newRelease = $this->updateGitHubRelease($release, $dbReleases);
+            if ($newRelease) {
+                $newReleases[] = $newRelease;
+            }
         }
 
         /** @var QueryBuilder $qb */
@@ -191,83 +254,83 @@ class ReleaseManager
 
         $this->em->flush();
 
-        // Jenkins builds
-        if ($includeJenkinsBuilds && $this->jenkinsClient) {
-            $oldJenkinsBuilds = $this->em->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('state' => CoreReleaseEntity::STATE_DEVELOPMENT));
-            foreach ($oldJenkinsBuilds as $oldJenkinsBuild) {
-                $this->em->remove($oldJenkinsBuild);
-            }
-            $this->em->flush();
+        return $newReleases;
+    }
 
-            /** @var Job $job */
-            foreach ($this->jenkinsClient->getJobs() as $job) {
-                if (!$job->isDisabled()) {
-                    $name = $job->getName();
-                    if (!preg_match('#Zikula(_Core|)-([0-9]\.[0-9]\.[0-9])#', $name, $matches)) {
-                        continue;
-                    }
-                    $version = $matches[2];
+    private function reloadReleasesFromJenkins()
+    {
+        $oldJenkinsBuilds = $this->em->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('state' => CoreReleaseEntity::STATE_DEVELOPMENT));
+        foreach ($oldJenkinsBuilds as $oldJenkinsBuild) {
+            $this->em->remove($oldJenkinsBuild);
+        }
+        $this->em->flush();
 
-                    /** @var Build[] $builds */
-                    $builds = $job->getBuilds();
-                    foreach ($builds as $key => $build) {
-                        if ($build->isBuilding() || $build->getResult() != "SUCCESS") {
-                            unset($builds[$key]);
-                        }
-                    }
-                    usort($builds, function (Build $a, Build $b) {
-                        $a = $a->getNumber();
-                        $b = $b->getNumber();
-                        if ($a === $b) {
-                            return 0;
-                        }
-
-                        return ($a > $b) ? -1 : 1;
-                    });
-
-                    $build = $builds[0];
-
-                    $jenkinsBuild = new CoreReleaseEntity($job->getName() . '#' . $build->getNumber());
-                    $jenkinsBuild->setName($job->getDisplayName() . '#' . $build->getNumber());
-                    $jenkinsBuild->setState(CoreReleaseEntity::STATE_DEVELOPMENT);
-                    $jenkinsBuild->setSemver($version);
-
-                    $description = $job->getDescription() ? $job->getDescription() : $job->getDisplayName();
-                    $changeSet = $build->getChangeSet()->toArray();
-                    if ($changeSet['kind'] == 'git' && !empty($changeSet['items'][0]->msg)) {
-                        $description .= "<br /><br />" . $this->markdown($changeSet['items'][0]->msg);
-                    }
-                    $jenkinsBuild->setDescription($description);
-
-                    $assets = array();
-                    $server = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'jenkins_server');
-                    foreach ($build->getArtifacts() as $artifact) {
-                        $downloadUrl = $server . '/job/' . urlencode($job->getName()) . '/' . $build->getNumber() . '/artifact/' . $artifact->relativePath;
-                        $assets[] = array (
-                            'name' => $artifact->fileName,
-                            'download_url' => $downloadUrl,
-                            'size' => null,
-                            'content_type' => null
-                        );
-                    }
-                    $jenkinsBuild->setAssets($assets);
-
-                    $sourceUrls = array();
-                    if ($changeSet['kind'] == 'git') {
-                        $sha = $changeSet['items'][0]->commitId;
-                        $sourceUrls['zip'] = 'https://github.com/' . urlencode($this->repo) . "/archive/$sha.zip";
-                        $sourceUrls['tar'] = 'https://github.com/' . urlencode($this->repo) . "/archive/$sha.tar";
-                    }
-                    $jenkinsBuild->setSourceUrls($sourceUrls);
-
-                    $this->em->persist($jenkinsBuild);
+        /** @var Job $job */
+        foreach ($this->jenkinsClient->getJobs() as $job) {
+            if (!$job->isDisabled()) {
+                $name = $job->getName();
+                if (!preg_match('#Zikula(_Core|)-([0-9]\.[0-9]\.[0-9])#', $name, $matches)) {
+                    continue;
                 }
-            }
+                $version = $matches[2];
 
-            $this->em->flush();
+                /** @var Build[] $builds */
+                $builds = $job->getBuilds();
+                foreach ($builds as $key => $build) {
+                    if ($build->isBuilding() || $build->getResult() != "SUCCESS") {
+                        unset($builds[$key]);
+                    }
+                }
+                usort($builds, function (Build $a, Build $b) {
+                    $a = $a->getNumber();
+                    $b = $b->getNumber();
+                    if ($a === $b) {
+                        return 0;
+                    }
+
+                    return ($a > $b) ? -1 : 1;
+                });
+
+                $build = $builds[0];
+
+                $jenkinsBuild = new CoreReleaseEntity($job->getName() . '#' . $build->getNumber());
+                $jenkinsBuild->setName($job->getDisplayName() . '#' . $build->getNumber());
+                $jenkinsBuild->setState(CoreReleaseEntity::STATE_DEVELOPMENT);
+                $jenkinsBuild->setSemver($version);
+
+                $description = $job->getDescription() ? $job->getDescription() : $job->getDisplayName();
+                $changeSet = $build->getChangeSet()->toArray();
+                if ($changeSet['kind'] == 'git' && !empty($changeSet['items'][0]->msg)) {
+                    $description .= "<br /><br />" . $this->markdown($changeSet['items'][0]->msg);
+                }
+                $jenkinsBuild->setDescription($description);
+
+                $assets = array();
+                $server = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'jenkins_server');
+                foreach ($build->getArtifacts() as $artifact) {
+                    $downloadUrl = $server . '/job/' . urlencode($job->getName()) . '/' . $build->getNumber() . '/artifact/' . $artifact->relativePath;
+                    $assets[] = array (
+                        'name' => $artifact->fileName,
+                        'download_url' => $downloadUrl,
+                        'size' => null,
+                        'content_type' => null
+                    );
+                }
+                $jenkinsBuild->setAssets($assets);
+
+                $sourceUrls = array();
+                if ($changeSet['kind'] == 'git') {
+                    $sha = $changeSet['items'][0]->commitId;
+                    $sourceUrls['zip'] = 'https://github.com/' . urlencode($this->repo) . "/archive/$sha.zip";
+                    $sourceUrls['tar'] = 'https://github.com/' . urlencode($this->repo) . "/archive/$sha.tar";
+                }
+                $jenkinsBuild->setSourceUrls($sourceUrls);
+
+                $this->em->persist($jenkinsBuild);
+            }
         }
 
-        return true;
+        $this->em->flush();
     }
 
     /**
@@ -278,7 +341,7 @@ class ReleaseManager
      *
      * @return bool
      */
-    public function updateRelease($release, $dbReleases = null)
+    public function updateGitHubRelease($release, $dbReleases = null)
     {
         if ($release['draft']) {
             // Ignore drafts.
@@ -348,7 +411,7 @@ class ReleaseManager
 
         $this->em->flush();
 
-        return true;
+        return ($mode === 'new') ? $dbRelease : null;
     }
 
     private function markdown($body)

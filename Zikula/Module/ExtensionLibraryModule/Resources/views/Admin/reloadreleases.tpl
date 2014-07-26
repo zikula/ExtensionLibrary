@@ -3,7 +3,7 @@
     <span class="fa fa-gears"></span>&nbsp;{gt text="Reload all core releases"}
 </h3>
 <div class="alert alert-warning">
-    {gt text='You are about to reload all core releases from GitHub. Are you sure you want to proceed?'}
+    {gt text='You are about to reload all core releases from GitHub as well as all development builds from jenkins. Are you sure you want to proceed?'}
 </div>
 <form class="form-horizontal" role="form" action="{route name='zikulaextensionlibrarymodule_admin_doreloadcorereleases'}" method="post" enctype="application/x-www-form-urlencoded" autocomplete="off">
     <div>
