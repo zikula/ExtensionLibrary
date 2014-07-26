@@ -99,33 +99,27 @@ class AdminController extends \Zikula_AbstractController
     }
 
     /**
-     * @Route("/releases/view")
-     */
-    public function viewCoreReleasesAction()
-    {
-        $this->view->assign('releases', $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findAll());
-
-        return $this->response($this->view->fetch('Admin/viewreleases.tpl'));
-    }
-
-    /**
-     * @Route("/releases/toggle-status/{id}")
+     * @Route("/releases/toggle-state/{id}")
      * @ParamConverter(class="ZikulaExtensionLibraryModule:CoreReleaseEntity")
      */
-    public function toggleReleaseStatusAction(CoreReleaseEntity $release)
+    public function toggleReleaseStateAction(CoreReleaseEntity $release)
     {
-        if ($release->getStatus() === CoreReleaseEntity::STATE_OUTDATED) {
-            $release->setStatus(CoreReleaseEntity::STATE_SUPPORTED);
-        } else if ($release->getStatus() === CoreReleaseEntity::STATE_SUPPORTED) {
-            $release->setStatus(CoreReleaseEntity::STATE_OUTDATED);
+        if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_MODERATE)) {
+            throw new AccessDeniedException();
+        }
+
+        if ($release->getState() === CoreReleaseEntity::STATE_OUTDATED) {
+            $release->setState(CoreReleaseEntity::STATE_SUPPORTED);
+        } else if ($release->getState() === CoreReleaseEntity::STATE_SUPPORTED) {
+            $release->setState(CoreReleaseEntity::STATE_OUTDATED);
         } else {
-            throw new NotFoundHttpException('Cannot change release status - must be outdated or supported to change it!');
+            throw new NotFoundHttpException('Cannot change release state - must be outdated or supported to change it!');
         }
 
         $this->entityManager->merge($release);
         $this->entityManager->flush();
 
-        return new RedirectResponse($this->get('router')->generate('zikulaextensionlibrarymodule_admin_viewcorereleases'));
+        return new RedirectResponse($this->get('router')->generate('zikulaextensionlibrarymodule_user_viewcorereleases'));
     }
 
     /**
@@ -134,6 +128,10 @@ class AdminController extends \Zikula_AbstractController
      */
     public function reloadCoreReleasesAction()
     {
+        if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_MODERATE)) {
+            throw new AccessDeniedException();
+        }
+
         return $this->response($this->view->fetch('Admin/reloadreleases.tpl'));
     }
 
@@ -143,12 +141,16 @@ class AdminController extends \Zikula_AbstractController
      */
     public function doReloadCoreReleasesAction(Request $request)
     {
+        if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_MODERATE)) {
+            throw new AccessDeniedException();
+        }
+
         /** @var ReleaseManager $releaseManager */
         $releaseManager = $this->get('zikulaextensionlibrarymodule.releasemanager');
-        $releaseManager->reloadAllReleases();
+        $releaseManager->reloadAllReleases(true);
 
-        $request->getSession()->getFlashBag()->add('status', $this->__('Reloaded all core releases from GitHub.'));
+        $request->getSession()->getFlashBag()->add('state', $this->__('Reloaded all core releases from GitHub.'));
 
-        return new RedirectResponse($this->get('router')->generate('zikulaextensionlibrarymodule_admin_viewcorereleases'));
+        return new RedirectResponse($this->get('router')->generate('zikulaextensionlibrarymodule_user_viewcorereleases'));
     }
 }

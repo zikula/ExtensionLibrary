@@ -330,4 +330,22 @@ class UserController extends \Zikula_AbstractController
             return $this->getImage();
         }
     }
+
+    /**
+     * @Route("/releases")
+     */
+    public function viewCoreReleasesAction()
+    {
+        $this->view->assign('breadcrumbs', array (
+            array (
+                'title' => 'Core Releases'
+            )
+        ));
+
+        $releaseManager = $this->get('zikulaextensionlibrarymodule.releasemanager');
+        $releases = $releaseManager->getSignificantReleases(false);
+        $this->view->assign('releases', $releases);
+
+        return $this->response($this->view->fetch('User/viewreleases.tpl'));
+    }
 }

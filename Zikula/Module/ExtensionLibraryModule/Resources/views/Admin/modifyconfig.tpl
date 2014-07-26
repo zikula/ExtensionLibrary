@@ -37,6 +37,30 @@
                 </div>
             </fieldset>
             <fieldset>
+                <legend>{gt text='Jenkins server'}</legend>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label" for="settings_jenkins_server">{gt text="URL of the server"}</label>
+                    <div class="col-lg-9">
+                        <input id="settings_jenkins_server" type="text" class="form-control" name="settings[jenkins_server]" value="{$settings.jenkins_server|default:''|safetext}" maxlength="100" />
+                        <p class="help-block">{gt text='Make sure to include "http://". Do not include "www". Example: "http://ci.zikula.org"'}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label" for="settings_jenkins_user">{gt text="Username"}</label>
+                    <div class="col-lg-9">
+                        <input id="settings_jenkins_user" type="text" class="form-control" name="settings[jenkins_user]" value="{$settings.jenkins_user|default:''|safetext}" maxlength="100" />
+                        <p class="help-block">{gt text='Can be left empty if the server isn\'t private.'}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label" for="settings_jenkins_password">{gt text="Password"}</label>
+                    <div class="col-lg-9">
+                        <input id="settings_jenkins_password" type="password" class="form-control" name="settings[jenkins_password]" value="{$settings.jenkins_password|default:''|safetext}" maxlength="100" />
+                        <p class="help-block">{gt text='Can be left empty if the server isn\'t private.'}</p>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
                 <legend>{gt text='Image caching'}</legend>
                 <div class="form-group">
                     <label class="col-lg-3 control-label" for="settings_image_cache_time">{gt text="Time (in seconds) for images to be cached"}</label>

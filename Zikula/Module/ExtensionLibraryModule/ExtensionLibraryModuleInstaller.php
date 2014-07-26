@@ -66,6 +66,12 @@ class ExtensionLibraryModuleInstaller extends \Zikula_AbstractInstaller
                 DoctrineHelper::updateSchema($this->entityManager, array('Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity'));
             case '1.0.3':
                 DoctrineHelper::createSchema($this->entityManager, array('Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity'));
+            case '1.0.4':
+                DoctrineHelper::updateSchema($this->entityManager, array('Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity'));
+            case '1.0.5':
+                $sql = "ALTER TABLE el_core_releases CHANGE status state INT";
+                $stmt = $this->entityManager->getConnection()->prepare($sql);
+                $stmt->execute();
         }
 
         // Update successful

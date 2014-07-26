@@ -13,16 +13,16 @@
 
 /**
  * Zikula_View|Smarty template plugin
- * Convert the status integer to a string representing it.
+ * Convert the state integer to a string representing it.
  *
  *
  * Example
- *   {$var|elReleaseStatusToText}
+ *   {$var|elReleaseStateToText}
  *
- * @param $status
- * @return string The release status.
+ * @param $state
+ * @return string The release state.
  */
-function smarty_modifier_elReleaseStatusToText($status, $singularPlural = 'singular')
+function smarty_modifier_elReleaseStateToText($state, $singularPlural = 'singular')
 {
-    return \Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity::statusToText($status, $singularPlural);
+    return \Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity::stateToText($state, $singularPlural);
 }

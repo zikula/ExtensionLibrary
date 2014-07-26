@@ -24,6 +24,8 @@ use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use CarlosIO\Jenkins\Dashboard;
+use CarlosIO\Jenkins\Source;
 
 class Util
 {
@@ -58,14 +60,13 @@ class Util
      */
     public static function getAvailableCoreVersions()
     {
-        $em = \ServiceUtil::get('doctrine.orm.entity_manager');
-        /** @var \Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity[] $dbReleases */
-        $dbReleases = $em->getRepository('Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity')->findAll();
+        $releaseManager = \ServiceUtil::get('zikulaextensionlibrarymodule.releasemanager');
+        $dbReleases = $releaseManager->getSignificantReleases(false);
+
         $releases = array();
         foreach ($dbReleases as $dbRelease) {
-            $releases[CoreReleaseEntity::statusToText($dbRelease->getStatus(), 'plural')][$dbRelease->getSemver()] = '';
+            $releases[CoreReleaseEntity::stateToText($dbRelease->getState(), 'plural')][$dbRelease->getSemver()] = '';
         }
-        krsort($releases);
 
         return $releases;
     }
@@ -101,24 +102,24 @@ class Util
         if (!(
             $filter === 'all'
             || (
-                isset($coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_SUPPORTED)])
+                isset($coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_SUPPORTED)])
                 &&
-                array_key_exists($filter, $coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_SUPPORTED)])
+                array_key_exists($filter, $coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_SUPPORTED)])
             )
             || (
-                isset($coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_OUTDATED)])
+                isset($coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_OUTDATED)])
                 &&
-                array_key_exists($filter, $coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_OUTDATED)])
+                array_key_exists($filter, $coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_OUTDATED)])
             )
             || (
-                isset($coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_PRERELEASE)])
+                isset($coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_PRERELEASE)])
                 &&
-                array_key_exists($filter, $coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_PRERELEASE)])
+                array_key_exists($filter, $coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_PRERELEASE)])
             )
             || (
-                isset($coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_DEVELOPMENT)])
+                isset($coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_DEVELOPMENT)])
                 &&
-                array_key_exists($filter, $coreVersions[CoreReleaseEntity::statusToText(CoreReleaseEntity::STATE_DEVELOPMENT)])
+                array_key_exists($filter, $coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_DEVELOPMENT)])
             )
         )) {
             throw new \InvalidArgumentException();
@@ -258,5 +259,23 @@ class Util
         }
 
         return $extensions;
+    }
+
+    public static function getJenkinsClient()
+    {
+        $jenkinsServer = trim(\ModUtil::getVar('ZikulaExtensionLibraryModule', 'jenkins_server', ''), '/');
+        if (empty($jenkinsServer)) {
+            return false;
+        }
+        $jenkinsUser = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'jenkins_user', '');
+        $jenkinsPassword = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'jenkins_password', '');
+        if (!empty($jenkinsUser) && !empty($jenkinsPassword)) {
+            $jenkinsServer = str_replace('://', "://" . urlencode($jenkinsUser) . ":" . urlencode($jenkinsPassword), $jenkinsServer);
+        }
+
+        $dashboard = new Dashboard();
+        $dashboard->addSource(new Source($jenkinsServer . '/view/All/api/json/?depth=2'));
+
+        return $dashboard;
     }
 } 

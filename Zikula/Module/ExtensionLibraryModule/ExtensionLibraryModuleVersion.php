@@ -33,7 +33,7 @@ class ExtensionLibraryModuleVersion extends \Zikula_AbstractVersion
             'displayname' => $this->__('Extension Library'),
             'description' => $this->__('Browseable Zikula extensions listing'),
             'url' => $this->__('library'),
-            'version' => '1.0.4',
+            'version' => '1.0.6',
             'core_min' => '1.4.0',
             'core_max' => '1.4.99',
             'securityschema' => array($this->name . '::' => '::'),
