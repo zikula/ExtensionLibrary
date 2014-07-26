@@ -85,7 +85,7 @@ class ReleaseManager
 
         // Jenkins builds
         if ($includeJenkinsBuilds && $this->jenkinsClient) {
-            $oldJenkinsBuilds = $this->em->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('status' => CoreReleaseEntity::STATE_DEVELOPMENT));
+            $oldJenkinsBuilds = $this->em->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('state' => CoreReleaseEntity::STATE_DEVELOPMENT));
             foreach ($oldJenkinsBuilds as $oldJenkinsBuild) {
                 $this->em->remove($oldJenkinsBuild);
             }
@@ -121,7 +121,7 @@ class ReleaseManager
 
                     $jenkinsBuild = new CoreReleaseEntity($job->getName() . '#' . $build->getNumber());
                     $jenkinsBuild->setName($job->getDisplayName() . '#' . $build->getNumber());
-                    $jenkinsBuild->setStatus(CoreReleaseEntity::STATE_DEVELOPMENT);
+                    $jenkinsBuild->setState(CoreReleaseEntity::STATE_DEVELOPMENT);
                     $jenkinsBuild->setSemver($version);
 
                     $description = $job->getDescription() ? $job->getDescription() : $job->getDisplayName();
@@ -179,9 +179,9 @@ class ReleaseManager
         $id = $release['id'];
 
         if ($release['prerelease']) {
-            $status = CoreReleaseEntity::STATE_PRERELEASE;
+            $state = CoreReleaseEntity::STATE_PRERELEASE;
         } else {
-            $status = CoreReleaseEntity::STATE_SUPPORTED;
+            $state = CoreReleaseEntity::STATE_SUPPORTED;
         }
 
         if ($dbReleases === null) {
@@ -200,9 +200,9 @@ class ReleaseManager
         } else {
             $dbRelease = $dbReleases[$id];
             $mode = 'edit';
-            if ($dbRelease->getStatus() === CoreReleaseEntity::STATE_OUTDATED) {
-                // Make sure not to override the status if it has been set to "outdated".
-                $status = CoreReleaseEntity::STATE_OUTDATED;
+            if ($dbRelease->getState() === CoreReleaseEntity::STATE_OUTDATED) {
+                // Make sure not to override the state if it has been set to "outdated".
+                $state = CoreReleaseEntity::STATE_OUTDATED;
             }
         }
 
@@ -213,7 +213,7 @@ class ReleaseManager
             'zip' => $release['zipball_url'],
             'tar' => $release['tarball_url']
         ));
-        $dbRelease->setStatus($status);
+        $dbRelease->setState($state);
 
         $assets = array();
         $htmlUrl = $release['html_url'];

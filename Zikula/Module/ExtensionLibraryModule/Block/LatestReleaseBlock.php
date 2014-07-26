@@ -64,9 +64,9 @@ class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
             return;
         }
 
-        $outdatedReleases = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('status' => CoreReleaseEntity::STATE_OUTDATED));
+        $outdatedReleases = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('state' => CoreReleaseEntity::STATE_OUTDATED));
 
-        $supportedReleases = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('status' => CoreReleaseEntity::STATE_SUPPORTED));
+        $supportedReleases = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('state' => CoreReleaseEntity::STATE_SUPPORTED));
         usort($supportedReleases, function (CoreReleaseEntity $a, CoreReleaseEntity $b) {
             $a = new version($a->getSemver());
             $b = new version($b->getSemver());
@@ -74,7 +74,7 @@ class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
             return version::compare($b, $a);
         });
 
-        $preReleases = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('status' => CoreReleaseEntity::STATE_PRERELEASE));
+        $preReleases = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('state' => CoreReleaseEntity::STATE_PRERELEASE));
         foreach ($preReleases as $key => $preRelease) {
             $preReleaseVersion = new version($preRelease->getSemver());
             foreach ($supportedReleases as $supportedRelease) {
@@ -92,7 +92,7 @@ class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
                 }
             }
         }
-        $developmentReleases = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('status' => CoreReleaseEntity::STATE_DEVELOPMENT));
+        $developmentReleases = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('state' => CoreReleaseEntity::STATE_DEVELOPMENT));
         foreach ($developmentReleases as $key => $developmentRelease) {
             $developmentReleasesVersion = new version($developmentRelease->getSemver());
             foreach ($supportedReleases as $supportedRelease) {

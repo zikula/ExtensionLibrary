@@ -99,21 +99,21 @@ class AdminController extends \Zikula_AbstractController
     }
 
     /**
-     * @Route("/releases/toggle-status/{id}")
+     * @Route("/releases/toggle-state/{id}")
      * @ParamConverter(class="ZikulaExtensionLibraryModule:CoreReleaseEntity")
      */
-    public function toggleReleaseStatusAction(CoreReleaseEntity $release)
+    public function toggleReleaseStateAction(CoreReleaseEntity $release)
     {
         if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_MODERATE)) {
             throw new AccessDeniedException();
         }
 
-        if ($release->getStatus() === CoreReleaseEntity::STATE_OUTDATED) {
-            $release->setStatus(CoreReleaseEntity::STATE_SUPPORTED);
-        } else if ($release->getStatus() === CoreReleaseEntity::STATE_SUPPORTED) {
-            $release->setStatus(CoreReleaseEntity::STATE_OUTDATED);
+        if ($release->getState() === CoreReleaseEntity::STATE_OUTDATED) {
+            $release->setState(CoreReleaseEntity::STATE_SUPPORTED);
+        } else if ($release->getState() === CoreReleaseEntity::STATE_SUPPORTED) {
+            $release->setState(CoreReleaseEntity::STATE_OUTDATED);
         } else {
-            throw new NotFoundHttpException('Cannot change release status - must be outdated or supported to change it!');
+            throw new NotFoundHttpException('Cannot change release state - must be outdated or supported to change it!');
         }
 
         $this->entityManager->merge($release);
@@ -149,7 +149,7 @@ class AdminController extends \Zikula_AbstractController
         $releaseManager = $this->get('zikulaextensionlibrarymodule.releasemanager');
         $releaseManager->reloadAllReleases(true);
 
-        $request->getSession()->getFlashBag()->add('status', $this->__('Reloaded all core releases from GitHub.'));
+        $request->getSession()->getFlashBag()->add('state', $this->__('Reloaded all core releases from GitHub.'));
 
         return new RedirectResponse($this->get('router')->generate('zikulaextensionlibrarymodule_user_viewcorereleases'));
     }

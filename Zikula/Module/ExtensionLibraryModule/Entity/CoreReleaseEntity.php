@@ -81,12 +81,12 @@ class CoreReleaseEntity extends EntityAccess
     private $descriptionsI18n = array();
 
     /**
-     * Core status (supported, outdated, prerelease, development)
+     * Core state (supported, outdated, prerelease, development)
      *
      * @ORM\Column(type="integer")
      * @var int
      */
-    private $status;
+    private $state;
 
     /**
      * Core assets.
@@ -109,7 +109,7 @@ class CoreReleaseEntity extends EntityAccess
         $this->id = (string)$id;
     }
 
-    public static function statusToText($status, $singularPlural = 'singular')
+    public static function stateToText($state, $singularPlural = 'singular')
     {
         $dom = \ZLanguage::getModuleDomain('ZikulaExtensionLibraryModule');
 
@@ -129,7 +129,7 @@ class CoreReleaseEntity extends EntityAccess
             );
         }
 
-        return $translation[$status];
+        return $translation[$state];
     }
 
     /**
@@ -197,19 +197,19 @@ class CoreReleaseEntity extends EntityAccess
     }
 
     /**
-     * @param int $status
+     * @param int $state
      */
-    public function setStatus($status)
+    public function setState($state)
     {
-        $this->status = $status;
+        $this->state = $state;
     }
 
     /**
      * @return int
      */
-    public function getStatus()
+    public function getState()
     {
-        return $this->status;
+        return $this->state;
     }
 
     /**
