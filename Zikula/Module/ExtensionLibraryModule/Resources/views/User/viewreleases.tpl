@@ -39,7 +39,7 @@
         {if $stateOld != $release->getState() && $release->getState() == $development}
             <tr>
                 <td colspan="{if $admin}5{else}3{/if}">
-                    {gt text='Below you see the latest builds of the core\'s development version. Do NEVER use them on production sites. They may be broken and absolutely not working. Really.'}
+                    {gt text='Below you see the latest builds of the core\'s development version. NEVER use them on production sites. They may be broken and absolutely not working. Really.'}
                 </td>
             </tr>
         {/if}
