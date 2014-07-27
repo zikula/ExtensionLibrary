@@ -286,7 +286,7 @@ class WebHookController extends \Zikula_AbstractController
 
     /**
      * @Route("/webhook-jenkins/{code}")
-     * @Method("GET")
+     * @Method("POST")
      */
     public function jenkinsAction($code)
     {
