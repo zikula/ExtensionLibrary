@@ -1,3 +1,4 @@
+{pageaddvar name='javascript' value=$moduleBundle->getRelativePath()|cat:'/Resources/public/js/Zikula.ExtensionLibrary.Admin.ModifyConfig.js'}
 {adminheader}
     <h3>
         <span class="fa fa-wrench"></span>&nbsp;{gt text="Settings"}
@@ -10,7 +11,7 @@
     <div class="alert alert-info">
         {gt text='Rate limit remaining for the next %s minutes: %s / %s' tag1=$rate.minutesUntilReset tag2=$rate.remaining tag3=$rate.limit}
     </div>
-    <form class="form-horizontal" role="form" action="{route name='zikulaextensionlibrarymodule_admin_modifyconfig'}" method="post" enctype="application/x-www-form-urlencoded" autocomplete="off">
+    <form class="form-horizontal" id="el-modify-config-form" role="form" action="{route name='zikulaextensionlibrarymodule_admin_modifyconfig'}" method="post" enctype="application/x-www-form-urlencoded" autocomplete="off">
         <div>
             <fieldset>
                 <legend>{gt text='GitHub'}</legend>
