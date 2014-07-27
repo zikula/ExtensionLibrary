@@ -231,7 +231,6 @@ class WebHookController extends \Zikula_AbstractController
         } catch (HttpException $e) {
             return new PlainResponse($e->getMessage(), $e->getStatusCode());
         }
-        $jsonPayload = $payloadManager->getJsonPayload();
 
         $securityToken = $this->getVar('github_webhook_token');
         if (!empty($securityToken)) {
@@ -239,7 +238,7 @@ class WebHookController extends \Zikula_AbstractController
             if (empty($signature)) {
                 return new PlainResponse('Missing security token!', Response::HTTP_BAD_REQUEST);
             }
-            $computedSignature = $this->computeSignature($jsonPayload, $securityToken);
+            $computedSignature = $this->computeSignature($payloadManager->getRawPayload(), $securityToken);
 
             if (!$this->secure_equals($computedSignature, $signature)) {
                 return new PlainResponse('Signature did not match!', Response::HTTP_BAD_REQUEST);
@@ -266,20 +265,20 @@ class WebHookController extends \Zikula_AbstractController
                 return new PlainResponse('Event ignored!');
         }
 
-        $json = json_decode($jsonPayload, true);
+        $jsonPayload = $payloadManager->getJsonPayload();
         // See https://developer.github.com/v3/activity/events/types/#releaseevent
-        if ($json['action'] != 'published') {
+        if ($jsonPayload['action'] != 'published') {
             return new PlainResponse('Release event ignored (action != "published")!');
         }
 
         $repo = $this->getVar('github_core_repo', 'zikula/core');
-        if ($json['repository']['full_name'] != $repo) {
+        if ($jsonPayload['repository']['full_name'] != $repo) {
             return new PlainResponse('Release event ignored (repository != "' . $repo . '")!', Response::HTTP_BAD_REQUEST);
         }
 
         /** @var ReleaseManager $releaseManager */
         $releaseManager = $this->get('zikulaextensionlibrarymodule.releasemanager');
-        $releaseManager->updateGitHubRelease($json['release']);
+        $releaseManager->updateGitHubRelease($jsonPayload['release']);
 
         return new PlainResponse('Release list reloaded!');
     }

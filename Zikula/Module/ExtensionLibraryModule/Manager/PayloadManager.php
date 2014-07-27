@@ -126,4 +126,12 @@ class PayloadManager {
     {
         return $this->jsonPayload;
     }
+
+    /**
+     * @return string
+     */
+    public function getRawPayload()
+    {
+        return $this->payload;
+    }
 } 
