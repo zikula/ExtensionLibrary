@@ -45,7 +45,7 @@ class PayloadManager {
     {
         if ($request->headers->get('X-GitHub-Event') == 'ping') {
             Util::log('Ping event received.');
-            throw new HttpException(200, 'Ping event received.');
+            throw new HttpException(Response::HTTP_OK, 'Ping event received.');
         }
 
         $contentType = $request->headers->get('content-type');

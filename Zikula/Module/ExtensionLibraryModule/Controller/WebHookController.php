@@ -18,6 +18,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotatio
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Zikula\Core\ModUrl;
 use Zikula\Core\Response\PlainResponse;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
@@ -47,7 +48,11 @@ class WebHookController extends \Zikula_AbstractController
         // log that the method was called
         Util::log('ExtensionLibraryModule::processInboundAction called.');
 
-        $payloadManager = new PayloadManager($this->request);
+        try {
+            $payloadManager = new PayloadManager($this->request);
+        } catch (HttpException $e) {
+            return new PlainResponse($e->getMessage(), $e->getStatusCode());
+        }
         $jsonPayload = $payloadManager->getJsonPayload();
 
         // check 'refs' for tags, if none, then return
@@ -221,7 +226,11 @@ class WebHookController extends \Zikula_AbstractController
      */
     public function coreAction(Request $request)
     {
-        $payloadManager = new PayloadManager($request, true);
+        try {
+            $payloadManager = new PayloadManager($request, true);
+        } catch (HttpException $e) {
+            return new PlainResponse($e->getMessage(), $e->getStatusCode());
+        }
         $jsonPayload = $payloadManager->getJsonPayload();
 
         $securityToken = $this->getVar('github_webhook_token');
@@ -274,7 +283,6 @@ class WebHookController extends \Zikula_AbstractController
 
         return new PlainResponse('Release list reloaded!');
     }
-
 
     /**
      * @Route("/webhook-jenkins/{code}")
