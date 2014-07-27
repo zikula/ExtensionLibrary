@@ -294,7 +294,7 @@ class ReleaseManager
                 $build = $builds[0];
 
                 $jenkinsBuild = new CoreReleaseEntity($job->getName() . '#' . $build->getNumber());
-                $jenkinsBuild->setName($job->getDisplayName() . '#' . $build->getNumber());
+                $jenkinsBuild->setName($job->getDisplayName() . ' #' . $build->getNumber());
                 $jenkinsBuild->setState(CoreReleaseEntity::STATE_DEVELOPMENT);
                 $jenkinsBuild->setSemver($version);
 
