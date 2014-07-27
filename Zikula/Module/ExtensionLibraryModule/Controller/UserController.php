@@ -204,7 +204,6 @@ class UserController extends \Zikula_AbstractController
                     'composer' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile', array('file' => 'composer')),
                     'validate' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_validatemanifest'),
                     'log' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_displaylog'),
-                    'postreceive-hook' => $this->get('router')->generate('zikulaextensionlibrarymodule_post_processinbound'),
                     'webhook' => $this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile', array('file' => 'webhook')),
                 )),
             'webhook' => array(
@@ -225,7 +224,7 @@ class UserController extends \Zikula_AbstractController
         if (substr($file, 0, 6) != "sample") {
             $parser = StringUtil::getMarkdownExtraParser();
             $parser->predef_urls = $docs[$file]['urls'];
-            $docfile = StringUtil::getMarkdownExtraParser()->transform($docfile);
+            $docfile = $parser->transform($docfile);
         } else {
             $json = true;
         }

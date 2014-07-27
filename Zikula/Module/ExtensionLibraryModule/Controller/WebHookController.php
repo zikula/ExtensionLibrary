@@ -17,6 +17,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Zikula\Core\ModUrl;
 use Zikula\Core\Response\PlainResponse;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity;
@@ -33,14 +34,15 @@ use Zikula\Core\Hook\ProcessHook;
 use ZLanguage;
 
 /**
- * GitHub Webhook access points.
+ * Jenkins and GitHub Webhook access points.
  */
-class PostController extends \Zikula_AbstractController
+class WebHookController extends \Zikula_AbstractController
 {
     /**
-     * @Route("/postreceive-hook")
+     * @Route("/webhook")
+     * @Method("POST")
      */
-    public function processInboundAction()
+    public function extensionAction()
     {
         // log that the method was called
         Util::log('ExtensionLibraryModule::processInboundAction called.');
@@ -214,10 +216,10 @@ class PostController extends \Zikula_AbstractController
     }
 
     /**
-     * @Route("/core-endpoint")
+     * @Route("/webhook-core")
      * @Method("POST")
      */
-    public function coreHookEndpoint(Request $request)
+    public function coreAction(Request $request)
     {
         $payloadManager = new PayloadManager($request, true);
         $jsonPayload = $payloadManager->getJsonPayload();
@@ -271,6 +273,23 @@ class PostController extends \Zikula_AbstractController
         $releaseManager->updateGitHubRelease($json['release']);
 
         return new PlainResponse('Release list reloaded!');
+    }
+
+
+    /**
+     * @Route("/webhook-jenkins/{code}")
+     * @Method("GET")
+     */
+    public function jenkinsAction($code)
+    {
+        if (!$this->secure_equals($code, $this->getVar('jenkins_token', ''))) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $releaseManager = $this->get('zikulaextensionlibrarymodule.releasemanager');
+        $releaseManager->reloadReleases('jenkins');
+
+        return new PlainResponse('Jenkins builds reloaded.', Response::HTTP_OK);
     }
 
     /**
