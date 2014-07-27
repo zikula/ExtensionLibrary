@@ -78,10 +78,10 @@
         {gt text='The release names and descriptions can be made multilingual, if the correct format is used at GitHub:'}
     </div>
     <pre>...English release descripion...
-    # LOCALE:LOCALISED RELEASE NAME
-    ...LOCALISED RELEASE DESCRIPTION...
-    # LOCALE:LOCALISED RELEASE NAME
-    ...LOCALISED RELEASE DESCRIPTION...</pre>
+# LOCALE:LOCALISED RELEASE NAME
+...LOCALISED RELEASE DESCRIPTION...
+# LOCALE:LOCALISED RELEASE NAME
+...LOCALISED RELEASE DESCRIPTION...</pre>
 {/if}
 
 {include file='User/footer.tpl'}
