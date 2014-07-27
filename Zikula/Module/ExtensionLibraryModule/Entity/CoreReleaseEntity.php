@@ -297,6 +297,9 @@ class CoreReleaseEntity extends EntityAccess
         }
 
         $tmpArr = preg_split('/<h1>(\s*)(.*?){2,5}:(.*)<\/h1>/', $this->description, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        if (count($tmpArr) == 0) {
+            $tmpArr[] = '';
+        }
         array_unshift($tmpArr, $this->name);
         array_unshift($tmpArr, 'en');
 

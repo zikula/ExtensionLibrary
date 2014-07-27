@@ -20,14 +20,14 @@ use vierbergenlars\SemVer\version;
 use Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity;
 use Zikula_Controller_AbstractBlock;
 
-class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
+class JenkinsBuildBlock extends Zikula_Controller_AbstractBlock
 {
     /**
      * initialise block
      */
     public function init()
     {
-        SecurityUtil::registerPermissionSchema('ZikulaExtensionLibraryModule:latestRelease:', 'Block title::');
+        SecurityUtil::registerPermissionSchema('ZikulaExtensionLibraryModule:jenkinsBuild:', 'Block title::');
     }
 
     /**
@@ -36,9 +36,9 @@ class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
     public function info()
     {
         return array(
-            'text_type' => 'latestRelease',
+            'text_type' => 'jenkinsBuild',
             'module' => 'ZikulaExtensionLibraryModule',
-            'text_type_long' => $this->__('Latest release button'),
+            'text_type_long' => $this->__('Jenkins build button'),
             'allow_multiple' => true,
             'form_content' => false,
             'form_refresh' => false,
@@ -52,28 +52,21 @@ class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
      */
     public function display($blockinfo)
     {
-        if (!SecurityUtil::checkPermission('ZikulaExtensionLibraryModule:latestRelease:', "$blockinfo[title]::", ACCESS_OVERVIEW) || !ModUtil::available('ZikulaExtensionLibraryModule')) {
+        if (!SecurityUtil::checkPermission('ZikulaExtensionLibraryModule:jenkinsBuild:', "$blockinfo[title]::", ACCESS_OVERVIEW) || !ModUtil::available('ZikulaExtensionLibraryModule')) {
             return;
         }
 
         $releaseManager = $this->get('zikulaextensionlibrarymodule.releasemanager');
-        $releases = $releaseManager->getSignificantReleases();
+        $releases = $releaseManager->getSignificantReleases(false);
 
-        $supportedReleases = array_filter($releases, function (CoreReleaseEntity $release) {
-            return $release->getState() === CoreReleaseEntity::STATE_SUPPORTED;
+        $developmentReleases = array_filter($releases, function (CoreReleaseEntity $release) {
+            return $release->getState() === CoreReleaseEntity::STATE_DEVELOPMENT;
         });
-        $preReleases = array_filter($releases, function (CoreReleaseEntity $release) {
-            return $release->getState() === CoreReleaseEntity::STATE_PRERELEASE;
-        });
-        if (!empty($supportedReleases) || !empty($preReleases)) {
-            if (!empty($supportedReleases)) {
-                $this->view->assign('supportedRelease', current($supportedReleases));
-            }
-            if (!empty($preReleases)) {
-                $this->view->assign('preRelease', current($preReleases));
-            }
+
+        if (!empty($developmentReleases)) {
+            $this->view->assign('developmentReleases', $developmentReleases);
             $this->view->assign('id', uniqid());
-            $blockinfo['content'] = $this->view->fetch('Blocks/latestrelease.tpl');
+            $blockinfo['content'] = $this->view->fetch('Blocks/jenkinsbuilds.tpl');
         } else {
             return;
         }

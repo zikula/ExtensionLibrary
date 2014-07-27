@@ -49,6 +49,7 @@ class ReleaseManager
         $this->jenkinsClient = Util::getJenkinsClient();
         $this->em = $em;
         $this->repo = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'github_core_repo', 'zikula/core');
+        $this->dom = \ZLanguage::getModuleDomain('ZikulaExtensionLibraryModule');
     }
 
     /**
@@ -172,7 +173,6 @@ class ReleaseManager
         }
 
         if (!empty($newReleases) && \ModUtil::available('News')) {
-            $dom = \ZLanguage::getModuleDomain('ZikulaExtensionLibraryModule');
             foreach ($newReleases as $newRelease) {
                 switch ($newRelease->getState()) {
                     case CoreReleaseEntity::STATE_DEVELOPMENT:
@@ -181,11 +181,11 @@ class ReleaseManager
                         // Do not create news post.
                         continue;
                     case CoreReleaseEntity::STATE_SUPPORTED:
-                        $title = __f('%s released!', array($newRelease->getNameI18n()), $dom);
+                        $title = __f('%s released!', array($newRelease->getNameI18n()), $this->dom);
                         $teaser = '<p>' . __f('The core development team is proud to anounce the availabilty of %s.', array($newRelease->getNameI18n())) . '</p>';
                         break;
                     case CoreReleaseEntity::STATE_PRERELEASE:
-                        $title = __f('%s ready for testing!', array($newRelease->getNameI18n()), $dom);
+                        $title = __f('%s ready for testing!', array($newRelease->getNameI18n()), $this->dom);
                         $teaser = '<p>' . __f('The core development team is proud to anounce a pre release of %s. Please help testing and report bugs!', array($newRelease->getNameI18n())) . '</p>';
                         break;
                 }
@@ -298,11 +298,23 @@ class ReleaseManager
                 $jenkinsBuild->setState(CoreReleaseEntity::STATE_DEVELOPMENT);
                 $jenkinsBuild->setSemver($version);
 
-                $description = $job->getDescription() ? $job->getDescription() : $job->getDisplayName();
+                $description = $job->getDescription();
+                $sourceUrls = array();
                 $changeSet = $build->getChangeSet()->toArray();
-                if ($changeSet['kind'] == 'git' && !empty($changeSet['items'][0]->msg)) {
-                    $description .= "<br /><br />" . $this->markdown($changeSet['items'][0]->msg);
+                if ($changeSet['kind'] == 'git' && count($changeSet['items']) > 0) {
+                    if (!empty($description)) {
+                        $description .= "<br /><br />";
+                    }
+                    $description .= '<h4>' . __('Latest changes:', $this->dom) . '</h4><ul>';
+
+                    foreach ($changeSet['items'] as $item) {
+                        $sha = $item->commitId;
+                        $description .= '<li><p>' . $item->msg . ' <a href="https://github.com/' . $this->repo . '/commit/' . urlencode($sha) . '">view at GitHub <i class="fa fa-github"></i></a></p></li>';
+                    }
+                    $sourceUrls['zip'] = 'https://github.com/' . $this->repo . "/archive/$sha.zip";
+                    $sourceUrls['tar'] = 'https://github.com/' . $this->repo . "/archive/$sha.tar";
                 }
+                $jenkinsBuild->setSourceUrls($sourceUrls);
                 $jenkinsBuild->setDescription($description);
 
                 $assets = array();
@@ -317,14 +329,6 @@ class ReleaseManager
                     );
                 }
                 $jenkinsBuild->setAssets($assets);
-
-                $sourceUrls = array();
-                if ($changeSet['kind'] == 'git') {
-                    $sha = $changeSet['items'][0]->commitId;
-                    $sourceUrls['zip'] = 'https://github.com/' . urlencode($this->repo) . "/archive/$sha.zip";
-                    $sourceUrls['tar'] = 'https://github.com/' . urlencode($this->repo) . "/archive/$sha.tar";
-                }
-                $jenkinsBuild->setSourceUrls($sourceUrls);
 
                 $this->em->persist($jenkinsBuild);
             }

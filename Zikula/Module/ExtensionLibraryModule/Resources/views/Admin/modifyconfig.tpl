@@ -46,6 +46,15 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label class="col-lg-3 control-label" for="settings_jenkins_token">{gt text="Security token"}</label>
+                    <div class="col-lg-9">
+                        <input id="settings_jenkins_token" type="password" class="form-control" name="settings[jenkins_token]" value="{$settings.jenkins_token|default:''|safetext}" maxlength="100" />
+                        {route name='zikulaextensionlibrarymodule_webhook_jenkins' code='SECURITYTOKEN' absolute=true assign='route'}
+                        {assign var='route' value="<a href=\"`$route`\">`$route`</a>"}
+                        <p class="help-block">{gt text='A security token to verify requests from Jenkins. Please setup Jenkins to make a GET request to the following url everytime a build has finished: %s' tag1=$route}</p>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="col-lg-3 control-label" for="settings_jenkins_user">{gt text="Username"}</label>
                     <div class="col-lg-9">
                         <input id="settings_jenkins_user" type="text" class="form-control" name="settings[jenkins_user]" value="{$settings.jenkins_user|default:''|safetext}" maxlength="100" />
