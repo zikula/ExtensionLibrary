@@ -383,7 +383,8 @@ class ReleaseManager
         }
 
         $dbRelease->setName($release['name']);
-        $dbRelease->setDescription($this->markdown($release['body']));
+        // Make sure to cast null to string if description is empty!
+        $dbRelease->setDescription((string)$this->markdown($release['body']));
         $dbRelease->setSemver($release['tag_name']);
         $dbRelease->setSourceUrls(array (
             'zip' => $release['zipball_url'],
