@@ -7,9 +7,9 @@
     <thead>
     <tr>
         {if $admin}<th>{gt text='Id'}</th>{/if}
-        <th>{gt text='State'}</th>
-        <th>{gt text='Name'}</th>
         <th>{gt text='Version'}</th>
+        <th>{gt text='Name'}</th>
+        <th>{gt text='State'}</th>
         {if $admin}<th>{gt text='Actions'}</th>{/if}
     </tr>
     </thead>
@@ -21,41 +21,37 @@
         $this->assign('development', \Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity::STATE_DEVELOPMENT);
     {/php}
     {assign var='stateOld' value=-1}
-    {foreach from=$releases item='release'}
+    {foreach from=$releases item='release' name='releases'}
         {if $stateOld != $release->getState() && $release->getState() == $outdated}
             <tr>
                 <td colspan="{if $admin}5{else}3{/if}">
-                    {gt text='The releases below are outdated and no longer receive bug fixes or maintenance. Please upgrade to supported versions.'}
+                    {gt text='Outdated releases:'}
                 </td>
             </tr>
         {/if}
         {if $stateOld != $release->getState() && $release->getState() == $prerelease}
             <tr>
                 <td colspan="{if $admin}5{else}3{/if}">
-                    {gt text='Below you see prereleases. They are not yet released, but we invite you to test them and help fixing latest bugs. You\'ll find further information in the release description.'}
+                    {gt text='Pre-releases:'}
                 </td>
             </tr>
         {/if}
         {if $stateOld != $release->getState() && $release->getState() == $development}
             <tr>
                 <td colspan="{if $admin}5{else}3{/if}">
-                    {gt text='Below you see the latest builds of the core\'s development version. NEVER use them on production sites. They may be broken and absolutely not working. Really.'}
+                    {gt text='Development builds:'}
                 </td>
             </tr>
         {/if}
         <tr class="{if $release->getState() == $prerelease || $release->getState() == $development}danger{elseif $release->getState() == $supported}success{else}warning{/if}">
-            {if $admin}<td>{$release->getId()}</td>{/if}
-            <td>{$release->getState()|elReleaseStateToText:'singular'|safetext}</td>
-            <td>{$release->getNameI18n()|safetext}</td>
-            <td>{$release->getSemver()|safetext}</td>
+            {if $admin}<td style="cursor: pointer" data-toggle="modal" data-target="#el-download-release-modal-{$smarty.foreach.releases.iteration}">{$release->getId()}</td>{/if}
+            <td style="cursor: pointer" data-toggle="modal" data-target="#el-download-release-modal-{$smarty.foreach.releases.iteration}">{$release->getSemver()|safetext}</td>
+            <td style="cursor: pointer" data-toggle="modal" data-target="#el-download-release-modal-{$smarty.foreach.releases.iteration}">{$release->getNameI18n()|safetext}</td>
+            <td style="cursor: pointer" data-toggle="modal" data-target="#el-download-release-modal-{$smarty.foreach.releases.iteration}">{$release->getState()|elReleaseStateToText:'singular'|safetext}</td>
             {if $admin}
                 <td class="text-right">
-                    <div class="hidden">{$release->getDescriptionI18n()}</div>
-                    <a href="#" title="{gt text='View release description'}" data-toggle="modal" data-target="#el-modal-release-description" onclick="jQuery('#el-modal-release-description .modal-body').html(jQuery(this).prev().html())">
-                        <i class="fa fa-comments-o"></i>
-                    </a>
                     {if $release->getState() == $outdated || $release->getState() == $supported}
-                        <a href="{route name='zikulaextensionlibrarymodule_admin_togglereleasestate' id=$release->getId()}" title="{if $release->getState() == $supported}{gt text='Mark release as outdated'}{else}{gt text='Mark release as supported'}{/if}">
+                        <a href="{route name='zikulaextensionlibrarymodule_admin_togglereleasestate' id=$release->getId()}" title="{if $release->getState() == $supported}{gt text='Mark release as outdated'}{else}{gt text='Mark release as supported'}{/if}" data-toggle="">
                             {if $release->getState() == $supported}
                                 <i class="fa fa-arrow-down"></i>
                             {else}
@@ -66,6 +62,7 @@
                 </td>
             {/if}
         </tr>
+        {include file='User/releasedownloadmodal.tpl' modalRelease=$release id="el-download-release-modal-`$smarty.foreach.releases.iteration`"}
         {assign var='stateOld' value=$release->getState()}
     {foreachelse}
         <tr><td colspan="{if $admin}5{else}3{/if}">{gt text='No releases available'}</td></tr>
@@ -85,18 +82,3 @@
 {/if}
 
 {include file='User/footer.tpl'}
-
-<div class="modal fade" id="el-modal-release-description">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">{gt text='Close'}</span></button>
-                <h4 class="modal-title">{gt text='Release description'}</h4>
-            </div>
-            <div class="modal-body"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">{gt text='Close'}</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
