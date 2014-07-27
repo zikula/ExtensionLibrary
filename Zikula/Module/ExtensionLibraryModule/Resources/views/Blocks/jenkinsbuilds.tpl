@@ -14,6 +14,7 @@
                 <h4 class="modal-title">{gt text='Download nightly builds'}</h4>
             </div>
             <div class="modal-body">
+                <div class="alert alert-danger"><strong>{gt text='Danger: Do not use on production sites! Download the latest release instead.'}</strong></div>
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs" role="tablist">
                     {foreach from=$developmentReleases item='developmentRelease' name='releases'}
