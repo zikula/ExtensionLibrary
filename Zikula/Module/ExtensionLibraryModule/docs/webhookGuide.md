@@ -31,7 +31,7 @@ To make sure everything worked, click on the webhook once again and scroll down.
 
 ![webhook recent deliveries][img6]
 
-Click on the three little dots at the right hand side and than on the `Response` tab. You're done if it says `Ping
+Click on the three little dots at the right hand side and then on the `Response` tab. You're done if it says `Ping
 event received` at the bottom.
 
 ![webhook sdf][img7]
