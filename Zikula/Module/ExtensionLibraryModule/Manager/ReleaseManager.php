@@ -311,6 +311,7 @@ class ReleaseManager
                         $sha = $item->commitId;
                         $description .= '<li><p>' . $item->msg . ' <a href="https://github.com/' . $this->repo . '/commit/' . urlencode($sha) . '">view at GitHub <i class="fa fa-github"></i></a></p></li>';
                     }
+                    $description .= "</ul>";
                     $sourceUrls['zip'] = 'https://github.com/' . $this->repo . "/archive/$sha.zip";
                     $sourceUrls['tar'] = 'https://github.com/' . $this->repo . "/archive/$sha.tar";
                 }
