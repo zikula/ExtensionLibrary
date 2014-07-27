@@ -215,6 +215,8 @@ class UserController extends \Zikula_AbstractController
                     'img3' => $module->getRelativePath() . '/docs/images/shots3.png',
                     'img4' => $module->getRelativePath() . '/docs/images/shots4.png',
                     'img5' => $module->getRelativePath() . '/docs/images/shots5.png',
+                    'img6' => $module->getRelativePath() . '/docs/images/shots6.png',
+                    'img7' => $module->getRelativePath() . '/docs/images/shots7.png',
                 )),
             'sample-manifest' => array('file' => '/docs/zikula.manifest.json'),
             'sample-composer' => array('file' => '/docs/composer.json'),
