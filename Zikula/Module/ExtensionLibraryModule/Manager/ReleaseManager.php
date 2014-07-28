@@ -453,7 +453,7 @@ class ReleaseManager
         ));
         $dbRelease->setState($state);
 
-        if ($mode == 'new' && count($release['assets']) == 0 && $this->jenkinsClient) {
+        if ($mode == 'new' && count($release['assets']) == 0 && $this->jenkinsClient && Util::hasGitHubClientPushAccess($this->client)) {
             // Jenkins Build files are not yet uploaded to GitHub. Try to upload them manually.
             // First, determine the sha of the release.
             $tagName = $release['tag_name'];

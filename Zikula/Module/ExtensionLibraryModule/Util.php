@@ -18,6 +18,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Github\Client as GitHubClient;
 use Github\HttpClient\Cache\FilesystemCache;
 use Github\HttpClient\CachedHttpClient;
+use Github\HttpClient\Message\ResponseMediator;
 use vierbergenlars\SemVer\expression;
 use vierbergenlars\SemVer\version;
 use Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity;
@@ -216,6 +217,31 @@ class Util
         }
 
         return $client;
+    }
+
+    /**
+     * Determines if the GitHub client has push access to a specifc repository.
+     *
+     * @param GitHubClient $client
+     *
+     * @return bool
+     */
+    public static function hasGitHubClientPushAccess(GitHubClient $client)
+    {
+        $repo = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'github_core_repo');
+        if (empty($repo)) {
+            return false;
+        }
+        $user = ResponseMediator::getContent($client->getHttpClient()->get('user'));
+
+        $collaborators = ResponseMediator::getContent($client->getHttpClient()->get('repos/' . $repo . "/collaborators"));
+        foreach ($collaborators as $collaborator) {
+            if ($collaborator['login'] == $user['login']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
