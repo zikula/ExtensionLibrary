@@ -180,14 +180,12 @@ class Util
      * Get an instance of the GitHub Client, authenticated with the admin's authentication token.
      *
      * @param bool $fallBackToNonAuthenticatedClient Whether or not to fall back to a non-authenticated client if
-     * authentication fails, default true.
-     *
-     * @param bool $log Whether to log errors or not, default true.
+     *                                               authentication fails, default true.
      *
      * @return GitHubClient|bool The authenticated GitHub client, or false if $fallBackToNonAuthenticatedClient
      * is false and the client could not be authenticated.
      */
-    public static function getGitHubClient($fallBackToNonAuthenticatedClient = true, $log = true)
+    public static function getGitHubClient($fallBackToNonAuthenticatedClient = true)
     {
         $cacheDir = \CacheUtil::getLocalDir('el/github-api');
 
@@ -209,9 +207,6 @@ class Util
                     $client = new GitHubClient($httpClient);
                 } else {
                     $client = false;
-                }
-                if ($log) {
-                    self::log('GitHub token is invalid, authorization failed!');
                 }
             }
         }
@@ -288,6 +283,11 @@ class Util
         return $extensions;
     }
 
+    /**
+     * Returns a Jenkins API client or false if the jenkins server is not available.
+     *
+     * @return bool|Dashboard
+     */
     public static function getJenkinsClient()
     {
         $jenkinsServer = trim(\ModUtil::getVar('ZikulaExtensionLibraryModule', 'jenkins_server', ''), '/');
@@ -300,9 +300,11 @@ class Util
             $jenkinsServer = str_replace('://', "://" . urlencode($jenkinsUser) . ":" . urlencode($jenkinsPassword), $jenkinsServer);
         }
 
+        $dashboard = new Dashboard();
+        $dashboard->addSource(new Source($jenkinsServer . '/view/All/api/json/?depth=2'));
         try {
-            $dashboard = new Dashboard();
-            $dashboard->addSource(new Source($jenkinsServer . '/view/All/api/json/?depth=2'));
+            // Dummy call to getJobs to test if Jenkins is available.
+            $dashboard->getJobs();
         } catch (SourceNotAvailableException $e) {
             return false;
         }
