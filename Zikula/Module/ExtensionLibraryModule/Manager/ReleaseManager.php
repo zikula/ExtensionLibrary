@@ -182,11 +182,11 @@ class ReleaseManager
                         continue;
                     case CoreReleaseEntity::STATE_SUPPORTED:
                         $title = __f('%s released!', array($newRelease->getNameI18n()), $this->dom);
-                        $teaser = '<p>' . __f('The core development team is proud to anounce the availabilty of %s.', array($newRelease->getNameI18n())) . '</p>';
+                        $teaser = '<p>' . __f('The core development team is proud to announce the availabilty of %s.', array($newRelease->getNameI18n())) . '</p>';
                         break;
                     case CoreReleaseEntity::STATE_PRERELEASE:
                         $title = __f('%s ready for testing!', array($newRelease->getNameI18n()), $this->dom);
-                        $teaser = '<p>' . __f('The core development team is proud to anounce a pre release of %s. Please help testing and report bugs!', array($newRelease->getNameI18n())) . '</p>';
+                        $teaser = '<p>' . __f('The core development team is proud to announce a pre-release of %s. Please help testing and report bugs!', array($newRelease->getNameI18n())) . '</p>';
                         break;
                 }
 
