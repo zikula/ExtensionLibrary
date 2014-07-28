@@ -235,9 +235,9 @@ class ReleaseManager
         $newReleases = array();
         foreach ($releases as $release) {
             $ids[] = $release['id'];
-            $newRelease = $this->updateGitHubRelease($release, $dbReleases);
-            if ($newRelease) {
-                $newReleases[] = $newRelease;
+            $result = $this->updateGitHubRelease($release, $dbReleases);
+            if ($result instanceof CoreReleaseEntity) {
+                $newReleases[] = $result;
             }
         }
 
@@ -344,13 +344,13 @@ class ReleaseManager
      * @param array               $release    The release data from the GitHub api.
      * @param CoreReleaseEntity[] $dbReleases INTERNAL: used in self::reloadAllReleases()
      *
-     * @return bool
+     * @return bool|CoreReleaseEntity False if it's a draft; true if a release is edited; the release itself if it's new.
      */
     public function updateGitHubRelease($release, $dbReleases = null)
     {
         if ($release['draft']) {
             // Ignore drafts.
-            return true;
+            return false;
         }
         $id = $release['id'];
 
@@ -417,7 +417,7 @@ class ReleaseManager
 
         $this->em->flush();
 
-        return ($mode === 'new') ? $dbRelease : null;
+        return ($mode === 'new') ? $dbRelease : true;
     }
 
     private function markdown($body)
