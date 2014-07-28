@@ -168,7 +168,7 @@ class ReleaseManager
         }
 
         // Jenkins builds
-        if ($source == 'all' || $source == 'jenkins') {
+        if ($this->jenkinsClient && ($source == 'all' || $source == 'jenkins')) {
             $this->reloadReleasesFromJenkins();
         }
 

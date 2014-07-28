@@ -13,6 +13,7 @@
 
 namespace Zikula\Module\ExtensionLibraryModule;
 
+use CarlosIO\Jenkins\Exception\SourceNotAvailableException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Github\Client as GitHubClient;
 use Github\HttpClient\Cache\FilesystemCache;
@@ -273,8 +274,12 @@ class Util
             $jenkinsServer = str_replace('://', "://" . urlencode($jenkinsUser) . ":" . urlencode($jenkinsPassword), $jenkinsServer);
         }
 
-        $dashboard = new Dashboard();
-        $dashboard->addSource(new Source($jenkinsServer . '/view/All/api/json/?depth=2'));
+        try {
+            $dashboard = new Dashboard();
+            $dashboard->addSource(new Source($jenkinsServer . '/view/All/api/json/?depth=2'));
+        } catch (SourceNotAvailableException $e) {
+            return false;
+        }
 
         return $dashboard;
     }
