@@ -197,6 +197,7 @@ class ReleaseManager
                 }
 
                 $args = array();
+                $now = \DateUtil::getDatetime();
                 $args['title'] = $title;
                 $args['hometext'] = $teaser;
                 $args['hometextcontenttype'] = 0;
@@ -206,7 +207,9 @@ class ReleaseManager
                 $args['published_status'] = \News_Api_User::STATUS_PENDING;
                 $args['displayonindex'] = 1;
                 $args['allowcomments'] = 1;
-                $args['from'] = \DateUtil::getDatetime();
+                $args['from'] = $now;
+                $args['cr_date'] = $now;
+                $args['tonolimit'] = true;
 
                 $id = \ModUtil::apiFunc('News', 'user', 'create', $args);
             }
