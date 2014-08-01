@@ -10,9 +10,11 @@ Add a Manifest and Composer file to your Repository
 ---------------------------------------------------
 The Zikula Extensions Library will look in the root level of your repository for a file named `zikula.manifest.json`.
 You will need to create the file according to the [manifest specification][manifest]. The manifest specifies the
-location of the `composer.json` file which is also required (see [specification][composer]). Use an online
+location of the `composer.json` file which is also required* (see [specification][composer]). Use an online
 JSON verifier such as [JSONlint](http://jsonlint.com/) to make sure both files are valid. Use our [online manifest validator][validate]
 to make sure your manifest validates against the required schema. You are now ready to publish your extension!
+
+*Please note the `composer.json` file is also required for Core 1.3.x-type extensions and has specific requirements
 
 Publishing a Version
 --------------------
@@ -21,8 +23,10 @@ the version in git and pushing the tag to GitHub. The post-receive hook will not
 is available and the extensions site will take care of the rest!
 
 <pre>
+```
 $ git tag 0.1.0
 $ git push origin --tags
+```
 </pre>
 
 The name of the tag must be a valid [semver](http://semver.org/) value, but may contain an optional `v` prefix. The tag

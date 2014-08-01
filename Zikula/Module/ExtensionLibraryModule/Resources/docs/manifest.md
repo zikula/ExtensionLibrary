@@ -154,22 +154,25 @@ Version range descriptors may be any of the following styles, where "version" is
  - `range1 || range2` Passes if either range1 or range2 are satisfied.
  
 For example, these are all valid:
-```json
-{ "dependencies" :
-    {
-        "foo" : "1.0.0 - 2.9999.9999",
-        "bar" : ">=1.0.2 <2.1.2",
-        "baz" : ">1.0.2 <=2.3.4",
-        "boo" : "2.0.1",
-        "qux" : "<1.0.0 || >=2.3.1 <2.4.5 || >=2.5.2 <3.0.0",
-        "asd" : "http://asdf.com/asdf.tar.gz",
-        "til" : "~1.2",
-        "elf" : "~1.2.3",
-        "two" : "2.x",
-        "thr" : "3.3.x"
-    }
+<pre>
+```
+{
+    "dependencies" :
+        {
+            "foo" : "1.0.0 - 2.9999.9999",
+            "bar" : ">=1.0.2 <2.1.2",
+            "baz" : ">1.0.2 <=2.3.4",
+            "boo" : "2.0.1",
+            "qux" : "<1.0.0 || >=2.3.1 <2.4.5 || >=2.5.2 <3.0.0",
+            "asd" : "http://asdf.com/asdf.tar.gz",
+            "til" : "~1.2",
+            "elf" : "~1.2.3",
+            "two" : "2.x",
+            "thr" : "3.3.x"
+        }
 }
 ```
+</pre>
 
 <a name="tilde"></a>Tilde Version Ranges
 --------------------

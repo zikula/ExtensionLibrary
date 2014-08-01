@@ -69,5 +69,5 @@
             "additionalProperties": true
         }
     },
-    "required": ["name", "description", "type", "license", "authors", "autoload", "require", "extra"]
+    "required": ["name", "description", "type", "license", "authors", "require"]
 }
