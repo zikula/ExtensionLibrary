@@ -210,18 +210,18 @@ class UserController extends \Zikula_AbstractController
                 'file' => '/docs/webhookGuide.md',
                 'urls' => array(
                     // @todo - getRelativePath() is deprecated
-                    'img1' => $module->getRelativePath() . '/docs/images/shots1.png',
-                    'img2' => $module->getRelativePath() . '/docs/images/shots2.png',
-                    'img3' => $module->getRelativePath() . '/docs/images/shots3.png',
-                    'img4' => $module->getRelativePath() . '/docs/images/shots4.png',
-                    'img5' => $module->getRelativePath() . '/docs/images/shots5.png',
-                    'img6' => $module->getRelativePath() . '/docs/images/shots6.png',
-                    'img7' => $module->getRelativePath() . '/docs/images/shots7.png',
+                    'img1' => $module->getRelativePath() . '/Resources/docs/images/shots1.png',
+                    'img2' => $module->getRelativePath() . '/Resources/docs/images/shots2.png',
+                    'img3' => $module->getRelativePath() . '/Resources/docs/images/shots3.png',
+                    'img4' => $module->getRelativePath() . '/Resources/docs/images/shots4.png',
+                    'img5' => $module->getRelativePath() . '/Resources/docs/images/shots5.png',
+                    'img6' => $module->getRelativePath() . '/Resources/docs/images/shots6.png',
+                    'img7' => $module->getRelativePath() . '/Resources/docs/images/shots7.png',
                 )),
             'sample-manifest' => array('file' => '/docs/zikula.manifest.json'),
             'sample-composer' => array('file' => '/docs/composer.json'),
         );
-        $docfile = file_get_contents($module->getPath() . $docs[$file]['file']);
+        $docfile = file_get_contents($module->getPath() . "/Resources" . $docs[$file]['file']);
         $json = false;
         if (substr($file, 0, 6) != "sample") {
             $parser = StringUtil::getMarkdownExtraParser();
