@@ -4,20 +4,20 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f17b3ccb6e5223abc50c460994291a2f",
+    "hash": "649cd6e8bc3c6eaf73a6279b6b5bc481",
     "packages": [
         {
             "name": "carlosio/jenkins",
-            "version": "1.1.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/carlosbuenosvinos/php-jenkins-api.git",
-                "reference": "dbd432962c2175ccc3b18f75101462038b389afd"
+                "reference": "a96fd6cafe61a9a944912d6a824c73878a37a8ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/carlosbuenosvinos/php-jenkins-api/zipball/dbd432962c2175ccc3b18f75101462038b389afd",
-                "reference": "dbd432962c2175ccc3b18f75101462038b389afd",
+                "url": "https://api.github.com/repos/carlosbuenosvinos/php-jenkins-api/zipball/a96fd6cafe61a9a944912d6a824c73878a37a8ed",
+                "reference": "a96fd6cafe61a9a944912d6a824c73878a37a8ed",
                 "shasum": ""
             },
             "require": {
@@ -46,7 +46,7 @@
                 "api",
                 "jenkins"
             ],
-            "time": "2014-04-22 10:41:36"
+            "time": "2014-07-31 18:06:21"
         },
         {
             "name": "guzzle/guzzle",
@@ -210,16 +210,16 @@
         },
         {
             "name": "knplabs/github-api",
-            "version": "1.2.6",
+            "version": "1.2.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/KnpLabs/php-github-api.git",
-                "reference": "6ee8ad85e4d4a82e8ab92ac76fd14671dbba5158"
+                "reference": "39dc9b4be0378c57279aa693f597cda5deb97c8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/KnpLabs/php-github-api/zipball/6ee8ad85e4d4a82e8ab92ac76fd14671dbba5158",
-                "reference": "6ee8ad85e4d4a82e8ab92ac76fd14671dbba5158",
+                "url": "https://api.github.com/repos/KnpLabs/php-github-api/zipball/39dc9b4be0378c57279aa693f597cda5deb97c8f",
+                "reference": "39dc9b4be0378c57279aa693f597cda5deb97c8f",
                 "shasum": ""
             },
             "require": {
@@ -267,7 +267,71 @@
                 "gist",
                 "github"
             ],
-            "time": "2014-07-01 12:09:42"
+            "time": "2014-07-31 23:03:14"
+        },
+        {
+            "name": "lusitanian/oauth",
+            "version": "v0.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Lusitanian/PHPoAuthLib.git",
+                "reference": "f981b349c03f7e233b7058a9d30903809898659c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Lusitanian/PHPoAuthLib/zipball/f981b349c03f7e233b7058a9d30903809898659c",
+                "reference": "f981b349c03f7e233b7058a9d30903809898659c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*",
+                "predis/predis": "0.8.*@dev",
+                "symfony/http-foundation": "~2.1"
+            },
+            "suggest": {
+                "ext-openssl": "Allows for usage of secure connections with the stream-based HTTP client.",
+                "predis/predis": "Allows using the Redis storage backend.",
+                "symfony/http-foundation": "Allows using the Symfony Session storage backend."
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "OAuth": "src",
+                    "OAuth\\Unit": "tests"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "David Desberg",
+                    "email": "david@daviddesberg.com"
+                },
+                {
+                    "name": "Pieter Hordijk",
+                    "email": "info@pieterhordijk.com",
+                    "homepage": "https://pieterhordijk.com",
+                    "role": "developer"
+                }
+            ],
+            "description": "PHP 5.3+ oAuth 1/2 Library",
+            "keywords": [
+                "Authentication",
+                "authorization",
+                "oauth",
+                "security"
+            ],
+            "time": "2014-03-30 13:50:10"
         },
         {
             "name": "symfony/event-dispatcher",
@@ -389,8 +453,10 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "vierbergenlars/php-semver": 20
+        "vierbergenlars/php-semver": 20,
+        "carlosio/jenkins": 20
     },
+    "prefer-stable": false,
     "platform": {
         "php": ">5.3.3"
     },

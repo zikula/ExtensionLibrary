@@ -18,6 +18,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Github\Client as GitHubClient;
 use Github\HttpClient\Cache\FilesystemCache;
 use Github\HttpClient\CachedHttpClient;
+use Github\HttpClient\Message\ResponseMediator;
 use vierbergenlars\SemVer\expression;
 use vierbergenlars\SemVer\version;
 use Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity;
@@ -179,14 +180,12 @@ class Util
      * Get an instance of the GitHub Client, authenticated with the admin's authentication token.
      *
      * @param bool $fallBackToNonAuthenticatedClient Whether or not to fall back to a non-authenticated client if
-     * authentication fails, default true.
-     *
-     * @param bool $log Whether to log errors or not, default true.
+     *                                               authentication fails, default true.
      *
      * @return GitHubClient|bool The authenticated GitHub client, or false if $fallBackToNonAuthenticatedClient
      * is false and the client could not be authenticated.
      */
-    public static function getGitHubClient($fallBackToNonAuthenticatedClient = true, $log = true)
+    public static function getGitHubClient($fallBackToNonAuthenticatedClient = true)
     {
         $cacheDir = \CacheUtil::getLocalDir('el/github-api');
 
@@ -209,13 +208,35 @@ class Util
                 } else {
                     $client = false;
                 }
-                if ($log) {
-                    self::log('GitHub token is invalid, authorization failed!');
-                }
             }
         }
 
         return $client;
+    }
+
+    /**
+     * Determines if the GitHub client has push access to a specifc repository.
+     *
+     * @param GitHubClient $client
+     *
+     * @return bool
+     */
+    public static function hasGitHubClientPushAccess(GitHubClient $client)
+    {
+        $repo = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'github_core_repo');
+        if (empty($repo)) {
+            return false;
+        }
+        $user = ResponseMediator::getContent($client->getHttpClient()->get('user'));
+
+        $collaborators = ResponseMediator::getContent($client->getHttpClient()->get('repos/' . $repo . "/collaborators"));
+        foreach ($collaborators as $collaborator) {
+            if ($collaborator['login'] == $user['login']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -262,6 +283,11 @@ class Util
         return $extensions;
     }
 
+    /**
+     * Returns a Jenkins API client or false if the jenkins server is not available.
+     *
+     * @return bool|Dashboard
+     */
     public static function getJenkinsClient()
     {
         $jenkinsServer = trim(\ModUtil::getVar('ZikulaExtensionLibraryModule', 'jenkins_server', ''), '/');
@@ -274,9 +300,11 @@ class Util
             $jenkinsServer = str_replace('://', "://" . urlencode($jenkinsUser) . ":" . urlencode($jenkinsPassword), $jenkinsServer);
         }
 
+        $dashboard = new Dashboard();
+        $dashboard->addSource(new Source($jenkinsServer . '/view/All/api/json/?depth=2'));
         try {
-            $dashboard = new Dashboard();
-            $dashboard->addSource(new Source($jenkinsServer . '/view/All/api/json/?depth=2'));
+            // Dummy call to getJobs to test if Jenkins is available.
+            $dashboard->getJobs();
         } catch (SourceNotAvailableException $e) {
             return false;
         }

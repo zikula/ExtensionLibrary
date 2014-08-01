@@ -56,7 +56,7 @@ class AdminController extends \Zikula_AbstractController
         $rate = $rate['rate'];
 
         $now = new \DateTime('now');
-        $reset = \DateTime::createFromFormat('U', $rate['reset']);
+        $reset = \DateTime::createFromFormat('U', $rate['reset'], new \DateTimeZone('UTC'));
         $rate['minutesUntilReset'] = $now->diff($reset)->format('%i');
 
         $this->view->assign('rate', $rate);
@@ -65,6 +65,7 @@ class AdminController extends \Zikula_AbstractController
         if (!ImageManager::checkStorageDir(false)) {
             $this->view->assign('storageDir', ImageManager::STORAGE_PATH);
         }
+        $this->view->assign('hasPushAccess', Util::hasGitHubClientPushAccess($client));
 
         $this->view->assign('settings', $this->getVars());
 
@@ -88,7 +89,7 @@ class AdminController extends \Zikula_AbstractController
         $this->setVars($modvars);
 
         // Check if GitHub authentication works after changing token.
-        $client = Util::getGitHubClient(false, false);
+        $client = Util::getGitHubClient(false);
 
         if ($client === false) {
             $this->setVar('github_token', null);

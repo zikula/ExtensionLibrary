@@ -8,13 +8,18 @@
             {gt text='The image storage directory must be created at "%s" relative to the Zikula root.' tag1=$storageDir}
         </div>
     {/if}
-    <div class="alert alert-info">
-        {gt text='Rate limit remaining for the next %s minutes: %s / %s' tag1=$rate.minutesUntilReset tag2=$rate.remaining tag3=$rate.limit}
-    </div>
     <form class="form-horizontal" id="el-modify-config-form" role="form" action="{route name='zikulaextensionlibrarymodule_admin_modifyconfig'}" method="post" enctype="application/x-www-form-urlencoded" autocomplete="off">
         <div>
             <fieldset>
                 <legend>{gt text='GitHub'}</legend>
+                <div class="alert alert-info">
+                    {gt text='Rate limit remaining for the next %s minutes: %s / %s' tag1=$rate.minutesUntilReset tag2=$rate.remaining tag3=$rate.limit}
+                </div>
+                {if $hasPushAccess}
+                    <div class="alert alert-success">{gt text='Great! The GitHub client has push access to the core repository!'}</div>
+                {else}
+                    <div class="alert alert-warning">{gt text='The GitHub client does not have push access to the core repository. Auto-loading Jenkins Build Assets into GitHub Core releases has been disabled.'}</div>
+                {/if}
                 <div class="form-group">
                     <label class="col-lg-3 control-label" for="settings_github_token">{gt text="Access Token"}</label>
                     <div class="col-lg-9">

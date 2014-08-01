@@ -270,75 +270,133 @@ class ReleaseManager
 
         /** @var Job $job */
         foreach ($this->jenkinsClient->getJobs() as $job) {
-            if (!$job->isDisabled()) {
-                $name = $job->getName();
-                if (!preg_match('#Zikula(_Core|)-([0-9]\.[0-9]\.[0-9])#', $name, $matches)) {
-                    continue;
-                }
-                $version = $matches[2];
-
-                /** @var Build[] $builds */
-                $builds = $job->getBuilds();
-                foreach ($builds as $key => $build) {
-                    if ($build->isBuilding() || $build->getResult() != "SUCCESS") {
-                        unset($builds[$key]);
-                    }
-                }
-                usort($builds, function (Build $a, Build $b) {
-                    $a = $a->getNumber();
-                    $b = $b->getNumber();
-                    if ($a === $b) {
-                        return 0;
-                    }
-
-                    return ($a > $b) ? -1 : 1;
-                });
-
-                $build = $builds[0];
-
-                $jenkinsBuild = new CoreReleaseEntity($job->getName() . '#' . $build->getNumber());
-                $jenkinsBuild->setName($job->getDisplayName() . ' #' . $build->getNumber());
-                $jenkinsBuild->setState(CoreReleaseEntity::STATE_DEVELOPMENT);
-                $jenkinsBuild->setSemver($version);
-
-                $description = $job->getDescription();
-                $sourceUrls = array();
-                $changeSet = $build->getChangeSet()->toArray();
-                if ($changeSet['kind'] == 'git' && count($changeSet['items']) > 0) {
-                    if (!empty($description)) {
-                        $description .= "<br /><br />";
-                    }
-                    $description .= '<h4>' . __('Latest changes:', $this->dom) . '</h4><ul>';
-
-                    foreach ($changeSet['items'] as $item) {
-                        $sha = $item->commitId;
-                        $description .= '<li><p>' . $item->msg . ' <a href="https://github.com/' . $this->repo . '/commit/' . urlencode($sha) . '">view at GitHub <i class="fa fa-github"></i></a></p></li>';
-                    }
-                    $description .= "</ul>";
-                    $sourceUrls['zip'] = 'https://github.com/' . $this->repo . "/archive/$sha.zip";
-                    $sourceUrls['tar'] = 'https://github.com/' . $this->repo . "/archive/$sha.tar";
-                }
-                $jenkinsBuild->setSourceUrls($sourceUrls);
-                $jenkinsBuild->setDescription($description);
-
-                $assets = array();
-                $server = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'jenkins_server');
-                foreach ($build->getArtifacts() as $artifact) {
-                    $downloadUrl = $server . '/job/' . urlencode($job->getName()) . '/' . $build->getNumber() . '/artifact/' . $artifact->relativePath;
-                    $assets[] = array (
-                        'name' => $artifact->fileName,
-                        'download_url' => $downloadUrl,
-                        'size' => null,
-                        'content_type' => null
-                    );
-                }
-                $jenkinsBuild->setAssets($assets);
-
-                $this->em->persist($jenkinsBuild);
+            if ($job->isDisabled()) {
+                // Ignore disabled = old jobs.
+                continue;
             }
+            $name = $job->getName();
+            if (!preg_match('#Zikula(_Core|)-([0-9]\.[0-9]\.[0-9])#', $name, $matches)) {
+                // Ignore jobs not matching the standard pattern.
+                continue;
+            }
+            $version = $matches[2];
+
+            /** @var Build[] $builds */
+            $builds = $job->getBuilds();
+            foreach ($builds as $key => $build) {
+                if ($build->isBuilding() || $build->getResult() != "SUCCESS") {
+                    unset($builds[$key]);
+                }
+            }
+
+            // Sort builds by build number DESC.
+            usort($builds, function (Build $a, Build $b) {
+                $a = $a->getNumber();
+                $b = $b->getNumber();
+                if ($a === $b) {
+                    return 0;
+                }
+
+                return ($a > $b) ? -1 : 1;
+            });
+
+            // Get latest build.
+            $build = $builds[0];
+
+            $jenkinsBuild = new CoreReleaseEntity($job->getName() . '#' . $build->getNumber());
+            $jenkinsBuild->setName($job->getDisplayName() . ' #' . $build->getNumber());
+            $jenkinsBuild->setState(CoreReleaseEntity::STATE_DEVELOPMENT);
+            $jenkinsBuild->setSemver($version);
+
+            $description = $job->getDescription();
+            $sourceUrls = array();
+            $changeSet = $build->getChangeSet()->toArray();
+            if ($changeSet['kind'] == 'git' && count($changeSet['items']) > 0) {
+                if (!empty($description)) {
+                    $description .= "<br /><br />";
+                }
+                $description .= '<h4>' . __('Latest changes:', $this->dom) . '</h4><ul>';
+
+                foreach ($changeSet['items'] as $item) {
+                    $sha = $item['commitId'];
+                    $description .= '<li><p>' . $item['msg'] . ' <a href="https://github.com/' . $this->repo . '/commit/' . urlencode($sha) . '">view at GitHub <i class="fa fa-github"></i></a></p></li>';
+                }
+                $description .= "</ul>";
+                $sha = $this->getShaFromJenkinsBuild($build);
+                if ($sha) {
+                    $sourceUrls['zip'] = 'https://github.com/' . $this->repo . "/archive/{$sha}.zip";
+                    $sourceUrls['tar'] = 'https://github.com/' . $this->repo . "/archive/{$sha}.tar";
+                }
+            }
+            $jenkinsBuild->setSourceUrls($sourceUrls);
+            $jenkinsBuild->setDescription($description);
+            $jenkinsBuild->setAssets($this->getAssetsFromJenkinsBuild($job, $build));
+
+            $this->em->persist($jenkinsBuild);
         }
 
         $this->em->flush();
+    }
+
+    /**
+     * Get all assets ready to be saved to the database from a specific Jenkins build.
+     * The content type is guessed based on the filename.
+     *
+     * @param Job   $job
+     * @param Build $build
+     *
+     * @return array
+     */
+    private function getAssetsFromJenkinsBuild(Job $job, Build $build)
+    {
+        $server = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'jenkins_server');
+        $assets = array();
+        foreach ($build->getArtifacts() as $artifact) {
+            $downloadUrl = $server . '/job/' . urlencode($job->getName()) . '/' . $build->getNumber() . '/artifact/' . $artifact->relativePath;
+            $fileExtension = pathinfo($artifact->fileName, PATHINFO_EXTENSION);
+            $contentType = null;
+            switch ($fileExtension) {
+                case 'zip':
+                    $contentType = 'application/zip';
+                    break;
+                case 'gz':
+                    $contentType = 'application/gzip';
+                    break;
+                case 'txt':
+                    $contentType = 'text/plain';
+                    break;
+                default:
+                    $contentType = null;
+
+            }
+            $assets[] = array (
+                'name' => $artifact->fileName,
+                'download_url' => $downloadUrl,
+                'size' => null,
+                'content_type' => $contentType
+            );
+        }
+
+        return $assets;
+    }
+
+    /**
+     * Get the corresponding git SHA of a Jenkins build.
+     *
+     * @param Build $build
+     *
+     * @return bool|string False if SHA could not be determined; string otherwise.
+     */
+    private function getShaFromJenkinsBuild(Build $build)
+    {
+        $buildArr = $build->toArray();
+        foreach ($buildArr['actions'] as $action) {
+            if (isset($action['lastBuiltRevision']['SHA1'])) {
+                return $action['lastBuiltRevision']['SHA1'];
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -364,9 +422,9 @@ class ReleaseManager
         }
 
         if ($dbReleases === null) {
-            $dbReleases = $this->em->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findOneBy(array('id' => $id));
-            if ($dbReleases) {
-                $dbReleases[$id] = $dbReleases;
+            $dbRelease = $this->em->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findOneBy(array('id' => $id));
+            if ($dbRelease) {
+                $dbReleases[$id] = $dbRelease;
             } else {
                 $dbReleases = array();
             }
@@ -395,16 +453,70 @@ class ReleaseManager
         ));
         $dbRelease->setState($state);
 
+        if ($mode == 'new' && count($release['assets']) == 0 && $this->jenkinsClient && Util::hasGitHubClientPushAccess($this->client)) {
+            // Jenkins Build files are not yet uploaded to GitHub. Try to upload them manually.
+            // First, determine the sha of the release.
+            $tagName = $release['tag_name'];
+            $tags = $this->client->getHttpClient()->get('repos/' . $this->repo . '/git/refs/tags');
+            $tags = ResponseMediator::getContent($tags);
+            $sha = false;
+            foreach ($tags as $tag) {
+                if ($tag['ref'] == "refs/tags/$tagName") {
+                    $sha = $tag['object']['sha'];
+                    break;
+                }
+            }
+            if ($sha) {
+                // We got the release's sha. Now check the latest builds on jenkins for that sha.
+                /** @var Job $job */
+                foreach ($this->jenkinsClient->getJobs() as $job) {
+                    /** @var Build $build */
+                    foreach ($job->getBuilds() as $build) {
+                        if ($sha == $this->getShaFromJenkinsBuild($build)) {
+                            // Gotcha! The current Jenkins build has the same sha as the GitHub release.
+                            // Now extract the assets from the Jenkins build.
+                            $worked = false;
+                            list ($repoOwner, $repoName) = explode('/', $this->repo);
+                            $assets = $this->getAssetsFromJenkinsBuild($job, $build);
+                            foreach ($assets as $asset) {
+                                if (!$asset['content_type']) {
+                                    // GitHub won't allow us to upload files without specifying the content type.
+                                    // Skip those files (but there shouldn't be any).
+                                    continue;
+                                }
+                                try {
+                                    $this->client->api('repo')->releases()->assets()->create(
+                                        $repoOwner,
+                                        $repoName,
+                                        $id,
+                                        $asset['name'],
+                                        $asset['content_type'],
+                                        file_get_contents($asset['download_url'])
+                                    );
+                                    $worked = true;
+                                } catch (\Exception $e) {
+                                    Util::log("Error while uploading assets to GitHub: " . $e->getMessage());
+                                }
+                            }
+                            if ($worked) {
+                                // Reload the release.
+                                $release = $this->client->api('repo')->releases()->show($repoOwner, $repoName, $id);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         $assets = array();
-        $htmlUrl = $release['html_url'];
-        $downloadUrl = str_replace('releases/tag', 'releases/download', $htmlUrl) . '/';
         foreach ($release['assets'] as $asset) {
             if ($asset['state'] != 'uploaded') {
                 continue;
             }
             $assets[] = array (
                 'name' => $asset['name'],
-                'download_url' => $downloadUrl . $asset['name'],
+                'download_url' => $asset['browser_download_url'],
                 'size' => $asset['size'],
                 'content_type' => $asset['content_type']
             );
@@ -417,16 +529,22 @@ class ReleaseManager
             $this->em->merge($dbRelease);
         }
 
-
         $this->em->flush();
 
         return ($mode === 'new') ? $dbRelease : true;
     }
 
-    private function markdown($body)
+    /**
+     * "Markdownify" a text using GitHub's flavoured markdown (resulting in @cmfcmf and zikula/core#123 links).
+     *
+     * @param string $text The text to "markdownify".
+     *
+     * @return string
+     */
+    private function markdown($text)
     {
         $settings = array(
-            'text' => $body,
+            'text' => $text,
             'mode' => 'gfm',
             'context' => $this->repo
         );
