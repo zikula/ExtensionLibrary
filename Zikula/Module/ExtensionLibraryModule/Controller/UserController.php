@@ -13,21 +13,28 @@
 
 namespace Zikula\Module\ExtensionLibraryModule\Controller;
 
+use Github\Exception\ValidationFailedException;
+use Github\Client as GitHubClient;
 use SecurityUtil;
 use ModUtil;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter; // used in annotations - do not remove
+use Zikula\Core\Response\PlainResponse;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity;
+use Zikula\Module\ExtensionLibraryModule\Manager\RepositoryManager;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Zikula\Module\UsersModule\Constant as UsersConstant;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use System;
 use StringUtil;
 use Zikula\Module\ExtensionLibraryModule\Manager\ImageManager;
+use Zikula\Module\ExtensionLibraryModule\OAuth\Manager as OAuthManager;
 
 /**
  * UI operations executable by general users.
@@ -314,7 +321,7 @@ class UserController extends \Zikula_AbstractController
             $type = isset($type[2]) ? $type[2] : false;
         }
         if ($type) {
-            $response = new Response(readfile($path), Response::HTTP_OK, array(
+            $response = new PlainResponse(file_get_contents($path), Response::HTTP_OK, array(
                 'Content-Type' => image_type_to_mime_type($type),
                 'Content-Length' => filesize($path)
             ));
@@ -348,5 +355,171 @@ class UserController extends \Zikula_AbstractController
         $this->view->assign('releases', $releases);
 
         return $this->response($this->view->fetch('User/viewreleases.tpl'));
+    }
+
+    /**
+     * @Route("/add-extension")
+     */
+    public function addExtensionAction(Request $request)
+    {
+        $oAuthManager = $this->get('zikulaextensionlibrarymodule.oauthmanager');
+        $elGitHubClient = Util::getGitHubClient(false);
+        $result = $oAuthManager->authenticate();
+        if ($result === false || $elGitHubClient === false) {
+            return new RedirectResponse($this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile', array ('file' => 'webhook'), RouterInterface::ABSOLUTE_URL));
+        } else if ($result instanceof RedirectResponse) {
+            return $result;
+        } else if ($result instanceof GitHubClient) {
+            $userGitHubClient = $result;
+            unset($result);
+        } else {
+            throw new \RuntimeException('Something unexpected happedn!');
+        }
+
+        /** @var RepositoryManager $userRepositoryManager */
+        $userRepositoryManager = $this->get('zikulaextensionlibrarymodule.repositorymanager');
+        $userRepositoryManager->setGitHubClient($userGitHubClient);
+
+        /** @var RepositoryManager $elRepositoryManager */
+        $elRepositoryManager = $this->get('zikulaextensionlibrarymodule.repositorymanager');
+        $elRepositoryManager->setGitHubClient($elGitHubClient);
+
+        $userRepositoriesWithPushAccess = array_column($userRepositoryManager->getRepositoriesWithPushAccess(), 'full_name');
+        sort($userRepositoriesWithPushAccess);
+
+        $currentUser = $userGitHubClient->api('current_user')->show();
+        $vendor = $request->request->get('vendor', json_decode($request->request->get('_vendor'), true));
+        $extension = $request->request->get('extension');
+        $this->view->assign('breadcrumbs', array (array ('title' => $this->__('Add extension'))));
+        if (empty($extension)) {
+            $this->view->assign('repos', $userRepositoriesWithPushAccess);
+            $this->view->assign('vendor', $currentUser);
+
+            return $this->response($this->view->fetch('User/addextension.tpl'));
+        } else if (empty($extension['name'])) {
+            list($owner, $repo) = explode('/', $extension['repository']);
+            $repo = $userGitHubClient->api('repo')->show($owner, $repo);
+            $this->view->assign('repo',  $repo);
+            $this->view->assign('vendor', $request->get('vendor'));
+
+            return $this->response($this->view->fetch('User/addextension2.tpl'));
+        }
+
+        list(, $repo) = explode('/', $extension['repository']);
+        if (!in_array($repo, $userRepositoriesWithPushAccess)) {
+            // The user tried to select a repository he has no push access to.
+            throw new NotFoundHttpException();
+        }
+
+        $userRepository = $userRepositoryManager->getRepository($extension['repository']);
+
+        try {
+            $webHook = $userRepositoryManager->createWebHook(
+                $userRepository,
+                array('push'),
+                $this->get('router')->generate('zikulaextensionlibrarymodule_webhook_extension', array(), RouterInterface::ABSOLUTE_URL)
+            );
+        } catch (ValidationFailedException $e) {
+            // Hook already exists.
+            $webHook = false;
+        }
+
+        $forkedRepository = $elRepositoryManager->forkRepository($userRepository);
+
+        $defaultBranch = $forkedRepository['default_branch'];
+        $prBranch = 'extension-library';
+        $elRepositoryManager->addBranch($forkedRepository, $defaultBranch, $prBranch);
+
+        $currentComposerFile = $elRepositoryManager->getFileInRepository($userRepository, $defaultBranch, 'composer.json');
+        if ($currentComposerFile !== false) {
+            $this->request->getSession()->getFlashBag()->set('error', $this->__('It seems like there already is a composer.json file in your repository. Sorry, we do not support updating composer files yet. Please follow the instructions below.'));
+
+            return new RedirectResponse(System::normalizeUrl($this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile')));
+        }
+        $forkedComposerFile = $elRepositoryManager->getFileInRepository($forkedRepository, $prBranch, 'composer.json');
+        if ($forkedComposerFile === false) {
+            $author = array(
+                "name" => $vendor['name'],
+                "role" => "owner"
+            );
+            if (!empty($vendor['url'])) {
+                $author["homepage"] = $vendor['url'];
+            }
+            if (!empty($vendor['email'])) {
+                $author["email"] = $vendor['email'];
+            }
+            list($vendorPrefix) = explode('/', $extension['repository']);
+            $content = json_encode(array(
+                "name" => "$vendorPrefix/{$extension['name']}-" . strtolower(substr($extension['type'], strlen('zikula-'))),
+                "description" => $extension['description'],
+                "type" => $extension['type'],
+                "license" => $extension['license'],
+                "authors" => array ($author),
+                "require" => array ("php" => ">5.3.3")
+            ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            $elRepositoryManager->createFileInRepository($forkedRepository, $prBranch, 'composer.json', $content);
+        }
+
+        $currentManifestFile = $elRepositoryManager->getFileInRepository($userRepository, $defaultBranch, 'zikula.manifest.json');
+        if ($currentManifestFile !== false) {
+            $this->request->getSession()->getFlashBag()->set('error', $this->__('It seems like there already is a composer.json file in your repository. Sorry, we do not support updating composer files yet. Please follow the instructions below.'));
+
+            return new RedirectResponse(System::normalizeUrl($this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile')));
+        }
+        $forkedManifestFile = $elRepositoryManager->getFileInRepository($forkedRepository, $prBranch, 'zikula.manifest.json');
+        if ($forkedManifestFile === false) {
+            $vendorArr = array("title" => $vendor['displayName']);
+            if (!empty($vendor['url'])) {
+                $vendorArr["url"] = $vendor['url'];
+            }
+            if (!empty($vendor['logo'])) {
+                $vendorArr["logo"] = $vendor['logo'];
+            }
+            $extensionArr = array("title" => $extension['displayName']);
+            if (!empty($extension['url'])) {
+                $extensionArr["url"] = $extension['url'];
+            }
+            if (!empty($extension['icon'])) {
+                $extensionArr["icon"] = $extension['icon'];
+            }
+            $versionArr = array();
+            if (!empty($extension['keywords'])) {
+                $versionArr['keywords'] = array_map("trim", explode(',', $extension['keywords']));
+            }
+            $versionArr['semver'] = '1.0.0'; // @todo Do something about this.
+            $versionArr['compatibility'] = $extension['coreCompatability'];
+            $versionArr['composerpath'] = 'composer.json';
+            $versionArr['description'] = $extension['description'];
+            $versionArr['urls']['issues'] = $userRepository['html_url'] . "/issues";
+
+            $content = json_encode(array(
+                /*"api" => "v1",*/
+                "vendor" => $vendorArr,
+                "extension" => $extensionArr,
+                "version" => $versionArr
+            ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            $elRepositoryManager->createFileInRepository($forkedRepository, $prBranch, 'zikula.manifest.json', $content);
+        }
+
+
+        $title = "Add this extension to the Zikula Extension Library";
+        $elLink = $this->get('router')->generate('zikulaextensionlibrarymodule_user_index', array(), RouterInterface::ABSOLUTE_URL);
+        $elRepoLink = 'https://github.com/craigh/ExtensionLibrary/issues/new';
+        $ghReleasesUrl = $userRepository['html_url'] . "/releases/new";
+        $body = <<< EOF
+#### Hi @{$userRepository['owner']['login']}!
+
+You requested to add this extension to the [Zikula Extension Library]($elLink) :star:. You're just two clicks away from there:
+1. Merge this PR!
+2. Add a new Tag (either using the git command line, your favourite git client or the [GitHub online interface]($ghReleasesUrl))!
+
+In case something doesn't work as expected, feel free to open an issue in the [Extension Library repository]($elRepoLink)!
+EOF;
+        $pullRequest = $elRepositoryManager->createPullRequest($userRepository, $forkedRepository, $prBranch, $defaultBranch, $title, $body);
+
+        // Delete the fork. The pull request will still work.
+        $elRepositoryManager->deleteRepository($forkedRepository);
+
+        return new RedirectResponse($userRepository['html_url'] . "/pull/{$pullRequest['number']}");
     }
 }

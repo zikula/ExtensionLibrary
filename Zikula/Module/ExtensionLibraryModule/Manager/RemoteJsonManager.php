@@ -14,6 +14,9 @@
 namespace Zikula\Module\ExtensionLibraryModule\Manager;
 
 use ModUtil;
+use Symfony\Component\HttpFoundation\Response;
+use Zikula\Module\ExtensionLibraryModule\Exception\ClientException;
+use Zikula\Module\ExtensionLibraryModule\Exception\ServerException;
 use Zikula\Module\ExtensionLibraryModule\Util;
 
 class RemoteJsonManager {
@@ -22,7 +25,7 @@ class RemoteJsonManager {
      * @var array
      */
     private $jsonErrorCodes = array(
-        JSON_ERROR_NONE	=> "No error has occurred",
+        JSON_ERROR_NONE => "No error has occurred",
         JSON_ERROR_DEPTH => "The maximum stack depth has been exceeded",
         JSON_ERROR_STATE_MISMATCH => "Invalid or malformed JSON",
         JSON_ERROR_CTRL_CHAR => "Control character error, possibly incorrectly encoded",
@@ -94,11 +97,8 @@ class RemoteJsonManager {
         try {
             $this->file = $this->client->api('repo')->contents()->show($owner, $repo, $remoteRelativePath, $ref);
         } catch (\Exception $e) {
-            Util::log("Unable to fetch $remoteRelativePath");
-            throw new \InvalidArgumentException();
+            throw new ClientException("Unable to fetch $remoteRelativePath", Response::HTTP_BAD_REQUEST);
         }
-        $rateLimitRemaining = $this->client->getHttpClient()->getLastResponse()->getHeader('X-RateLimit-Remaining');
-        Util::log('Rate limit remaining: ' . $rateLimitRemaining);
 
         if ($this->decodeContent()) {
             $this->validate();
@@ -112,7 +112,6 @@ class RemoteJsonManager {
      */
     private function decodeContent()
     {
-        Util::log("decoding content.");
         $jsonEncodedContent = base64_decode($this->file["content"]); // returns false on failure
         if (!$jsonEncodedContent) {
             $this->valid = false;
@@ -126,7 +125,7 @@ class RemoteJsonManager {
             $this->decodingErrors[] = sprintf("Unable to json_decode file content (%s). Be sure json is valid.", $error);
             return false;
         }
-        Util::log("Content decoded!");
+
         return true;
     }
 
@@ -136,8 +135,7 @@ class RemoteJsonManager {
     private function validate()
     {
         if (empty($this->schema)) {
-            Util::log(sprintf("Schema is undefined (%s).", $this->schema));
-            throw new \InvalidArgumentException();
+            throw new ServerException(sprintf("Schema is undefined (%s).", $this->schema), Response::HTTP_BAD_REQUEST);
         }
         // Get the schema and data as objects
         $retriever = new \JsonSchema\Uri\UriRetriever;
@@ -149,7 +147,6 @@ class RemoteJsonManager {
 
         if ($validator->isValid()) {
             $this->valid = true;
-            Util::log('The file validated!');
         } else {
             $this->valid = false;
             $this->validationErrors = array_merge($this->validationErrors, $validator->getErrors());

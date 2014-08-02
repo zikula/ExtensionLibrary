@@ -19,6 +19,7 @@ use CarlosIO\Jenkins\Job;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Github\HttpClient\Message\ResponseMediator;
+use Symfony\Component\Routing\RouterInterface;
 use vierbergenlars\SemVer\version;
 use Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity;
 use Zikula\Module\ExtensionLibraryModule\Util;
@@ -43,13 +44,16 @@ class ReleaseManager
 
     private $jenkinsClient;
 
-    public function __construct($em)
+    private $router;
+
+    public function __construct($em, RouterInterface $router)
     {
         $this->client = Util::getGitHubClient();
         $this->jenkinsClient = Util::getJenkinsClient();
         $this->em = $em;
         $this->repo = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'github_core_repo', 'zikula/core');
         $this->dom = \ZLanguage::getModuleDomain('ZikulaExtensionLibraryModule');
+        $this->router = $router;
     }
 
     /**
@@ -190,7 +194,7 @@ class ReleaseManager
                         break;
                 }
 
-                $downloadLinkTpl = '<a href="%link%" class="btn btn-success btn-md">%text%</a>';
+                $downloadLinkTpl = '<a href="%link%" class="btn btn-success btn-sm">%text%</a>';
                 $downloadLinks = array();
                 foreach ($newRelease->getAssets() as $asset) {
                     $downloadLinks[] = str_replace('%link%', $asset['download_url'], str_replace('%text%', $asset['name'], $downloadLinkTpl));
@@ -318,14 +322,15 @@ class ReleaseManager
                 $description .= '<h4>' . __('Latest changes:', $this->dom) . '</h4><ul>';
 
                 foreach ($changeSet['items'] as $item) {
-                    $sha = $item['commitId'];
-                    $description .= '<li><p>' . $item['msg'] . ' <a href="https://github.com/' . $this->repo . '/commit/' . urlencode($sha) . '">view at GitHub <i class="fa fa-github"></i></a></p></li>';
+                    $description .= '<li><p>' . $item['msg'] . ' <a href="https://github.com/' . $this->repo . '/commit/' . urlencode($item['commitId']) . '">view at GitHub <i class="fa fa-github"></i></a></p></li>';
                 }
                 $description .= "</ul>";
                 $sha = $this->getShaFromJenkinsBuild($build);
                 if ($sha) {
                     $sourceUrls['zip'] = 'https://github.com/' . $this->repo . "/archive/{$sha}.zip";
                     $sourceUrls['tar'] = 'https://github.com/' . $this->repo . "/archive/{$sha}.tar";
+
+                    $this->notifyBuildAdded($sha);
                 }
             }
             $jenkinsBuild->setSourceUrls($sourceUrls);
@@ -552,5 +557,44 @@ class ReleaseManager
         $response = $this->client->getHttpClient()->post('markdown', json_encode($settings));
 
         return ResponseMediator::getContent($response);
+    }
+
+    /**
+     * This adds a little message to GitHub (if the build is based on a PR) showing that it has been added to the
+     * ExtensionLibrary.
+     *
+     * @param $sha
+     */
+    private function notifyBuildAdded($sha)
+    {
+        if (!Util::hasGitHubClientPushAccess($this->client)) {
+            return;
+        }
+        // Catch everything as the api is still in preview mode and can change without further notice.
+        try {
+            $response = $this->client->getHttpClient()->post(
+                'repos/' . $this->repo . '/deployments',
+                json_encode(array (
+                    'ref' => $sha,
+                    'auto_merge' => false,
+                    'required_contexts' => array(),
+                    'environment' => 'Extension Library',
+                    'description' => 'Updating the Extension Library.'
+                )),
+                array ('Accept' => 'application/vnd.github.cannonball-preview+json')
+            );
+            $response = ResponseMediator::getContent($response);
+            $this->client->getHttpClient()->post(
+                'repos/' . $this->repo . '/deployments/' . $response['id'] . '/statuses',
+                json_encode(array (
+                    'state' => 'success',
+                    'target_url' => $this->router->generate('zikulaextensionlibrarymodule_user_viewcorereleases', array(), RouterInterface::ABSOLUTE_URL),
+                    'description' => 'Build has been added to the Extension Library.'
+                )),
+                array ('Accept' => 'application/vnd.github.cannonball-preview+json')
+            );
+        } catch (\Exception $e) {
+            Util::log("Deployment API failed:" . $e->getMessage(), Util::LOG_PROD);
+        }
     }
 }

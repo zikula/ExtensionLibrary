@@ -104,6 +104,12 @@ class CoreReleaseEntity extends EntityAccess
      */
     private $sourceUrls;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @var int
+     */
+    private $news_id;
+
     public function __construct($id)
     {
         $this->id = (string)$id;
@@ -307,5 +313,21 @@ class CoreReleaseEntity extends EntityAccess
             $this->descriptionsI18n[$tmpArr[$i]] = $tmpArr[$i + 2];
             $this->namesI18n[$tmpArr[$i]] = $tmpArr[$i + 1];
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getNewsId()
+    {
+        return $this->news_id;
+    }
+
+    /**
+     * @param int $news_id
+     */
+    public function setNewsId($news_id)
+    {
+        $this->news_id = $news_id;
     }
 }

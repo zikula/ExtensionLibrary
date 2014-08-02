@@ -18,7 +18,6 @@ use SecurityUtil;
 
 class AdminApi extends \Zikula_AbstractApi
 {
-
     /**
      * get available admin panel links
      *
@@ -49,5 +48,4 @@ class AdminApi extends \Zikula_AbstractApi
 
         return $links;
     }
-
 }

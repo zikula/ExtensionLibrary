@@ -15,9 +15,8 @@ namespace Zikula\Module\ExtensionLibraryModule\Manager;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Zikula\Module\ExtensionLibraryModule\Util;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Zikula\Module\ExtensionLibraryModule\Exception\ClientException;
 
 class PayloadManager {
     /**
@@ -44,8 +43,7 @@ class PayloadManager {
     public function __construct(Request $request, $payloadToArray = false)
     {
         if ($request->headers->get('X-GitHub-Event') == 'ping') {
-            Util::log('Ping event received.');
-            throw new HttpException(Response::HTTP_OK, 'Ping event received.');
+            throw new ClientException('Ping event received.', Response::HTTP_OK);
         }
 
         $contentType = $request->headers->get('content-type');
@@ -54,13 +52,11 @@ class PayloadManager {
         } else if ($contentType == 'application/x-www-form-urlencoded') {
             $payload = $request->request->get('payload', null);
         } else {
-            Util::log('ExtensionLibraryModule::payload was null.');
-            throw new HttpException(Response::HTTP_BAD_REQUEST, '"content-type" header must be either "application/json" or "application/x-www-form-urlencoded".');
+            throw new ClientException('"content-type" header must be either "application/json" or "application/x-www-form-urlencoded".', Response::HTTP_BAD_REQUEST);
         }
 
         if (empty($payload)) {
-            Util::log('ExtensionLibraryModule::payload was null.');
-            throw new NotFoundHttpException('Sorry! Page not found.', null, 404);
+            throw new ClientException('Payload is missing!', Response::HTTP_BAD_REQUEST);
         }
 
         $this->payload = $payload;
@@ -68,16 +64,14 @@ class PayloadManager {
 
         // check to make sure IP address is from github
         if (!$this->ipCIDRCheck()) {
-            Util::log('ExtensionLibraryModule::IP was invalid.');
-            throw new NotFoundHttpException('Sorry! Page not found.', null, 404);
+            throw new ClientException('Request IP is invalid.', Response::HTTP_BAD_REQUEST);
         }
 
         // payload is valid
         try {
             $this->jsonPayload = json_decode($payload, $payloadToArray);
         } catch (\Exception $e) {
-            Util::log('ExtensionLibraryModule::unable to decode json payload.');
-            throw new \InvalidArgumentException();
+            throw new ClientException('Unable to decode json payload.', Response::HTTP_BAD_REQUEST);
         }
 
     }
@@ -107,6 +101,7 @@ class PayloadManager {
             return true;
         }
         // IP range taken from https://help.github.com/articles/what-ip-addresses-does-github-use-that-i-should-whitelist#service-hook-ip-addresses
+        // @todo Fetch from GitHub using the "meta" api endpoint.
         $CIDR = "192.30.252.0/22";
 
         // check current IP is in acceptable range
