@@ -11,8 +11,9 @@ Add a Manifest and Composer file to your Repository
 The Zikula Extensions Library will look in the root level of your repository for a file named `zikula.manifest.json`.
 You will need to create the file according to the [manifest specification][manifest]. The manifest specifies the
 location of the `composer.json` file which is also required* (see [specification][composer]). Use an online
-JSON verifier such as [JSONlint](http://jsonlint.com/) to make sure both files are valid. Use our [online manifest validator][validate]
-to make sure your manifest validates against the required schema. You are now ready to publish your extension!
+JSON verifier such as [JSONlint](http://jsonlint.com/) to make sure both files are valid. Use our [online json validator][validate]
+to make sure your manifest and composer files validate against the required schema. You are now ready to publish your
+extension!
 
 *Please note the `composer.json` file is also required for Core 1.3.x-type extensions and has specific requirements
 

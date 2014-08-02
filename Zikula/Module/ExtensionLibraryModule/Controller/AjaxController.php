@@ -25,16 +25,17 @@ use ModUtil;
 class AjaxController extends \Zikula_Controller_AbstractAjax
 {
     /**
-     * @Route("/validateManifest", options={"expose"=true})
+     * @Route("/validateJson", options={"expose"=true})
      * @Method("POST")
      *
-     * Validate a manifest
+     * Validate a json
      *
      * @return AjaxResponse
      */
-    public function validateManifestAction()
+    public function validateJsonAction()
     {
         $this->checkAjaxToken();
+        $schema = $this->request->request->get('schema', 'schema.manifest.json');
         $content = $this->request->request->get('content', '');
         if (empty($content)) {
             return new BadDataResponse();
@@ -43,7 +44,7 @@ class AjaxController extends \Zikula_Controller_AbstractAjax
         // Get the schema and data as objects
         $module = ModUtil::getModule($this->name);
         $retriever = new \JsonSchema\Uri\UriRetriever;
-        $schemaFile = $retriever->retrieve('file://' . realpath($module->getPath() . '/Schema/schema.manifest.json'));
+        $schemaFile = $retriever->retrieve('file://' . realpath($module->getPath() . '/Schema/' . $schema));
 
         // Validate
         $validator = new \JsonSchema\Validator();
@@ -56,9 +57,14 @@ class AjaxController extends \Zikula_Controller_AbstractAjax
             $valid = false;
             $errors = $validator->getErrors();
         }
+        $schemaNames = array(
+            'schema.manifest.json' => 'zikula.manifest.json',
+            'schema.composer.json' => 'composer.json',
+        );
 
         return new AjaxResponse(array(
             'content' => $content,
+            'schemaName' => $schemaNames[$schema],
             'errors' => $errors,
             'valid' => $valid));
     }

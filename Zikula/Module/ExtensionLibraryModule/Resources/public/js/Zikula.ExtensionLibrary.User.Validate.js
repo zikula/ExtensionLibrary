@@ -5,19 +5,27 @@
  */
 
 jQuery(document).ready(function() {
-    // register the click handler
-    jQuery('#validateButton').click(validateManifest);
+    // register the click handlers
+    jQuery('#schema').change(updateTitle);
+    jQuery('#validateButton').click(validateJson);
 
-    // instigate an ajax request to validate the manifest
-    function validateManifest(e) {
+    // update the title to reflect the selected json type
+    function updateTitle() {
+        jQuery('#json-type').html(jQuery("#schema option:selected").text());
+    }
+
+    // instigate an ajax request to validate the json
+    function validateJson(e) {
         e.preventDefault();
-        var content = jQuery('#manifest').val();
+        var content = jQuery('#json').val();
+        var schema = jQuery('#schema').val();
         jQuery.ajax({
             type: "POST",
             data: {
-                content: content
+                content: content,
+                schema: schema
             },
-            url: Routing.generate('zikulaextensionlibrarymodule_ajax_validatemanifest'),
+            url: Routing.generate('zikulaextensionlibrarymodule_ajax_validatejson'),
             success: function(result) {
                 renderResponse(result.data)
             },
@@ -32,9 +40,9 @@ jQuery(document).ready(function() {
         var resultDiv = jQuery("#validationResults");
         resultDiv.empty();
         if (data.valid) {
-            resultDiv.append('<div class="alert alert-success"><strong><i class="fa fa-smile-o"></i> Valid Manifest!</strong></div>');
+            resultDiv.append('<div class="alert alert-success"><strong><i class="fa fa-smile-o"></i> Valid '+data.schemaName+'!</strong></div>');
         } else {
-            resultDiv.append('<div class="alert alert-danger"><strong><i class="fa fa-warning"></i> Invalid Manifest!</strong></div>');
+            resultDiv.append('<div class="alert alert-danger"><strong><i class="fa fa-warning"></i> Invalid '+data.schemaName+'!</strong></div>');
             for (var i = 0; i < data.errors.length; i++) {
                 resultDiv.append('<div class="alert alert-danger">In property <strong>'+data.errors[i].property+'</strong>: '+data.errors[i].message+'.</div>');
             }

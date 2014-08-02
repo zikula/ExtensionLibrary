@@ -6,7 +6,7 @@
         <li><a href="{route name='zikulaextensionlibrarymodule_user_displaydocfile' file='webhook'}">{gt text="Quick Webhook set up"}</a></li>
         <li><a href="{route name='zikulaextensionlibrarymodule_user_displaydocfile' file='manifest'}">{gt text="Manifest"}</a></li>
         <li><a href="{route name='zikulaextensionlibrarymodule_user_displaydocfile' file='sample-manifest'}">{gt text="Sample Manifest file"}</a></li>
-        <li><a href="{route name='zikulaextensionlibrarymodule_user_validatemanifest'}">{gt text="Validate your Manifest file"}</a></li>
+        <li><a href="{route name='zikulaextensionlibrarymodule_user_validatemanifest'}">{gt text="Validate your Manifest or Composer Json"}</a></li>
         <li><a href="{route name='zikulaextensionlibrarymodule_user_displaydocfile' file='composer'}">{gt text="Composer"}</a></li>
         <li><a href="{route name='zikulaextensionlibrarymodule_user_displaydocfile' file='sample-composer'}">{gt text="Sample Composer file"}</a></li>
     </ul>
