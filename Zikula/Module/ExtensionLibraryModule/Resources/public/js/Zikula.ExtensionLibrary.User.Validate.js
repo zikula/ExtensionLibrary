@@ -49,7 +49,7 @@ jQuery(document).ready(function() {
             resultDiv.append('<div class="alert alert-danger"><strong><i class="fa fa-warning"></i> Invalid '+data.schemaName+'!</strong></div>');
             for (var i = 0; i < data.errors.length; i++) {
                 var msg = '<div class="alert alert-danger">';
-                if  (data.errors[i].property.len > 0) {
+                if  (data.errors[i].property.length > 0) {
                     msg += 'In property <strong>' + data.errors[i].property + '</strong>: ' + data.errors[i].message;
                 } else {
                     msg += capitaliseFirstLetter(data.errors[i].message);
