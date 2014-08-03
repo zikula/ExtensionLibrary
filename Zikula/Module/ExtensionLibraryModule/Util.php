@@ -60,14 +60,19 @@ class Util
      *
      * @todo Fetch from GitHub.
      */
-    public static function getAvailableCoreVersions()
+    public static function getAvailableCoreVersions($indexBy = 'stateText')
     {
         $releaseManager = \ServiceUtil::get('zikulaextensionlibrarymodule.releasemanager');
         $dbReleases = $releaseManager->getSignificantReleases(false);
 
         $releases = array();
         foreach ($dbReleases as $dbRelease) {
-            $releases[CoreReleaseEntity::stateToText($dbRelease->getState(), 'plural')][$dbRelease->getSemver()] = '';
+            if ($indexBy == 'stateText') {
+                $key = CoreReleaseEntity::stateToText($dbRelease->getState(), 'plural');
+            } else {
+                $key = $dbRelease->getState();
+            }
+            $releases[$key][$dbRelease->getSemver()] = '';
         }
 
         return $releases;
@@ -98,30 +103,30 @@ class Util
      */
     public static function setCoreFilter($filter)
     {
-        $coreVersions = self::getAvailableCoreVersions();
+        $coreVersions = self::getAvailableCoreVersions('state');
 
         // @todo Simplify this :/
         if (!(
             $filter === 'all'
             || (
-                isset($coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_SUPPORTED)])
+                isset($coreVersions[CoreReleaseEntity::STATE_SUPPORTED])
                 &&
-                array_key_exists($filter, $coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_SUPPORTED)])
+                array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_SUPPORTED])
             )
             || (
-                isset($coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_OUTDATED)])
+                isset($coreVersions[CoreReleaseEntity::STATE_OUTDATED])
                 &&
-                array_key_exists($filter, $coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_OUTDATED)])
+                array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_OUTDATED])
             )
             || (
-                isset($coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_PRERELEASE)])
+                isset($coreVersions[CoreReleaseEntity::STATE_PRERELEASE])
                 &&
-                array_key_exists($filter, $coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_PRERELEASE)])
+                array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_PRERELEASE])
             )
             || (
-                isset($coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_DEVELOPMENT)])
+                isset($coreVersions[CoreReleaseEntity::STATE_DEVELOPMENT])
                 &&
-                array_key_exists($filter, $coreVersions[CoreReleaseEntity::stateToText(CoreReleaseEntity::STATE_DEVELOPMENT)])
+                array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_DEVELOPMENT])
             )
         )) {
             throw new \InvalidArgumentException();
