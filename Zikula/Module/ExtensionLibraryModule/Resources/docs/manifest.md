@@ -22,12 +22,12 @@ Fields
      - [icon](#extension-icon)
  - [version](#version)
      - [semver](#version-semver) (required)
-     - [compatibility](#version-compatibility) (required)
      - [composerpath](#version-composerpath) (required)
      - [description](#version-description)
      - [keywords](#version-keywords)
      - [urls](#version-urls)
      - [dependencies](#version-dependencies)
+         - [zikula/core](#version-dependencies-core) (required)
 
 
 <a name="vendor"></a>Vendor
@@ -83,11 +83,6 @@ Images MUST be less than 120px x 120px. Recommended size is 90px x 90px.
 A valid version string as defined by [SemVer 2.0.0](http://semver.org). Changes to the extension should come along with
 changes to the version. See [Specifying Versions](#versions).
 
-<a name="version-compatibility"></a>compatibility (required)
-------------------------
-
-A string defining Zikula Core version compatibility. See [Specifying Versions](#versions).
-
 <a name="version-composerpath"></a>composerpath (required)
 -------------------
 
@@ -124,13 +119,19 @@ Zikula Extensions Library site. Keywords may only contain letters, numbers, hyph
 <a name="version-dependencies"></a>dependencies
 ------------
 
-Dependencies are specified with a simple hash of name, type and version. The name should be the repository name and not
-the title. The type must be as defined in extension type above. Version uses the same definition as core compatibility.
+Dependencies are specified by mapping their name to the required version. The name should be the name specified in the
+composer.json file and not the title.
 See [Specifying Versions](#versions).
 
 If a extension that you depend on uses other extensions as dependencies that your extension uses as well, we recommend
 you list those also. In the event that the depended on extension alters its dependencies, your extension's dependency
 tree won't be affected.
+
+### <a name="version-dependencies-core"></a>Core dependency (required)
+
+A property defining Zikula Core version compatibility. **Important: All modules using legacy core technologies, i.e.
+Smarty, DBUtil, Doctrine1, the Forms Framework and many more, MUST specifiy `<1.5` in their core compatability.**
+Example: `"zikula/core": ">=1.3.5 <1.5"`. See [Specifying Versions](#versions).
 
 
 Additional Details

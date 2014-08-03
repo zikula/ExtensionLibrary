@@ -130,11 +130,11 @@ class ExtensionVersionEntity extends EntityAccess
     /**
      * Constructor
      */
-    public function __construct(ExtensionEntity $extension, $semver, $compatibility, $licenses)
+    public function __construct(ExtensionEntity $extension, $semver, $dependencies, $licenses)
     {
         $this->extension = $extension;
         $this->semver = $semver;
-        $this->compatibility = $compatibility;
+        $this->compatibility = $dependencies->{'zikula/core'};
         $this->licenses = (array)$licenses;
         $this->impressions = 0;
     }
