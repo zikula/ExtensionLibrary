@@ -37,6 +37,10 @@ jQuery(document).ready(function() {
 
     // handle the results of the ajax request to validate the manifest
     function renderResponse(data) {
+        function capitaliseFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
         var resultDiv = jQuery("#validationResults");
         resultDiv.empty();
         if (data.valid) {
@@ -44,7 +48,13 @@ jQuery(document).ready(function() {
         } else {
             resultDiv.append('<div class="alert alert-danger"><strong><i class="fa fa-warning"></i> Invalid '+data.schemaName+'!</strong></div>');
             for (var i = 0; i < data.errors.length; i++) {
-                resultDiv.append('<div class="alert alert-danger">In property <strong>'+data.errors[i].property+'</strong>: '+data.errors[i].message+'.</div>');
+                var msg = '<div class="alert alert-danger">';
+                if  (data.errors[i].property.len > 0) {
+                    msg += 'In property <strong>' + data.errors[i].property + '</strong>: ' + data.errors[i].message;
+                } else {
+                    msg += capitaliseFirstLetter(data.errors[i].message);
+                }
+                resultDiv.append(msg + '.</div>');
             }
         }
     }
