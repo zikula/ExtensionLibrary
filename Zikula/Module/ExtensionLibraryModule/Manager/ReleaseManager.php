@@ -329,8 +329,6 @@ class ReleaseManager
                 if ($sha) {
                     $sourceUrls['zip'] = 'https://github.com/' . $this->repo . "/archive/{$sha}.zip";
                     $sourceUrls['tar'] = 'https://github.com/' . $this->repo . "/archive/{$sha}.tar";
-
-                    $this->notifyBuildAdded($sha);
                 }
             }
             $jenkinsBuild->setSourceUrls($sourceUrls);
@@ -338,6 +336,8 @@ class ReleaseManager
             $jenkinsBuild->setAssets($this->getAssetsFromJenkinsBuild($job, $build));
 
             $this->em->persist($jenkinsBuild);
+
+            $this->notifyBuildAdded($build);
         }
 
         $this->em->flush();
@@ -392,12 +392,20 @@ class ReleaseManager
      *
      * @return bool|string False if SHA could not be determined; string otherwise.
      */
-    private function getShaFromJenkinsBuild(Build $build)
+    private function getShaFromJenkinsBuild(Build $build, $excludeMergeSha = false)
     {
         $buildArr = $build->toArray();
-        foreach ($buildArr['actions'] as $action) {
-            if (isset($action['lastBuiltRevision']['SHA1'])) {
-                return $action['lastBuiltRevision']['SHA1'];
+        if (!$excludeMergeSha) {
+            foreach ($buildArr['actions'] as $action) {
+                if (isset($action['lastBuiltRevision']['SHA1'])) {
+                    return $action['lastBuiltRevision']['SHA1'];
+                }
+            }
+        } else {
+            foreach ($buildArr['changeSet']['items'] as $item) {
+                if (isset($item['commitId'])) {
+                    return $item['commitId'];
+                }
             }
         }
 
@@ -563,11 +571,15 @@ class ReleaseManager
      * This adds a little message to GitHub (if the build is based on a PR) showing that it has been added to the
      * ExtensionLibrary.
      *
-     * @param $sha
+     * @param Build $build
      */
-    private function notifyBuildAdded($sha)
+    private function notifyBuildAdded($build)
     {
         if (!Util::hasGitHubClientPushAccess($this->client)) {
+            return;
+        }
+        $sha = $this->getShaFromJenkinsBuild($build, true);
+        if (!$sha) {
             return;
         }
         // Catch everything as the api is still in preview mode and can change without further notice.
