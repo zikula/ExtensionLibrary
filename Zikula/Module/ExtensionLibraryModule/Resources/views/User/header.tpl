@@ -49,3 +49,4 @@
         {/foreach}
     </ol>
 </div>
+{insert name="getstatusmsg"}

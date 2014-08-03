@@ -1,7 +1,12 @@
 {include file='User/header.tpl' displayFilter=true}
 <div class="row">
+    <div class="col-sm-4">
+        <a href="{route name='zikulaextensionlibrarymodule_user_addextension'}" class="btn btn-success btn-lg">
+            {gt text='Add your own extension!'}
+        </a>
+    </div>
     {foreach from=$extensions item="extension" name='loop'}
-        {if ($smarty.foreach.loop.iteration - 1) % 3 == 0 && $smarty.foreach.loop.iteration != 1}
+        {if ($smarty.foreach.loop.iteration) % 3 == 0 && $smarty.foreach.loop.iteration != 1}
         </div>
         <hr />
         <div class="row">

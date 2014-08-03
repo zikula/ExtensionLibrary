@@ -6,11 +6,20 @@
 
     <parameters>
         <parameter key="zikulaextensionlibrarymodule.releasemanager.class">Zikula\Module\ExtensionLibraryModule\Manager\ReleaseManager</parameter>
+        <parameter key="zikulaextensionlibrarymodule.repositorymanager.class">Zikula\Module\ExtensionLibraryModule\Manager\RepositoryManager</parameter>
+        <parameter key="zikulaextensionlibrarymodule.oauthmanager.class">Zikula\Module\ExtensionLibraryModule\OAuth\Manager</parameter>
     </parameters>
 
     <services>
         <service id="zikulaextensionlibrarymodule.releasemanager" class="%zikulaextensionlibrarymodule.releasemanager.class%">
             <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="router" />
+        </service>
+        <service id="zikulaextensionlibrarymodule.repositorymanager" scope="prototype" class="%zikulaextensionlibrarymodule.repositorymanager.class%" />
+        <service id="zikulaextensionlibrarymodule.oauthmanager" class="%zikulaextensionlibrarymodule.oauthmanager.class%">
+            <argument type="service" id="request_stack" />
+            <argument type="service" id="router" />
+            <argument type="service" id="doctrine.entitymanager" />
         </service>
     </services>
 </container>

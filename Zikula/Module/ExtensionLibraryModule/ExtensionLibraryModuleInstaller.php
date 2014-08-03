@@ -26,6 +26,7 @@ class ExtensionLibraryModuleInstaller extends \Zikula_AbstractInstaller
         'Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity',
         'Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity',
         'Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity',
+        'Zikula\Module\ExtensionLibraryModule\Entity\OAuthEntity'
     );
 
     /**
@@ -69,6 +70,9 @@ class ExtensionLibraryModuleInstaller extends \Zikula_AbstractInstaller
             case '1.0.4':
             case '1.0.5':
                 DoctrineHelper::updateSchema($this->entityManager, array('Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity'));
+            case '1.0.6':
+                DoctrineHelper::updateSchema($this->entityManager, array('Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity'));
+                DoctrineHelper::createSchema($this->entityManager, array('Zikula\Module\ExtensionLibraryModule\Entity\OAuthEntity'));
         }
 
         // Update successful

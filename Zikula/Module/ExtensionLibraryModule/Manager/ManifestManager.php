@@ -13,8 +13,6 @@
 
 namespace Zikula\Module\ExtensionLibraryModule\Manager;
 
-use Zikula\Module\ExtensionLibraryModule\Util;
-
 class ManifestManager extends RemoteJsonManager {
     /**
      * Constructor
@@ -47,7 +45,6 @@ class ManifestManager extends RemoteJsonManager {
             $this->valid = false;
             $this->validationErrors[] = array('property' => 'version.semver', 'message' => 'manifest version.semver does not match tagged version');
         }
-        Util::log("The version is valid.");
     }
 
     /**

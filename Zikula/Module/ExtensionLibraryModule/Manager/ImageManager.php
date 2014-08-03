@@ -13,7 +13,8 @@
 
 namespace Zikula\Module\ExtensionLibraryModule\Manager;
 
-use Zikula\Module\ExtensionLibraryModule\Util;
+use Symfony\Component\HttpFoundation\Response;
+use Zikula\Module\ExtensionLibraryModule\Exception\ServerException;
 
 /**
  * Class ImageManager
@@ -69,7 +70,7 @@ class ImageManager
                 $this->addValidationError("Could not validate image extension.");
             }
         } else {
-            Util::log("could not validate storage directory.");
+            throw new ServerException("Could not validate storage directory.", Response::HTTP_BAD_REQUEST);
         }
     }
 
@@ -81,7 +82,6 @@ class ImageManager
     public function import()
     {
         if (!isset($this->name)) {
-            Util::log("image name is not set. Aborting import.");
             return false;
         }
         // move the file to local directory
@@ -91,9 +91,7 @@ class ImageManager
             $r = $this->curlDownload($this->url, self::STORAGE_PATH . $this->name);
         }
 
-        if ($r) {
-            Util::log("file successfully copied to local directory.");
-        } else {
+        if (!$r) {
             $this->addValidationError("Could not find image file from url.");
             return false;
         }
@@ -108,8 +106,6 @@ class ImageManager
         if (!in_array($type, array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
             $this->removeFile("improper imagetype upload attempted. file removed.");
             return false;
-        } else {
-            Util::log("valid imagetype.");
         }
 
         // confirm image size
@@ -119,10 +115,8 @@ class ImageManager
             return false;
         } else {
             if ($imagesize[0] > $this->maxSize['width'] || $imagesize[1] > $this->maxSize['height']) {
-                $this->removeFile("image size exceeds allowed limits. file removed.");
+                $this->removeFile("image size exceeds allowed limits (allowed {$this->maxSize['width']}x{$this->maxSize['height']}), got {$imagesize[0]}x{$imagesize[1]}. file removed.");
                 return false;
-            } else {
-                Util::log("valid image size");
             }
         }
 
@@ -158,14 +152,11 @@ class ImageManager
      *
      * @return bool
      */
-    public static function checkStorageDir($log = true)
+    public static function checkStorageDir()
     {
         if (is_dir(self::STORAGE_PATH) && is_writable(self::STORAGE_PATH)) {
             return true;
         } else {
-            if ($log) {
-                Util::log("unable to find storage directory! You must manually create the directory.");
-            }
             return false;
         }
     }
@@ -178,14 +169,14 @@ class ImageManager
      */
     private function validateExtension($url)
     {
-        $parts = explode('/', $url);
-        $filename = array_pop($parts);
-
         // Valid file extensions.
-        $validExtensions = array('.jpg', '.jpeg', '.png', '.gif');
+        $validExtensions = array('jpg', 'jpeg', 'png', 'gif');
+
+        // Make sure to strip query parameters from the url.
+        $path = parse_url($url, PHP_URL_PATH);
 
         // Get current file extension
-        $extension = (strpos($filename, '.') !== false) ? strrchr($filename, '.') : '';
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
 
         if (in_array(strtolower($extension), $validExtensions, true)) {
             return true;

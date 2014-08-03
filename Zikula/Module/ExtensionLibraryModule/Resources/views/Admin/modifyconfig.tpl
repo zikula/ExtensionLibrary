@@ -21,6 +21,13 @@
                     <div class="alert alert-warning">{gt text='The GitHub client does not have push access to the core repository. Auto-loading Jenkins Build Assets into GitHub Core releases has been disabled.'}</div>
                 {/if}
                 <div class="form-group">
+                    <label class="col-lg-3 control-label" for="settings_github_core_repo">{gt text="Core repository"}</label>
+                    <div class="col-lg-9">
+                        <input id="settings_github_core_repo" type="text" class="form-control" name="settings[github_core_repo]" value="{$settings.github_core_repo|default:''|safetext}" maxlength="100" />
+                        <p class="help-block">{gt text='Fill in the name of the core repository. This should always be "zikula/core"'}</p>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="col-lg-3 control-label" for="settings_github_token">{gt text="Access Token"}</label>
                     <div class="col-lg-9">
                         <input id="settings_github_token" type="password" class="form-control" name="settings[github_token]" value="{$settings.github_token|default:''|safetext}" maxlength="100" autocomplete="off" />
@@ -35,10 +42,17 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-lg-3 control-label" for="settings_github_core_repo">{gt text="Core repository"}</label>
+                    <label class="col-lg-3 control-label" for="settings_github_app_id">{gt text="Application Client ID"}</label>
                     <div class="col-lg-9">
-                        <input id="settings_github_core_repo" type="text" class="form-control" name="settings[github_core_repo]" value="{$settings.github_core_repo|default:''|safetext}" maxlength="100" />
-                        <p class="help-block">{gt text='Fill in the name of the core repository. This should always be "zikula/core"'}</p>
+                        <input id="settings_github_app_id" type="text" class="form-control" name="settings[github_app_id]" value="{$settings.github_app_id|default:''|safetext}" maxlength="100" />
+                        <p class="help-block">{gt text='Create an application at %s to ease the process of adding a module to the Extension Library for new users.' tag1='<a href="https://github.com/settings/applications">https://github.com/settings/applications</a>'}</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label" for="settings_github_app_secret">{gt text="Application Client Secret"}</label>
+                    <div class="col-lg-9">
+                        <input id="settings_github_app_secret" type="password" class="form-control" name="settings[github_app_secret]" value="{$settings.github_app_secret|default:''|safetext}" maxlength="100" autocomplete="off" />
+                        <p class="help-block">{gt text='Create an application at %s to ease the process of adding a module to the Extension Library for new users.' tag1='<a href="https://github.com/settings/applications">https://github.com/settings/applications</a>'}</p>
                     </div>
                 </div>
             </fieldset>
