@@ -332,11 +332,11 @@ class WebHookController extends \Zikula_AbstractController
                 $code = $e->getCode();
                 break;
             case $e instanceof ServerException:
-                $text = "Something went wrong at our server. Please report this issue.({$e->getMessage()})";
+                $text = "Something went wrong at our server. Please report this issue.\n\n{$e->getMessage()}\n{$e->getTraceAsString()}";
                 $code = $e->getCode();
                 break;
             default:
-                $text = "Something unexpected happend. Please report this issue.";
+                $text = "Something unexpected happend. Please report this issue.\n\n{$e->getMessage()}\n{$e->getTraceAsString()}";
                 $code = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
 
