@@ -267,7 +267,9 @@ class ReleaseManager
     private function reloadReleasesFromJenkins()
     {
         $oldJenkinsBuilds = $this->em->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('state' => CoreReleaseEntity::STATE_DEVELOPMENT));
+        $oldJenkinsBuildIds = array();
         foreach ($oldJenkinsBuilds as $oldJenkinsBuild) {
+            $oldJenkinsBuildIds[] = $oldJenkinsBuild->getId();
             $this->em->remove($oldJenkinsBuild);
         }
         $this->em->flush();
@@ -337,7 +339,9 @@ class ReleaseManager
 
             $this->em->persist($jenkinsBuild);
 
-            $this->notifyBuildAdded($build);
+            if (!in_array($jenkinsBuild->getId(), $oldJenkinsBuildIds)) {
+                $this->notifyBuildAdded($build);
+            }
         }
 
         $this->em->flush();
