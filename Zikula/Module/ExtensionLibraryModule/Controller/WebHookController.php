@@ -163,7 +163,7 @@ class WebHookController extends \Zikula_AbstractController
                 $version = new ExtensionVersionEntity(
                     $extension,
                     $semver,
-                    $manifestContent->version->compatibility,
+                    $manifestContent->version->dependencies,
                     $composerContent->license
                 );
                 $this->entityManager->persist($version);
