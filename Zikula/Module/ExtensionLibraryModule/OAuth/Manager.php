@@ -127,7 +127,7 @@ class Manager
         $r = new \ReflectionClass($service);
         $r = $r->getProperty('scopes');
         $r->setAccessible(true);
-        $r->setValue($service, array('write:repo_hook', 'read:org'));
+        $r->setValue($service, array('admin:repo_hook', 'read:org'));
 
         return $service;
     }
