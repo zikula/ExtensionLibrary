@@ -405,8 +405,7 @@ class UserController extends \Zikula_AbstractController
             return $this->response($this->view->fetch('User/addextension2.tpl'));
         }
 
-        list(, $repo) = explode('/', $extension['repository']);
-        if (!in_array($repo, $userRepositoriesWithPushAccess)) {
+        if (!in_array($extension['repository'], $userRepositoriesWithPushAccess)) {
             // The user tried to select a repository he has no push access to.
             throw new NotFoundHttpException();
         }
