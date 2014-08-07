@@ -246,9 +246,8 @@ class WebHookController extends \Zikula_AbstractController
             return new PlainResponse('"X-Github-Event" header is missing!', Response::HTTP_BAD_REQUEST);
         }
         $useragent = $request->headers->get('User-Agent');
-        // @todo Removed second allowed user agent. This is until GitHub fixed their api.
-        if (strpos($useragent, 'GitHub Hookshot') !== 0 && strpos($useragent, 'GitHub-Hookshot') !== 0) {
-            // User agent does not match "GitHub Hookshot*"
+        if (strpos($useragent, 'GitHub-Hookshot/') !== 0) {
+            // User agent does not match "GitHub-Hookshot/*"
             return new PlainResponse('User-Agent not allowed!', Response::HTTP_BAD_REQUEST);
         }
 
