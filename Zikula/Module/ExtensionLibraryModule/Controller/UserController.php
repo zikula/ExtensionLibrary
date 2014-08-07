@@ -364,7 +364,7 @@ class UserController extends \Zikula_AbstractController
     {
         $oAuthManager = $this->get('zikulaextensionlibrarymodule.oauthmanager');
         $elGitHubClient = Util::getGitHubClient(false);
-        $result = $oAuthManager->authenticate();
+        $result = $oAuthManager->authenticate($this->router->generate('zikulaextensionlibrarymodule_user_addextension', array(), RouterInterface::ABSOLUTE_URL));
         if ($result === false || $elGitHubClient === false) {
             return new RedirectResponse($this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile', array ('file' => 'webhook'), RouterInterface::ABSOLUTE_URL));
         } else if ($result instanceof RedirectResponse) {

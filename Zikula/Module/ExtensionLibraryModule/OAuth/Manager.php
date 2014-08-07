@@ -57,13 +57,15 @@ class Manager
     /**
      * Authenticate a user via GitHub's OAuth process.
      *
+     * @param  string $redirectUrl                The url to redirect the user to after successful authentication.
+     *
      * @return bool|RedirectResponse|GitHubClient Returns false on fatal error, a RedirectResponse to authenticate at
      *                                            GitHub if appropriate or an authenticated GitHubClient if everything
      *                                            went ok.
      */
-    public function authenticate()
+    public function authenticate($redirectUrl)
     {
-        $oAuthService = $this->getOAuthService();
+        $oAuthService = $this->getOAuthService($redirectUrl);
         if (!$oAuthService) {
             return false;
         }
@@ -98,9 +100,11 @@ class Manager
     /**
      * Get an authenticated GitHub OAuth service.
      *
+     * @param  string $redirectUrl The url to redirect the user to after successful authentication.
+     *
      * @return bool|GitHubService
      */
-    private function getOAuthService()
+    private function getOAuthService($redirectUrl)
     {
         $appId = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'github_app_id', '');
         $appSecret = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'github_app_secret', '');
@@ -112,7 +116,7 @@ class Manager
         $credentials = new Credentials(
             $appId,
             $appSecret,
-            $this->router->generate('zikulaextensionlibrarymodule_user_addextension', array(), RouterInterface::ABSOLUTE_URL)
+            $redirectUrl
         );
         // Session storage
         $storage = new TokenStorage($this->em, $this->request->getSession());
