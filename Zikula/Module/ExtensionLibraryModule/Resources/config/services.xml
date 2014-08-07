@@ -16,10 +16,11 @@
             <argument type="service" id="router" />
         </service>
         <service id="zikulaextensionlibrarymodule.repositorymanager" scope="prototype" class="%zikulaextensionlibrarymodule.repositorymanager.class%" />
-        <service id="zikulaextensionlibrarymodule.oauthmanager" class="%zikulaextensionlibrarymodule.oauthmanager.class%">
+        <service id="zikulaextensionlibrarymodule.oauthmanager" scope="prototype" class="%zikulaextensionlibrarymodule.oauthmanager.class%">
             <argument type="service" id="request_stack" />
             <argument type="service" id="router" />
             <argument type="service" id="doctrine.entitymanager" />
+            <argument type="service" id="zikulaextensionlibrarymodule.repositorymanager" />
         </service>
     </services>
 </container>

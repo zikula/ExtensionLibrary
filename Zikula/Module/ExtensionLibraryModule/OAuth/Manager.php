@@ -25,6 +25,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Github\Client as GitHubClient;
+use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
+use Zikula\Module\ExtensionLibraryModule\Manager\RepositoryManager;
 
 class Manager
 {
@@ -43,7 +45,12 @@ class Manager
      */
     private $em;
 
-    public function __construct(RequestStack $requestStack, RouterInterface $router, EntityManagerInterface $em)
+    /**
+     * @var \Zikula\Module\ExtensionLibraryModule\Manager\RepositoryManager
+     */
+    private $repositoryManager;
+
+    public function __construct(RequestStack $requestStack, RouterInterface $router, EntityManagerInterface $em, RepositoryManager $repositoryManager)
     {
         $request = $requestStack->getCurrentRequest();
         if (is_null($request)) {
@@ -52,6 +59,7 @@ class Manager
         $this->request = $request;
         $this->router = $router;
         $this->em = $em;
+        $this->repositoryManager = $repositoryManager;
     }
 
     /**
@@ -95,6 +103,31 @@ class Manager
         }
 
         return $userGitHubClient;
+    }
+
+    /**
+     * Checks if the currently authenticated user has push access to a specific repository. If the user is not authenticated
+     * via GitHub's OAuth yet, no attempt will be made to authenticate him.
+     *
+     * @param ExtensionEntity $extensionEntity
+     *
+     * @return bool
+     */
+    public function hasPushAccess(ExtensionEntity $extensionEntity)
+    {
+        $userGitHubClient = $this->authenticate($this->router->generate('zikulaextensionlibrarymodule_user_index', array(), RouterInterface::ABSOLUTE_URL));
+        if (!$userGitHubClient instanceof GitHubClient) {
+            return false;
+        }
+
+        $this->repositoryManager->setGitHubClient($userGitHubClient);
+        $userRepositoriesWithPushAccess = array_column($this->repositoryManager->getRepositoriesWithPushAccess(), 'full_name');
+
+        if (in_array("{$extensionEntity->getVendor()->getOwner()}/{$extensionEntity->getName()}", $userRepositoriesWithPushAccess)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

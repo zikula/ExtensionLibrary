@@ -18,6 +18,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method; // used in annotati
 use Zikula\Core\Response\Ajax\AjaxResponse;
 use Zikula\Core\Response\Ajax\BadDataResponse;
 use ModUtil;
+use Zikula\Core\Response\Ajax\ForbiddenResponse;
 
 /**
  * @Route("/ajax")
@@ -90,6 +91,14 @@ class AjaxController extends \Zikula_Controller_AbstractAjax
         $version = $this->entityManager
             ->getRepository('ZikulaExtensionLibraryModule:ExtensionVersionEntity')
             ->findOneBy(array('extension' => $extid, 'semver' => $version));
+
+        $oAuthManager = $this->get('zikulaextensionlibrarymodule.oauthmanager');
+        $hasPushAccess = $oAuthManager->hasPushAccess($version->getExtension());
+        if (!\SecurityUtil::checkPermission('ZikulaExtensionLibraryModule::', '.*', ACCESS_ADMIN) && !$hasPushAccess) {
+            return new ForbiddenResponse(\LogUtil::getErrorMsgPermission());
+        }
+
+
         $version->setStatus($checked);
         $this->entityManager->flush();
 

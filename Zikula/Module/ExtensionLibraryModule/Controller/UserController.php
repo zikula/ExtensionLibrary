@@ -96,14 +96,28 @@ class UserController extends \Zikula_AbstractController
      *
      * @return Response
      */
-    public function displayAction(ExtensionEntity $extensionEntity)
+    public function displayAction(ExtensionEntity $extensionEntity, Request $request)
     {
         if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_READ)) {
             throw new AccessDeniedException();
         }
 
+        $oAuthManager = $this->get('zikulaextensionlibrarymodule.oauthmanager');
+        $hasPushAccess = $oAuthManager->hasPushAccess($extensionEntity);
+        if (!$hasPushAccess && $request->query->filter('authenticate', false, false, FILTER_VALIDATE_BOOLEAN)) {
+            $result = $oAuthManager->authenticate($this->get('router')->generate('zikulaextensionlibrarymodule_user_display', array ('extension_slug' => $extensionEntity->getTitleSlug(), 'authenticate' => true), RouterInterface::ABSOLUTE_URL));
+            if ($result instanceof RedirectResponse) {
+                return $result;
+            } else if ($result instanceof GitHubClient) {
+                $hasPushAccess = $oAuthManager->hasPushAccess($extensionEntity);
+            } else {
+                throw new \RuntimeException('Something went wrong!');
+            }
+        }
+
+        $this->view->assign('isExtensionAdmin', $hasPushAccess);
         $this->view->assign('extension', $extensionEntity);
-        $this->view->assign('gravatarDefaultPath', $this->request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
+        $this->view->assign('gravatarDefaultPath', $request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
         $this->view->assign('breadcrumbs', array(
             array(
                 'title' => $extensionEntity->getVendor()->getTitle(),

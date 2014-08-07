@@ -1,5 +1,6 @@
 {pageaddvar name='javascript' value=$moduleBundle->getRelativePath()|cat:'/Resources/public/js/Zikula.ExtensionLibrary.User.Display.js'}
 {include file='User/header.tpl' icon=$extension.icon}
+{checkpermission component=$module|cat:"::" instance=".*" level="ACCESS_ADMIN" assign='isZikulaAdmin'}
 
 <div class="row">
     <div class="col-md-8">
@@ -41,9 +42,11 @@
 <ul class="nav nav-tabs row">
     <li class="active"><a href="#versions" data-toggle="tab"><i class="fa fa-bars"></i> {gt text="Available Versions"}</a></li>
     <li><a href="#community" data-toggle="tab"><i class="fa fa-comments"></i> {gt text="Community Feedback"}</a></li>
-    {checkpermissionblock component=$module|cat:"::" instance=".*" level="ACCESS_ADMIN"}
+    {if $isZikulaAdmin || $isExtensionAdmin}
         <li><a href="#admin" data-toggle="tab"><i class="fa fa-wrench"></i> {gt text="Administrate"}</a></li>
-    {/checkpermissionblock}
+    {else}
+        <li><a href="{route name='zikulaextensionlibrarymodule_user_display' extension_slug=$extension.titleSlug authenticate=true}"><i class="fa fa-github"></i> {gt text="Login with GitHub to administrate"}</a></li>
+    {/if}
 </ul>
 
 <div class="tab-content">
@@ -113,7 +116,7 @@
             {notifydisplayhooks eventname='el.ui_hooks.community.display_view' id=$extension.id}
         </div>
     </div>
-    {checkpermissionblock component=$module|cat:"::" instance=".*" level="ACCESS_ADMIN"}
+    {if $isZikulaAdmin || $isExtensionAdmin}
         <div class="tab-pane row" id="admin">
             <h3>{gt text="Administration"}</h3>
             <form role="form">
@@ -136,7 +139,7 @@
                 </table>
             </form>
         </div>
-    {/checkpermissionblock}
+    {/if}
 </div>
 
 
