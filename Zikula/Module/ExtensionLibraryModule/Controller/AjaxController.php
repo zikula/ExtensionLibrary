@@ -17,6 +17,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotatio
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method; // used in annotations - do not remove
 use Zikula\Core\Response\Ajax\AjaxResponse;
 use Zikula\Core\Response\Ajax\BadDataResponse;
+use Zikula\Core\Response\Ajax\FatalResponse;
 use ModUtil;
 use Zikula\Core\Response\Ajax\ForbiddenResponse;
 
@@ -92,16 +93,51 @@ class AjaxController extends \Zikula_Controller_AbstractAjax
             ->getRepository('ZikulaExtensionLibraryModule:ExtensionVersionEntity')
             ->findOneBy(array('extension' => $extid, 'semver' => $version));
 
-        $oAuthManager = $this->get('zikulaextensionlibrarymodule.oauthmanager');
-        $hasPushAccess = $oAuthManager->hasPushAccess($version->getExtension());
-        if (!\SecurityUtil::checkPermission('ZikulaExtensionLibraryModule::', '.*', ACCESS_ADMIN) && !$hasPushAccess) {
+        if (!\SecurityUtil::checkPermission('ZikulaExtensionLibraryModule::', '.*', ACCESS_ADMIN)) {
             return new ForbiddenResponse(\LogUtil::getErrorMsgPermission());
         }
-
 
         $version->setStatus($checked);
         $this->entityManager->flush();
 
         return new AjaxResponse(array('status' => $version->getStatus()));
     }
+
+    /**
+     * @Route("/deleteVersion", options={"expose"=true})
+     * @Method("POST")
+     *
+     * delete a version
+     *
+     * @return AjaxResponse
+     */
+    public function deleteVersion()
+    {
+        $this->checkAjaxToken();
+        $extid = $this->request->request->get('extid');
+        $version = $this->request->request->get('version');
+        if (empty($extid) || empty($version)) {
+            return new BadDataResponse();
+        }
+
+        $version = $this->entityManager
+            ->getRepository('ZikulaExtensionLibraryModule:ExtensionVersionEntity')
+            ->findOneBy(array('extension' => $extid, 'semver' => $version));
+
+        $oAuthManager = $this->get('zikulaextensionlibrarymodule.oauthmanager');
+        $hasPushAccess = $oAuthManager->hasPushAccess($version->getExtension());
+        if (!\SecurityUtil::checkPermission('ZikulaExtensionLibraryModule::', '.*', ACCESS_ADMIN) && !$hasPushAccess) {
+            return new ForbiddenResponse(\LogUtil::getErrorMsgPermission());
+        }
+
+        try {
+            $this->entityManager->remove($version);
+            $this->entityManager->flush();
+        } catch (\Exception $e) {
+            return new FatalResponse('Could not remove version: ' . $e->getMessage());
+        }
+
+        return new AjaxResponse(array('status' => 1));
+    }
+
 }

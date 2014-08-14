@@ -122,19 +122,32 @@
             <form role="form">
                 <input type="hidden" name="csrftoken" value="{insert name='csrftoken'}" />
                 <table class="table table-bordered">
-                    <thead><tr><th>{gt text="Version"}</th><th>{gt text="Verified"}</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>{gt text="Version"}</th>
+                            {if $isZikulaAdmin}<th>{gt text="Verified"}</th>{/if}
+                            <th>{gt text="Remove"}</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                    {foreach from=$extension.versions item="version" name="versionLoop2"}
-                    <tr class="{if $version.verified}success{else}warning{/if}">
-                        <td>{$version.semver}</td>
-                        <td>
-                            <div class="checkbox">
-                                <label><input data-version="{$version.semver}" data-extid="{$extension.id}" class="verify" type="checkbox" {if $version.verified}checked="checked"{/if}></label>
-                                <i class="fa fa-cog fa-spin text-danger" style="display: none;"></i>
-                            </div>
-                        </td>
-                    </tr>
-                    {/foreach}
+                        {foreach from=$extension.versions item="version" name="versionLoop2"}
+                        <tr id="{$version.semver}" class="{if $version.verified}success{else}warning{/if}">
+                            <td>{$version.semver}</td>
+                            {if $isZikulaAdmin}
+                            <td>
+                                <div class="verify-checkbox">
+                                    <label><input data-version="{$version.semver}" data-extid="{$extension.id}" class="verify" type="checkbox" {if $version.verified}checked="checked"{/if}></label>
+                                    <i class="fa fa-cog fa-spin text-danger" style="display: none;"></i>
+                                </div>
+                            </td>
+                            {/if}
+                            <td>
+                                <a class='deleteversion' data-version="{$version.semver}" data-extid="{$extension.id}" data-title="{$extension.title|safetext}" href="" data-target="#deleteVersionModal" data-toggle="modal">
+                                    <i class="fa fa-trash-o fa-lg text-danger"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {/foreach}
                     </tbody>
                 </table>
             </form>
@@ -144,7 +157,7 @@
 
 
 {include file='User/footer.tpl'}
-<!-- Modal -->
+<!-- Contributors Modal -->
 <div class="modal fade" id="contributorsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -153,6 +166,28 @@
                 <h4 class="modal-title" id="myModalLabel">{gt text="Contributors"}</h4>
             </div>
             <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Delete Version Modal -->
+<div class="modal fade" id="deleteVersionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">{gt text="Delete Version"}</h4>
+            </div>
+            <div class="modal-body">
+                <p class="alert alert-danger">
+                    {gt text="Deleting a version of this extension will <em>permenently remove it from the database</em>. Once removed, it <em>cannot be replaced</em> unless it is the most recent version!"}
+                </p>
+                <h4>{gt text="Delete version %s of extension %s?" tag1="<strong id='version-tag'>1</strong>" tag2="<strong id='extension-title-tag'>name</strong>"}</h4>
+                <h3 class="text-center text-danger"><strong class="text-uppercase">{gt text="This is not recommended!"}</strong></h3>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal"><i class='fa fa-times'></i> {gt text="Cancel"}</button>
+                <button id='deleteVersionButton' data-version="" data-extid="" type="button" class="btn btn-danger"><i id="deleteVersionIcon" class='fa fa-trash-o'></i> {gt text="Delete version"}</button>
             </div>
         </div>
     </div>

@@ -26,15 +26,16 @@ jQuery(document).ready(function() {
      * update the database to reflect admin choice to verify/unverify a version
      */
     jQuery('.verify').change(function() {
-        var spinner = jQuery(this).parents('.checkbox').children('i');
+        var spinner = jQuery(this).parents('.verify-checkbox').children('i');
         spinner.fadeIn();
-        var parentRow = jQuery(this).parents("tr");
+        var versionData = jQuery(this).data();
+        var parentRow = jQuery(jq(versionData.version));
         jQuery.ajax({
             type: "POST",
             data: {
                 checked: jQuery(this).prop("checked") ? 1 : 0,
-                extid: jQuery(this).data("extid"),
-                version: jQuery(this).data("version")
+                extid: versionData.extid,
+                version: versionData.version
             },
             url: Routing.generate('zikulaextensionlibrarymodule_ajax_setversionstatus'),
             success: function(result) {
@@ -53,7 +54,59 @@ jQuery(document).ready(function() {
     });
 
     /**
+     * update modal data values on open
+     */
+    jQuery('#deleteVersionModal').on('show.bs.modal', function (e) {
+        var extData = jQuery(e.relatedTarget).data();
+        jQuery(this).find("#deleteVersionButton").data({
+                version: extData.version,
+                extid: extData.extid
+            });
+        jQuery(this).find('#version-tag').text(extData.version)
+        jQuery(this).find('#extension-title-tag').text(extData.title);
+    });
+
+    /**
+     * process delete version function on button click
+     */
+    jQuery('#deleteVersionButton').click(function() {
+        var icon = jQuery('#deleteVersionIcon');
+        icon.addClass('fa-spin');
+        var extData = jQuery(this).data();
+        jQuery.ajax({
+            type: "POST",
+            data: extData,
+            url: Routing.generate('zikulaextensionlibrarymodule_ajax_deleteversion'),
+            success: function(result) {
+                icon.removeClass(function() {
+                    if (result.data.status == 1) {
+                        return "fa-spin";
+                    }
+                    return "";
+                });
+                jQuery('#deleteVersionModal').modal('hide');
+                jQuery(jq(extData.version)).fadeOut();
+            },
+            error: function(result) {
+                alert(result.responseJSON.core.statusmsg);
+            }
+        });
+
+    });
+
+    /**
      * enable tooltips
      */
     jQuery('.tooltips').tooltip();
+
+    /**
+     * escape disallowed characters in an id name and add `#` to beginning
+     *
+     * @see http://learn.jquery.com/using-jquery-core/faq/how-do-i-select-an-element-by-an-id-that-has-characters-used-in-css-notation/
+     * @param myid
+     * @returns {string}
+     */
+    function jq( myid ) {
+        return "#" + myid.replace( /(:|\.|\[|\])/g, "\\$1" );
+    }
 });
