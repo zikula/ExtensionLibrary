@@ -67,9 +67,9 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="el-add-extension-extension-coreCompatability" class="col-sm-2 control-label">{gt text='Core compatability'}<span class="z-form-mandatory-flag">*</span></label>
+            <label for="el-add-extension-extension-coreCompatibility" class="col-sm-2 control-label">{gt text='Core compatability'}<span class="z-form-mandatory-flag">*</span></label>
             <div class="col-sm-10">
-                <input required type="text" name="extension[coreCompatability]" id="el-add-extension-extension-coreCompatability" class="form-control" value=">=1.3.5 <1.5"/>
+                <input required type="text" name="extension[coreCompatibility]" id="el-add-extension-extension-coreCompatibility" class="form-control" value=">=1.3.5 <1.5"/>
                 <span class="help-block">{gt text='A string defining Zikula Core version compatibility. Example: %s.' tag1='<code>>=1.3.5 <1.5</code>'}</span>
             </div>
         </div>

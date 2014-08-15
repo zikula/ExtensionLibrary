@@ -531,7 +531,7 @@ class UserController extends \Zikula_AbstractController
                 $versionArr['keywords'] = array_map("trim", explode(',', $extension['keywords']));
             }
             $versionArr['semver'] = $extension['version'];
-            $versionArr['dependencies']['zikula/core'] = $extension['coreCompatability'];
+            $versionArr['dependencies']['zikula/core'] = $extension['coreCompatibility'];
             $versionArr['composerpath'] = 'composer.json';
             $versionArr['description'] = $extension['description'];
             $versionArr['urls']['issues'] = $userRepository['html_url'] . "/issues";
