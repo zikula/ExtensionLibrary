@@ -15,7 +15,7 @@
         <div class="form-group">
             <label for="el-add-extension-vendor-displayName" class="col-sm-2 control-label">{gt text='Display name'}<span class="z-form-mandatory-flag">*</span></label>
             <div class="col-sm-10">
-                <input type="text" name="vendor[displayName]" value="{$vendor.name|safetext}" id="el-add-extension-vendor-displayName" placeholder="{gt text='e.g. Acme Corporation, Peter Smith'}" class="form-control">
+                <input required type="text" name="vendor[displayName]" value="{$vendor.name|safetext}" id="el-add-extension-vendor-displayName" placeholder="{gt text='e.g. Acme Corporation, Peter Smith'}" class="form-control">
                 <span class="help-block">{gt text='The display title of your vendor. This will be used for the page title and top-level heading on your vendor\'s page. Include spaces and mixed case as desired.'}</span>
             </div>
         </div>

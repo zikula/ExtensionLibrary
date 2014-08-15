@@ -435,6 +435,7 @@ class UserController extends \Zikula_AbstractController
         // @TODO validate actual semver? validate license acronym?
         if ($this->request->getSession()->getFlashBag()->has('error')) {
             $request->request->remove('extension');
+            // @TODO is there a way to make this redirect to the second step instead of the first?
             return $this->addExtensionAction($request); // @TODO not sure this is proper... maybe a redirect instead
         }
 
