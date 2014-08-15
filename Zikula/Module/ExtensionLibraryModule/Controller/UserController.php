@@ -411,12 +411,31 @@ class UserController extends \Zikula_AbstractController
 
             return $this->response($this->view->fetch('User/addextension.tpl'));
         } else if (empty($extension['name'])) {
+            // validate step one parameters
+            if (empty($vendor['displayName'])) {
+                $this->request->getSession()->getFlashBag()->set('error', $this->__f('%s is required', '<code>Vendor display name</code>'));
+                $request->request->remove('extension');
+                return $this->addExtensionAction($request); // @TODO not sure this is proper... maybe a redirect instead
+            }
+
             list($owner, $repo) = explode('/', $extension['repository']);
             $repo = $userGitHubClient->api('repo')->show($owner, $repo);
             $this->view->assign('repo',  $repo);
             $this->view->assign('vendor', $request->get('vendor'));
 
             return $this->response($this->view->fetch('User/addextension2.tpl'));
+        }
+        // validate step two parameters
+        $requiredParams = array('name', 'version', 'description', 'license', 'coreCompatibility');
+        foreach ($requiredParams as $requiredParam) {
+            if (empty($extension[$requiredParam])) {
+                $this->request->getSession()->getFlashBag()->set('error', $this->__f('%s is required', '<code>'.$requiredParam.'</code>'));
+            }
+        }
+        // @TODO validate actual semver? validate license acronym?
+        if ($this->request->getSession()->getFlashBag()->has('error')) {
+            $request->request->remove('extension');
+            return $this->addExtensionAction($request); // @TODO not sure this is proper... maybe a redirect instead
         }
 
         if (!in_array($extension['repository'], $userRepositoriesWithPushAccess)) {
@@ -437,20 +456,26 @@ class UserController extends \Zikula_AbstractController
             $webHook = false;
         }
 
+        // fork repository to zikulabot
         $forkedRepository = $elRepositoryManager->forkRepository($userRepository);
 
+        // create branch
         $defaultBranch = $forkedRepository['default_branch'];
         $prBranch = 'extension-library';
         $elRepositoryManager->addBranch($forkedRepository, $defaultBranch, $prBranch);
 
+        // search for current composer.json file in original repo
+        // @TODO currently only searches at repo root for composer file. This MUST change to allow for PSR-0
         $currentComposerFile = $elRepositoryManager->getFileInRepository($userRepository, $defaultBranch, 'composer.json');
         if ($currentComposerFile !== false) {
             $this->request->getSession()->getFlashBag()->set('error', $this->__('It seems like there already is a composer.json file in your repository. Sorry, we do not support updating composer files yet. Please follow the instructions below.'));
 
             return new RedirectResponse(System::normalizeUrl($this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile')));
         }
+        // ensure composer file also not in forked repo
         $forkedComposerFile = $elRepositoryManager->getFileInRepository($forkedRepository, $prBranch, 'composer.json');
         if ($forkedComposerFile === false) {
+            // create and write composer file
             $author = array(
                 "name" => $vendor['name'],
                 "role" => "owner"
@@ -462,6 +487,7 @@ class UserController extends \Zikula_AbstractController
                 $author["email"] = $vendor['email'];
             }
             list($vendorPrefix) = explode('/', $extension['repository']);
+            // @TODO must add the `extra` field here for namespaced modules.
             $content = json_encode(array(
                 "name" => "$vendorPrefix/{$extension['name']}-" . strtolower(substr($extension['type'], strlen('zikula-'))),
                 "description" => $extension['description'],
@@ -470,17 +496,22 @@ class UserController extends \Zikula_AbstractController
                 "authors" => array ($author),
                 "require" => array ("php" => ">5.3.3")
             ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            // place composer.json in root of repo
+            // @TODO need to place in proper location for PSR-0
             $elRepositoryManager->createFileInRepository($forkedRepository, $prBranch, 'composer.json', $content);
         }
 
+        // search for existing zikula.manifest.json file in original repo
         $currentManifestFile = $elRepositoryManager->getFileInRepository($userRepository, $defaultBranch, 'zikula.manifest.json');
         if ($currentManifestFile !== false) {
-            $this->request->getSession()->getFlashBag()->set('error', $this->__('It seems like there already is a composer.json file in your repository. Sorry, we do not support updating composer files yet. Please follow the instructions below.'));
+            $this->request->getSession()->getFlashBag()->set('error', $this->__('It seems like there already is a zikula.manifest.json file in your repository. Sorry, we do not support updating manifest files yet. Please follow the instructions below.'));
 
             return new RedirectResponse(System::normalizeUrl($this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile')));
         }
+        // ensure zikula.manifest file also not in forked repo
         $forkedManifestFile = $elRepositoryManager->getFileInRepository($forkedRepository, $prBranch, 'zikula.manifest.json');
         if ($forkedManifestFile === false) {
+            // create and write zikula.manifest file
             $vendorArr = array("title" => $vendor['displayName']);
             if (!empty($vendor['url'])) {
                 $vendorArr["url"] = $vendor['url'];
@@ -499,7 +530,7 @@ class UserController extends \Zikula_AbstractController
             if (!empty($extension['keywords'])) {
                 $versionArr['keywords'] = array_map("trim", explode(',', $extension['keywords']));
             }
-            $versionArr['semver'] = '1.0.0'; // @todo Do something about this.
+            $versionArr['semver'] = '1.0.0'; // @TODO Do something about this.
             $versionArr['dependencies']['zikula/core'] = $extension['coreCompatability'];
             $versionArr['composerpath'] = 'composer.json';
             $versionArr['description'] = $extension['description'];
@@ -511,10 +542,12 @@ class UserController extends \Zikula_AbstractController
                 "extension" => $extensionArr,
                 "version" => $versionArr
             ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            // place zikula.manifest file in root of repo
             $elRepositoryManager->createFileInRepository($forkedRepository, $prBranch, 'zikula.manifest.json', $content);
         }
 
-
+        // @TODO check for success of other operations before creating PR?
+        // create Pull Request
         $title = "Add this extension to the Zikula Extension Library";
         $elLink = $this->get('router')->generate('zikulaextensionlibrarymodule_user_index', array(), RouterInterface::ABSOLUTE_URL);
         $elRepoLink = 'https://github.com/craigh/ExtensionLibrary/issues/new';
@@ -524,7 +557,7 @@ class UserController extends \Zikula_AbstractController
 
 You requested to add this extension to the [Zikula Extension Library]($elLink) :star:. You're just two clicks away from there:
 1. Merge this PR!
-2. Add a new Tag (either using the git command line, your favourite git client or the [GitHub online interface]($ghReleasesUrl))!
+2. Add a new Tag as version {$versionArr['semver']} (either using the git command line, your favourite git client or the [GitHub online interface]($ghReleasesUrl))!
 
 In case something doesn't work as expected, feel free to open an issue in the [Extension Library repository]($elRepoLink)!
 EOF;
