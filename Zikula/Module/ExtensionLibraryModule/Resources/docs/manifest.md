@@ -129,7 +129,7 @@ tree won't be affected.
 
 ### <a name="version-dependencies-core"></a>Core dependency (required)
 
-A property defining Zikula Core version compatibility. **Important: All modules using legacy core technologies, i.e.
+A string defining Zikula Core version compatibility. **Important: All modules using legacy core technologies, i.e.
 Smarty, DBUtil, Doctrine1, the Forms Framework and many more, MUST specifiy `<1.5` in their core compatability.**
 Example: `"zikula/core": ">=1.3.5 <1.5"`. See [Specifying Versions](#versions).
 
