@@ -530,7 +530,7 @@ class UserController extends \Zikula_AbstractController
             if (!empty($extension['keywords'])) {
                 $versionArr['keywords'] = array_map("trim", explode(',', $extension['keywords']));
             }
-            $versionArr['semver'] = '1.0.0'; // @TODO Do something about this.
+            $versionArr['semver'] = $extension['version'];
             $versionArr['dependencies']['zikula/core'] = $extension['coreCompatability'];
             $versionArr['composerpath'] = 'composer.json';
             $versionArr['description'] = $extension['description'];
