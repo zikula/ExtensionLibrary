@@ -22,7 +22,7 @@
         <div class="form-group">
             <label for="el-add-extension-vendor-url" class="col-sm-2 control-label">{gt text='Homepage'}</label>
             <div class="col-sm-10">
-                <input type="url" name="vendor[url]" value="{$vendor.blog|safetext}" id="el-add-extension-vendor-url" class="form-control" placeholder="{gt text='e.g. http://example.com'}">
+                <input type="url" name="vendor[url]" value="{$vendor.html_url|safetext}" id="el-add-extension-vendor-url" class="form-control" placeholder="{gt text='e.g. http://example.com'}">
                 <span class="help-block">{gt text='The url to the homepage for your self, group or company. A Github page is suitable or any other page as you desire.'}</span>
             </div>
         </div>
