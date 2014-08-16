@@ -14,9 +14,9 @@ jQuery(document).ready(function() {
     function updateInput() {
         var apitype = jQuery('#el-add-extension-extension-apitype').val();
         if (apitype != '1.3') {
-            jQuery('#el-add-extension-extension-namespace-input').show(400);
+            jQuery('#el-add-extension-extension-namespace-input').show(400).find('input').attr('required', '');
         } else {
-            jQuery('#el-add-extension-extension-namespace-input').hide(400);
+            jQuery('#el-add-extension-extension-namespace-input').hide(400).find('input').removeAttr('required');
         }
     }
 });
