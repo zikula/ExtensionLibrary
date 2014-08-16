@@ -433,19 +433,20 @@ class UserController extends \Zikula_AbstractController
             }
         }
         if (($extension['apitype'] != "1.3") && (!strpos($extension['namespace'], "\\"))) {
-            $this->request->getSession()->getFlashBag()->set('error', $this->__f('%1$s is required if %2$s is selected.', array('<code>namespace</code>', '<code>Core 1.4 '. $this->__("compatible") .' namespaced/PSR-4</code>')));
+            $this->request->getSession()->getFlashBag()->set('error', $this->__f('%1$s is required if %2$s is selected.', array('<code>namespace</code>', '<code>Core 1.4 '. $this->__("compatible") .' namespaced/PSR-n</code>')));
         }
+        if (!in_array($extension['repository'], $userRepositoriesWithPushAccess)) {
+            // The user tried to select a repository he has no push access to.
+            $this->request->getSession()->getFlashBag()->set('error', $this->__('You selected a repository for which you do not have push access rights. Please select another.'));
+        }
+
         // @TODO validate actual semver? validate license acronym?
         if ($this->request->getSession()->getFlashBag()->has('error')) {
             $request->request->remove('extension');
             unset($extension['name']);
             $request->request->set('extension', $extension);
+            $request->request->set('vendor', $vendor);
             return $this->addExtensionAction($request);
-        }
-
-        if (!in_array($extension['repository'], $userRepositoriesWithPushAccess)) {
-            // The user tried to select a repository he has no push access to.
-            throw new NotFoundHttpException();
         }
 
         $userRepository = $userRepositoryManager->getRepository($extension['repository']);
