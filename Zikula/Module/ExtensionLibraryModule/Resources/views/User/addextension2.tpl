@@ -6,7 +6,7 @@
 <form class="form-horizontal" role="form" method="post" action="{route name='zikulaextensionlibrarymodule_user_addextension'}">
     <fieldset>
         <input type="hidden" value="{$vendor|@json_encode|safetext}" name="_vendor" />
-        <legend><i class='fa fa-cube'></i> {gt text='About your extension'}</legend>
+        <legend><i class='fa fa-info-circle'></i> {gt text='About your extension'}</legend>
         <div class="form-group">
             <label for="el-add-extension-repository" class="col-sm-2 control-label">{gt text='Repository'}<span class="z-form-mandatory-flag">*</span></label>
             <div class="col-sm-10">
@@ -57,7 +57,7 @@
         </div>
     </fieldset>
     <fieldset>
-        <legend><i class='fa fa-info-circle'></i> {gt text='About this version of your extension'}</legend>
+        <legend><i class='fa fa-cube'></i> {gt text='About this version of your extension'}</legend>
         <div class="form-group">
             <label for="el-add-extension-extension-version" class="col-sm-2 control-label">{gt text='Version'}<span class="z-form-mandatory-flag">*</span></label>
             <div class="col-sm-10">
