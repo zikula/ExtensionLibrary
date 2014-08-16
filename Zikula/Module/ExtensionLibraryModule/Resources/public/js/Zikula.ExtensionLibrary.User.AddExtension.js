@@ -12,7 +12,7 @@ jQuery(document).ready(function() {
      * hide/show the namespace input
      */
     function updateInput() {
-        var apitype = jQuery('#el-add-extension-repository-apitype').val();
+        var apitype = jQuery('#el-add-extension-extension-apitype').val();
         if (apitype != '1.3') {
             jQuery('#el-add-extension-extension-namespace-input').show(400);
         } else {
