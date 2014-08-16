@@ -82,8 +82,8 @@
                                     {if !empty($version.dependencies)}
                                         <li>{gt text="Dependencies"}
                                             <ul>
-                                                {foreach from=$version.dependencies item="dependency"}
-                                                    <li>{$dependency.name} ({$dependency.version})</li>
+                                                {foreach from=$version.dependencies key="entity" item="version"}
+                                                    <li>{$entity} ({$version})</li>
                                                 {/foreach}
                                             </ul>
                                         </li>
