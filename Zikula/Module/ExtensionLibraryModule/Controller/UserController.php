@@ -415,7 +415,7 @@ class UserController extends \Zikula_AbstractController
             if (empty($vendor['displayName'])) {
                 $this->request->getSession()->getFlashBag()->set('error', $this->__f('%s is required', '<code>Vendor display name</code>'));
                 $request->request->remove('extension');
-                return $this->addExtensionAction($request); // @TODO not sure this is proper... maybe a redirect instead
+                return $this->addExtensionAction($request);
             }
 
             list($owner, $repo) = explode('/', $extension['repository']);
@@ -432,11 +432,15 @@ class UserController extends \Zikula_AbstractController
                 $this->request->getSession()->getFlashBag()->set('error', $this->__f('%s is required', '<code>'.$requiredParam.'</code>'));
             }
         }
+        if (($extension['apitype'] != "1.3") && (!strpos($extension['namespace'], "\\"))) {
+            $this->request->getSession()->getFlashBag()->set('error', $this->__f('%1$s is required if %2$s is selected.', array('<code>namespace</code>', '<code>Core 1.4 '. $this->__("compatible") .' namespaced/PSR-4</code>')));
+        }
         // @TODO validate actual semver? validate license acronym?
         if ($this->request->getSession()->getFlashBag()->has('error')) {
             $request->request->remove('extension');
-            // @TODO is there a way to make this redirect to the second step instead of the first?
-            return $this->addExtensionAction($request); // @TODO not sure this is proper... maybe a redirect instead
+            unset($extension['name']);
+            $request->request->set('extension', $extension);
+            return $this->addExtensionAction($request);
         }
 
         if (!in_array($extension['repository'], $userRepositoriesWithPushAccess)) {
@@ -466,15 +470,17 @@ class UserController extends \Zikula_AbstractController
         $elRepositoryManager->addBranch($forkedRepository, $defaultBranch, $prBranch);
 
         // search for current composer.json file in original repo
-        // @TODO currently only searches at repo root for composer file. This MUST change to allow for PSR-0
-        $currentComposerFile = $elRepositoryManager->getFileInRepository($userRepository, $defaultBranch, 'composer.json');
+        $path = strpos($extension['namespace'], "\\") ? str_replace("\\", "/", $extension['namespace']) : '';
+        $composerPath = ($extension['apitype'] != '1.4-0') ? 'composer.json' : $path.'/composer.json';
+        // @TODO enable modification of current composer.json file
+        $currentComposerFile = $elRepositoryManager->getFileInRepository($userRepository, $defaultBranch, $composerPath);
         if ($currentComposerFile !== false) {
             $this->request->getSession()->getFlashBag()->set('error', $this->__('It seems like there already is a composer.json file in your repository. Sorry, we do not support updating composer files yet. Please follow the instructions below.'));
 
             return new RedirectResponse(System::normalizeUrl($this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile')));
         }
         // ensure composer file also not in forked repo
-        $forkedComposerFile = $elRepositoryManager->getFileInRepository($forkedRepository, $prBranch, 'composer.json');
+        $forkedComposerFile = $elRepositoryManager->getFileInRepository($forkedRepository, $prBranch, $composerPath);
         if ($forkedComposerFile === false) {
             // create and write composer file
             $author = array(
@@ -488,18 +494,26 @@ class UserController extends \Zikula_AbstractController
                 $author["email"] = $vendor['email'];
             }
             list($vendorPrefix) = explode('/', $extension['repository']);
-            // @TODO must add the `extra` field here for namespaced modules.
-            $content = json_encode(array(
+            $composerContent = array(
                 "name" => "$vendorPrefix/{$extension['name']}-" . strtolower(substr($extension['type'], strlen('zikula-'))),
                 "description" => $extension['description'],
                 "type" => $extension['type'],
                 "license" => $extension['license'],
                 "authors" => array ($author),
                 "require" => array ("php" => ">5.3.3")
-            ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-            // place composer.json in root of repo
-            // @TODO need to place in proper location for PSR-0
-            $elRepositoryManager->createFileInRepository($forkedRepository, $prBranch, 'composer.json', $content);
+            );
+            // add the `extra` and `autoload` fields for namespaced modules.
+            if ($extension['apitype'] != '1.3') {
+                $psrType = "psr-" . substr($extension['apitype'], -1);
+                $class = str_replace("\\", "\\\\", $extension['namespace']);
+                $classNameParts = explode("\\", $extension['namespace']);
+                $className = array_shift($classNameParts) . array_pop($classNameParts);
+                $composerContent['autoload'] = array($psrType => $class);
+                $composerContent['extra'] = array('zikula' => array('class' => $class . "\\\\" . $className));
+            }
+            $content = json_encode($composerContent, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            // place composer.json in specified path
+            $elRepositoryManager->createFileInRepository($forkedRepository, $prBranch, $composerPath, $content);
         }
 
         // search for existing zikula.manifest.json file in original repo
@@ -533,7 +547,7 @@ class UserController extends \Zikula_AbstractController
             }
             $versionArr['semver'] = $extension['version'];
             $versionArr['dependencies']['zikula/core'] = $extension['coreCompatibility'];
-            $versionArr['composerpath'] = 'composer.json';
+            $versionArr['composerpath'] = $composerPath;
             $versionArr['description'] = $extension['description'];
             $versionArr['urls']['issues'] = $userRepository['html_url'] . "/issues";
 
@@ -547,7 +561,6 @@ class UserController extends \Zikula_AbstractController
             $elRepositoryManager->createFileInRepository($forkedRepository, $prBranch, 'zikula.manifest.json', $content);
         }
 
-        // @TODO check for success of other operations before creating PR?
         // create Pull Request
         $title = "Add this extension to the Zikula Extension Library";
         $elLink = $this->get('router')->generate('zikulaextensionlibrarymodule_user_index', array(), RouterInterface::ABSOLUTE_URL);

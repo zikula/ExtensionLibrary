@@ -5,12 +5,6 @@
 <form class="form-horizontal" role="form" method="post" action="{route name='zikulaextensionlibrarymodule_user_addextension'}">
     <fieldset>
         <legend><i class='fa fa-institution'></i> {gt text='Vendor information'}</legend>
-        {*<div class="form-group">*}
-            {*<label for="el-add-extension-vendor-name" class="col-sm-2 control-label">{gt text='Name'}<span class="z-form-mandatory-flag">*</span></label>*}
-            {*<div class="col-sm-10">*}
-                {*<input required type="text" name="vendor[name]" value="{$vendor.login|safetext}" id="el-add-extension-vendor-name" placeholder="{gt text='e.g. cmfcmf, zikula, craigh, symfony'}" class="form-control">*}
-            {*</div>*}
-        {*</div>*}
         <input type="hidden" name="vendor[name]" value="{$vendor.login|safetext}" />
         <div class="form-group">
             <label for="el-add-extension-vendor-displayName" class="col-sm-2 control-label">{gt text='Display name'}<span class="z-form-mandatory-flag">*</span></label>
@@ -26,13 +20,12 @@
                 <span class="help-block">{gt text='The url to the homepage for your self, group or company. A Github page is suitable or any other page as you desire.'}</span>
             </div>
         </div>
-        {*<div class="form-group">*}
-            {*<label for="el-add-extension-vendor-email" class="col-sm-2 control-label">{gt text='Email'}</label>*}
-            {*<div class="col-sm-10">*}
-                {*<input type="email" name="vendor[email]" value="{$vendor.email|safetext}" id="el-add-extension-vendor-email" class="form-control" placeholder="{gt text='e.g. example@zikula.org'}">*}
-            {*</div>*}
-        {*</div>*}
-        <input type="hidden" name="vendor[email]" value="{$vendor.email|safetext}" />
+        <div class="form-group">
+            <label for="el-add-extension-vendor-email" class="col-sm-2 control-label">{gt text='Email'}</label>
+            <div class="col-sm-10">
+                <input type="email" name="vendor[email]" value="{$vendor.email|safetext}" id="el-add-extension-vendor-email" class="form-control" placeholder="{gt text='e.g. example@zikula.org'}">
+            </div>
+        </div>
         <div class="form-group">
             <label for="el-add-extension-vendor-logo" class="col-sm-2 control-label">{gt text='Vendor Logo'}</label>
             <div class="col-sm-10">

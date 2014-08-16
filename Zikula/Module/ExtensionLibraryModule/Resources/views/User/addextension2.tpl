@@ -1,3 +1,4 @@
+{pageaddvar name='javascript' value=$moduleBundle->getRelativePath()|cat:'/Resources/public/js/Zikula.ExtensionLibrary.User.AddExtension.js'}
 {include file='User/header.tpl'}
 <h2>{gt text='Add your extension to the extension library.'}</h2>
 <div class="alert alert-info">{gt text='This step is only required once per extension.'}</div>
@@ -15,19 +16,30 @@
         <div class="form-group">
             <label for="el-add-extension-type" class="col-sm-2 control-label">{gt text='Type'}<span class="z-form-mandatory-flag">*</span></label>
             <div class="col-sm-10">
-                <select class="form-control" name="extension[type]" id="el-add-extension-repository">
+                <select class="form-control" name="extension[type]" id="el-add-extension-repository-type">
                     <option value="zikula-module" selected="selected">{gt text='Module'}</option>
                     <option value="zikula-theme">{gt text='Theme'}</option>
                     <option value="zikula-plugin">{gt text='Plugin'}</option>
                 </select>
             </div>
         </div>
-        {*<div class="form-group">*}
-            {*<label for="el-add-extension-extension-name" class="col-sm-2 control-label">{gt text='Name'}<span class="z-form-mandatory-flag">*</span></label>*}
-            {*<div class="col-sm-10">*}
-                {*<input required type="text" name="extension[name]" id="el-add-extension-extension-name" class="form-control" placeholder="{gt text='e.g. news'}" />*}
-            {*</div>*}
-        {*</div>*}
+        <div class="form-group">
+            <label for="el-add-extension-apitype" class="col-sm-2 control-label">{gt text='Extension API type'}<span class="z-form-mandatory-flag">*</span></label>
+            <div class="col-sm-10">
+                <select class="form-control" name="extension[apitype]" id="el-add-extension-repository-apitype">
+                    <option value="1.3">Core 1.3 {gt text="compatible"} OOP-{gt text="style"}</option>
+                    <option value="1.4-0">Core 1.4 {gt text="compatible"} namespaced/PSR-0</option>
+                    <option value="1.4-4" selected="selected">Core 1.4 {gt text="compatible"} namespaced/PSR-4</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group" id="el-add-extension-extension-namespace-input">
+            <label for="el-add-extension-extension-namespace" class="col-sm-2 control-label">{gt text='Namespace'}<span class="z-form-mandatory-flag">*</span></label>
+            <div class="col-sm-10">
+                <input required type="text" name="extension[namespace]" id="el-add-extension-extension-namespace" class="form-control" placeholder="{gt text='e.g. Acme\Module\WidgetCreatorModule'}" />
+                <span class="help-block">{gt text='Namespace to extension root (or module/theme/plugin class).'}</span>
+            </div>
+        </div>
         <input type="hidden" value="{$repo.name}" name="extension[name]" />
         <div class="form-group">
             <label for="el-add-extension-extension-displayName" class="col-sm-2 control-label">{gt text='Display Name'}<span class="z-form-mandatory-flag">*</span></label>
@@ -71,6 +83,7 @@
             <div class="col-sm-10">
                 <input required type="text" name="extension[coreCompatibility]" id="el-add-extension-extension-coreCompatibility" class="form-control" value=">=1.3.5 <1.5"/>
                 <span class="help-block">{gt text='A string defining Zikula Core version compatibility. Example: %s.' tag1='<code>>=1.3.5 <1.5</code>'}</span>
+                <span class="help-block">{gt text='Extensions written for Core 1.3 should be compatible with Core 1.4 but must be tested carefully before publishing as such.'}</span>
             </div>
         </div>
         <div class="form-group">
