@@ -96,7 +96,7 @@
         <div class="form-group">
             <label for="el-add-extension-extension-keywords" class="col-sm-2 control-label">{gt text='Keywords'}</label>
             <div class="col-sm-10">
-                <input type="url" name="extension[keywords]" id="el-add-extension-extension-keywords" class="form-control" placeholder="{gt text='e.g. module, news, example'}" />
+                <input type="text" name="extension[keywords]" id="el-add-extension-extension-keywords" class="form-control" placeholder="{gt text='e.g. module, news, example'}" />
             </div>
         </div>
     </fieldset>
