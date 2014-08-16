@@ -505,7 +505,8 @@ class UserController extends \Zikula_AbstractController
             // add the `extra` and `autoload` fields for namespaced modules.
             if ($extension['apitype'] != '1.3') {
                 $psrType = "psr-" . substr($extension['apitype'], -1);
-                $class = str_replace("\\", "\\\\", $extension['namespace']);
+//                $class = str_replace("\\", "\\\\", $extension['namespace']);
+                $class = $extension['namespace'];
                 $classNameParts = explode("\\", $extension['namespace']);
                 $className = array_shift($classNameParts) . array_pop($classNameParts);
                 $composerContent['autoload'] = array($psrType => $class);
