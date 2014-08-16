@@ -324,7 +324,7 @@ class ReleaseManager
                 $description .= '<h4>' . __('Latest changes:', $this->dom) . '</h4><ul>';
 
                 foreach ($changeSet['items'] as $item) {
-                    $description .= '<li><p>' . $item['msg'] . ' <a href="https://github.com/' . $this->repo . '/commit/' . urlencode($item['commitId']) . '">view at GitHub <i class="fa fa-github"></i></a></p></li>';
+                    $description .= '<li><p>' . $this->markdown($item['msg']) . ' <a href="https://github.com/' . $this->repo . '/commit/' . urlencode($item['commitId']) . '">view at GitHub <i class="fa fa-github"></i></a></p></li>';
                 }
                 $description .= "</ul>";
                 $sha = $this->getShaFromJenkinsBuild($build);
