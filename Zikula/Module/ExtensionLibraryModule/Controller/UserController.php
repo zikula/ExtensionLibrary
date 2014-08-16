@@ -495,7 +495,7 @@ class UserController extends \Zikula_AbstractController
             }
             list($vendorPrefix) = explode('/', $extension['repository']);
             $composerContent = array(
-                "name" => "$vendorPrefix/{$extension['name']}-" . strtolower(substr($extension['type'], strlen('zikula-'))),
+                "name" => strtolower("$vendorPrefix/{$extension['name']}-" . substr($extension['type'], strlen('zikula-'))),
                 "description" => $extension['description'],
                 "type" => $extension['type'],
                 "license" => $extension['license'],
