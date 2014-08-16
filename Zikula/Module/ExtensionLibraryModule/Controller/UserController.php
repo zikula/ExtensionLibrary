@@ -323,7 +323,7 @@ class UserController extends \Zikula_AbstractController
             // get a default image
             $module = ModUtil::getModule('ZikulaExtensionLibraryModule');
             // @todo - getRelativePath() is deprecated
-            $path = $module->getRelativePath() . '/Resources/public/images/zikula.png';
+            $path = $module->getRelativePath() . '/Resources/public/images/logo90px.png';
         }
 
         if (function_exists('exif_imagetype')) {
