@@ -24,7 +24,7 @@
                     <h4 class="media-heading"><a href="{route name='zikulaextensionlibrarymodule_user_display' extension_slug=$extension.titleSlug}">{$extension.title|safetext}</a></h4>
                     <em class="text-muted">{$extension.typeForDisplay}</em>
                     <ul class="list-unstyled">
-                        {if !empty($extension.vendor.title)}<li>{$extension.vendor.title|safehtml}</li>{/if}
+                        {if !empty($extension.vendor.title)}<li>{$extension.vendor.title|safetext}</li>{/if}
                         {if !empty($extension.vendor.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.url}">{gt text="Vendor Website"}</a></li>{/if}
                     </ul>
                 </div>
