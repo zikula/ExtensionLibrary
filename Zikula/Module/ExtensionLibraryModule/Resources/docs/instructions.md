@@ -45,11 +45,12 @@ push v1.7.1.
 
 Troubleshooting
 ---------------
-If you have problems with your extension not publishing you should check the [error log][log] for hints on what the
-problem might be.
+If you have problems with your extension not publishing you should first check the `response` to your webhook as
+outlined in the [step by step webhook guide](webhook). If that is not enough information to solve the problem, you might
+also check the Extension Library [error log][log] for hints on what the problem might be.
 
 If you still encounter trouble getting this process to work with your extension, please submit a support request on the
-forums at http://www.zikula.org/forums
+forums at http://www.zikula.org/forum
 
 How long should the process take
 --------------------------------

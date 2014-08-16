@@ -33,6 +33,7 @@ use Zikula\Module\ExtensionLibraryModule\Manager\ImageManager;
 use ModUtil;
 use Zikula\Core\Hook\ProcessHook;
 use ZLanguage;
+use Zikula\Module\ExtensionLibraryModule\Util;
 
 /**
  * Jenkins and GitHub Webhook access points.
@@ -67,6 +68,7 @@ class WebHookController extends \Zikula_AbstractController
                 foreach ($manifestManager->getDecodingErrors() as $error) {
                     $responseText .= "- $error\n";
                 }
+                Util::log("{$jsonPayload->repository->name}: $error", Util::LOG_PROD);
                 return new PlainResponse($responseText, Response::HTTP_BAD_REQUEST);
             }
 
@@ -76,6 +78,7 @@ class WebHookController extends \Zikula_AbstractController
                 foreach ($manifestManager->getValidationErrors() as $error) {
                     $responseText .= "- " . sprintf("[%s] %s", $error['property'], $error['message']) . "\n";
                 }
+                Util::log("{$jsonPayload->repository->name}: $error", Util::LOG_PROD);
                 return new PlainResponse($responseText, Response::HTTP_BAD_REQUEST);
             }
 
@@ -92,6 +95,7 @@ class WebHookController extends \Zikula_AbstractController
                 foreach ($composerManager->getValidationErrors() as $error) {
                     $responseText .= "- " . (sprintf("[%s] %s", $error['property'], $error['message'])) . "\n";
                 }
+                Util::log("{$jsonPayload->repository->name}: $error", Util::LOG_PROD);
                 return new PlainResponse($responseText, Response::HTTP_BAD_REQUEST);
             }
 
@@ -117,6 +121,7 @@ class WebHookController extends \Zikula_AbstractController
                     foreach ($imageManager->getValidationErrors() as $error) {
                         $responseText .= "- $error\n";
                     }
+                    Util::log("{$jsonPayload->repository->name}: $error", Util::LOG_PROD);
                 }
             }
             $vendor->mergeManifest($manifestContent);
@@ -150,6 +155,7 @@ class WebHookController extends \Zikula_AbstractController
                     foreach ($imageManager->getValidationErrors() as $error) {
                         $responseText .= "- $error\n";
                     }
+                    Util::log("{$jsonPayload->repository->name}: $error", Util::LOG_PROD);
                 }
             }
             $extension->mergeManifest($manifestContent);
@@ -178,6 +184,7 @@ class WebHookController extends \Zikula_AbstractController
                     $semver,
                     $newestVersion->getSemver());
                 // return without flushing since there should be no changes if version isn't new
+                Util::log("{$jsonPayload->repository->name}: $responseText", Util::LOG_PROD);
                 return new PlainResponse($responseText, Response::HTTP_BAD_REQUEST);
             }
 
@@ -213,6 +220,7 @@ class WebHookController extends \Zikula_AbstractController
             return $this->handleException($e);
         }
 
+        Util::log("{$jsonPayload->repository->name}: $responseText", Util::LOG_PROD);
         return new PlainResponse($responseText, Response::HTTP_OK);
     }
 
