@@ -1,6 +1,6 @@
 {pageaddvar name='javascript' value=$moduleBundle->getRelativePath()|cat:'/Resources/public/js/Zikula.ExtensionLibrary.User.AddExtension.js'}
 {include file='User/header.tpl'}
-<h2>{gt text='Add your extension to the extension library.'}</h2>
+<h2>{gt text='Add your extension to the extension library (step 2 of 2)'}</h2>
 <div class="alert alert-info">{gt text='This step is only required once per extension.'}</div>
 
 <form class="form-horizontal" role="form" method="post" action="{route name='zikulaextensionlibrarymodule_user_addextension'}">
@@ -8,15 +8,15 @@
         <input type="hidden" value="{$vendor|@json_encode|safetext}" name="_vendor" />
         <legend><i class='fa fa-info-circle'></i> {gt text='About your extension'}</legend>
         <div class="form-group">
-            <label for="el-add-extension-repository" class="col-sm-2 control-label">{gt text='Repository'}<span class="z-form-mandatory-flag">*</span></label>
+            <label for="el-add-extension-extension-repository" class="col-sm-2 control-label">{gt text='Repository'}<span class="z-form-mandatory-flag">*</span></label>
             <div class="col-sm-10">
-                <input class="form-control" type="text" name="extension[repository]" value="{$repo.full_name|safetext}" readonly>
+                <input class="form-control" id="el-add-extension-extension-repository" type="text" name="extension[repository]" value="{$repo.full_name|safetext}" readonly>
             </div>
         </div>
         <div class="form-group">
-            <label for="el-add-extension-type" class="col-sm-2 control-label">{gt text='Type'}<span class="z-form-mandatory-flag">*</span></label>
+            <label for="el-add-extension-extension-type" class="col-sm-2 control-label">{gt text='Type'}<span class="z-form-mandatory-flag">*</span></label>
             <div class="col-sm-10">
-                <select class="form-control" name="extension[type]" id="el-add-extension-repository-type">
+                <select class="form-control" name="extension[type]" id="el-add-extension-extension-type">
                     <option value="zikula-module" selected="selected">{gt text='Module'}</option>
                     <option value="zikula-theme">{gt text='Theme'}</option>
                     <option value="zikula-plugin">{gt text='Plugin'}</option>
@@ -24,9 +24,9 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="el-add-extension-apitype" class="col-sm-2 control-label">{gt text='Extension API type'}<span class="z-form-mandatory-flag">*</span></label>
+            <label for="el-add-extension-extension-apitype" class="col-sm-2 control-label">{gt text='Extension API type'}<span class="z-form-mandatory-flag">*</span></label>
             <div class="col-sm-10">
-                <select class="form-control" name="extension[apitype]" id="el-add-extension-repository-apitype">
+                <select class="form-control" name="extension[apitype]" id="el-add-extension-extension-apitype">
                     <option value="1.3">Core 1.3 {gt text="compatible"} OOP-{gt text="style"}</option>
                     <option value="1.4-0">Core 1.4 {gt text="compatible"} namespaced/PSR-0</option>
                     <option value="1.4-4" selected="selected">Core 1.4 {gt text="compatible"} namespaced/PSR-4</option>
