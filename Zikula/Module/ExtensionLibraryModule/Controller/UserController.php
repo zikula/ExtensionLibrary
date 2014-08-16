@@ -509,7 +509,7 @@ class UserController extends \Zikula_AbstractController
                 $psrType = "psr-" . substr($extension['apitype'], -1);
                 $classNameParts = explode("\\", $extension['namespace']);
                 $className = array_shift($classNameParts) . array_pop($classNameParts);
-                $composerContent['autoload'] = array($psrType => $extension['namespace']);
+                $composerContent['autoload'] = array($psrType => array($extension['namespace'] => ""));
                 $composerContent['extra'] = array('zikula' => array('class' => $extension['namespace'] . "\\" . $className));
             }
             $content = json_encode($composerContent, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
