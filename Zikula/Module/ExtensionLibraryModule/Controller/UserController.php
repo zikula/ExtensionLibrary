@@ -75,7 +75,7 @@ class UserController extends \Zikula_AbstractController
         if ($vendorEntity === null) {
             $this->view->assign('breadcrumbs', array());
         } else {
-            $this->view->assign('breadcrumbs', array(array('title' => $vendorEntity->getTitle())));
+            $this->view->assign('breadcrumbs', array(array('title' => \DataUtil::formatForDisplay($vendorEntity->getTitle()))));
         }
 
         return $this->response($this->view->fetch('User/view.tpl'));
@@ -120,7 +120,7 @@ class UserController extends \Zikula_AbstractController
         $this->view->assign('gravatarDefaultPath', $request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
         $this->view->assign('breadcrumbs', array(
             array(
-                'title' => $extensionEntity->getVendor()->getTitle(),
+                'title' => \DataUtil::formatForDisplay($extensionEntity->getVendor()->getTitle()),
                 'route' => $this->get('router')->generate(
                         'zikulaextensionlibrarymodule_user_filterbyvendor',
                         array('vendor_slug' => $extensionEntity->getVendor()->getTitleSlug()
@@ -128,7 +128,7 @@ class UserController extends \Zikula_AbstractController
                     )
             ),
             array(
-                'title' => $extensionEntity->getName()
+                'title' => \DataUtil::formatForDisplay($extensionEntity->getName())
             ),
         ));
 
