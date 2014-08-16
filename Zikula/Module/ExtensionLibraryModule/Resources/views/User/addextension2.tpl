@@ -33,7 +33,7 @@
                 </select>
             </div>
         </div>
-        <div class="form-group" id="el-add-extension-extension-namespace-input"{if $extension.apitype='1.3'} style="display: none;"{/if}>
+        <div class="form-group" id="el-add-extension-extension-namespace-input"{if $extension.apitype=='1.3'} style="display: none;"{/if}>
             <label for="el-add-extension-extension-namespace" class="col-sm-2 control-label">{gt text='Namespace'}<span class="z-form-mandatory-flag">*</span></label>
             <div class="col-sm-10">
                 <input required type="text" name="extension[namespace]" value="{$extension.namespace|default:''}" id="el-add-extension-extension-namespace" class="form-control" placeholder="{gt text='e.g. Acme\Module\WidgetCreatorModule'}" />
