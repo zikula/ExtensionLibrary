@@ -12,14 +12,14 @@
         }
     ],
     "autoload": {
-        "psr-4": { "Acme\\SuperWidgetModule\\": "" }
+        "psr-4": { "Acme\\Module\\SuperWidgetModule\\": "" }
     },
     "require": {
         "php": ">5.3.3"
     },
     "extra": {
         "zikula": {
-            "class": "Acme\\SuperWidgetModule\\AcmeSuperWidgetModule"
+            "class": "Acme\\Module\\SuperWidgetModule\\AcmeSuperWidgetModule"
         }
     }
 }
