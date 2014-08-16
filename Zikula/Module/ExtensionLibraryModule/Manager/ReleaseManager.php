@@ -46,6 +46,10 @@ class ReleaseManager
 
     private $router;
 
+    /**
+     * @param                 $em
+     * @param RouterInterface $router
+     */
     public function __construct($em, RouterInterface $router)
     {
         $this->client = Util::getGitHubClient();
@@ -223,6 +227,91 @@ class ReleaseManager
     }
 
     /**
+     * Update or add one specific release.
+     *
+     * @param array               $release    The release data from the GitHub api.
+     * @param CoreReleaseEntity[] $dbReleases INTERNAL: used in self::reloadAllReleases()
+     *
+     * @return bool|CoreReleaseEntity False if it's a draft; true if a release is edited; the release itself if it's new.
+     */
+    public function updateGitHubRelease($release, $dbReleases = null)
+    {
+        if ($release['draft']) {
+            // Ignore drafts.
+            return false;
+        }
+        $id = $release['id'];
+
+        if ($release['prerelease']) {
+            $state = CoreReleaseEntity::STATE_PRERELEASE;
+        } else {
+            $state = CoreReleaseEntity::STATE_SUPPORTED;
+        }
+
+        if ($dbReleases === null) {
+            $dbRelease = $this->em->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findOneBy(array('id' => $id));
+            if ($dbRelease) {
+                $dbReleases[$id] = $dbRelease;
+            } else {
+                $dbReleases = array();
+            }
+        }
+
+        if (!array_key_exists($id, $dbReleases)) {
+            // This is a new release.
+            $dbRelease = new CoreReleaseEntity($id);
+            $mode = 'new';
+        } else {
+            $dbRelease = $dbReleases[$id];
+            $mode = 'edit';
+            if ($dbRelease->getState() === CoreReleaseEntity::STATE_OUTDATED) {
+                // Make sure not to override the state if it has been set to "outdated".
+                $state = CoreReleaseEntity::STATE_OUTDATED;
+            }
+        }
+
+        $dbRelease->setName($release['name']);
+        // Make sure to cast null to string if description is empty!
+        $dbRelease->setDescription((string)$this->markdown($release['body']));
+        $dbRelease->setSemver($release['tag_name']);
+        $dbRelease->setSourceUrls(array (
+            'zip' => $release['zipball_url'],
+            'tar' => $release['tarball_url']
+        ));
+        $dbRelease->setState($state);
+
+        if ($mode == 'new' && count($release['assets']) == 0 && $this->jenkinsClient && Util::hasGitHubClientPushAccess($this->client)) {
+            // Jenkins Build files are not yet uploaded to GitHub. Try to upload them manually.
+            // First, determine the sha of the release.
+            $this->moveAssetsFromJenkinsToGitHubRelease($release);
+        }
+
+        $assets = array();
+        foreach ($release['assets'] as $asset) {
+            if ($asset['state'] != 'uploaded') {
+                continue;
+            }
+            $assets[] = array (
+                'name' => $asset['name'],
+                'download_url' => $asset['browser_download_url'],
+                'size' => $asset['size'],
+                'content_type' => $asset['content_type']
+            );
+        }
+        $dbRelease->setAssets($assets);
+
+        if ($mode == 'new') {
+            $this->em->persist($dbRelease);
+        } else {
+            $this->em->merge($dbRelease);
+        }
+
+        $this->em->flush();
+
+        return ($mode === 'new') ? $dbRelease : true;
+    }
+
+    /**
      * @return CoreReleaseEntity[]
      */
     private function reloadReleasesFromGitHub()
@@ -264,6 +353,9 @@ class ReleaseManager
         return $newReleases;
     }
 
+    /**
+     * First, delete all Jenkins builds and then reload the newest ones.
+     */
     private function reloadReleasesFromJenkins()
     {
         $oldJenkinsBuilds = $this->em->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findBy(array('state' => CoreReleaseEntity::STATE_DEVELOPMENT));
@@ -417,141 +509,6 @@ class ReleaseManager
     }
 
     /**
-     * Update or add one specific release.
-     *
-     * @param array               $release    The release data from the GitHub api.
-     * @param CoreReleaseEntity[] $dbReleases INTERNAL: used in self::reloadAllReleases()
-     *
-     * @return bool|CoreReleaseEntity False if it's a draft; true if a release is edited; the release itself if it's new.
-     */
-    public function updateGitHubRelease($release, $dbReleases = null)
-    {
-        if ($release['draft']) {
-            // Ignore drafts.
-            return false;
-        }
-        $id = $release['id'];
-
-        if ($release['prerelease']) {
-            $state = CoreReleaseEntity::STATE_PRERELEASE;
-        } else {
-            $state = CoreReleaseEntity::STATE_SUPPORTED;
-        }
-
-        if ($dbReleases === null) {
-            $dbRelease = $this->em->getRepository('ZikulaExtensionLibraryModule:CoreReleaseEntity')->findOneBy(array('id' => $id));
-            if ($dbRelease) {
-                $dbReleases[$id] = $dbRelease;
-            } else {
-                $dbReleases = array();
-            }
-        }
-
-        if (!array_key_exists($id, $dbReleases)) {
-            // This is a new release.
-            $dbRelease = new CoreReleaseEntity($id);
-            $mode = 'new';
-        } else {
-            $dbRelease = $dbReleases[$id];
-            $mode = 'edit';
-            if ($dbRelease->getState() === CoreReleaseEntity::STATE_OUTDATED) {
-                // Make sure not to override the state if it has been set to "outdated".
-                $state = CoreReleaseEntity::STATE_OUTDATED;
-            }
-        }
-
-        $dbRelease->setName($release['name']);
-        // Make sure to cast null to string if description is empty!
-        $dbRelease->setDescription((string)$this->markdown($release['body']));
-        $dbRelease->setSemver($release['tag_name']);
-        $dbRelease->setSourceUrls(array (
-            'zip' => $release['zipball_url'],
-            'tar' => $release['tarball_url']
-        ));
-        $dbRelease->setState($state);
-
-        if ($mode == 'new' && count($release['assets']) == 0 && $this->jenkinsClient && Util::hasGitHubClientPushAccess($this->client)) {
-            // Jenkins Build files are not yet uploaded to GitHub. Try to upload them manually.
-            // First, determine the sha of the release.
-            $tagName = $release['tag_name'];
-            $tags = $this->client->getHttpClient()->get('repos/' . $this->repo . '/git/refs/tags');
-            $tags = ResponseMediator::getContent($tags);
-            $sha = false;
-            foreach ($tags as $tag) {
-                if ($tag['ref'] == "refs/tags/$tagName") {
-                    $sha = $tag['object']['sha'];
-                    break;
-                }
-            }
-            if ($sha) {
-                // We got the release's sha. Now check the latest builds on jenkins for that sha.
-                /** @var Job $job */
-                foreach ($this->jenkinsClient->getJobs() as $job) {
-                    /** @var Build $build */
-                    foreach ($job->getBuilds() as $build) {
-                        if ($sha == $this->getShaFromJenkinsBuild($build)) {
-                            // Gotcha! The current Jenkins build has the same sha as the GitHub release.
-                            // Now extract the assets from the Jenkins build.
-                            $worked = false;
-                            list ($repoOwner, $repoName) = explode('/', $this->repo);
-                            $assets = $this->getAssetsFromJenkinsBuild($job, $build);
-                            foreach ($assets as $asset) {
-                                if (!$asset['content_type']) {
-                                    // GitHub won't allow us to upload files without specifying the content type.
-                                    // Skip those files (but there shouldn't be any).
-                                    continue;
-                                }
-                                try {
-                                    $this->client->api('repo')->releases()->assets()->create(
-                                        $repoOwner,
-                                        $repoName,
-                                        $id,
-                                        $asset['name'],
-                                        $asset['content_type'],
-                                        file_get_contents($asset['download_url'])
-                                    );
-                                    $worked = true;
-                                } catch (\Exception $e) {
-                                    Util::log("Error while uploading assets to GitHub: " . $e->getMessage());
-                                }
-                            }
-                            if ($worked) {
-                                // Reload the release.
-                                $release = $this->client->api('repo')->releases()->show($repoOwner, $repoName, $id);
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        $assets = array();
-        foreach ($release['assets'] as $asset) {
-            if ($asset['state'] != 'uploaded') {
-                continue;
-            }
-            $assets[] = array (
-                'name' => $asset['name'],
-                'download_url' => $asset['browser_download_url'],
-                'size' => $asset['size'],
-                'content_type' => $asset['content_type']
-            );
-        }
-        $dbRelease->setAssets($assets);
-
-        if ($mode == 'new') {
-            $this->em->persist($dbRelease);
-        } else {
-            $this->em->merge($dbRelease);
-        }
-
-        $this->em->flush();
-
-        return ($mode === 'new') ? $dbRelease : true;
-    }
-
-    /**
      * "Markdownify" a text using GitHub's flavoured markdown (resulting in @cmfcmf and zikula/core#123 links).
      *
      * @param string $text The text to "markdownify".
@@ -611,6 +568,69 @@ class ReleaseManager
             );
         } catch (\Exception $e) {
             Util::log("Deployment API failed:" . $e->getMessage(), Util::LOG_PROD);
+        }
+    }
+
+    /**
+     * Try to upload the Jenkins assets to a GitHub release.
+     *
+     * @param $release
+     *
+     * @return array
+     */
+    private function moveAssetsFromJenkinsToGitHubRelease(&$release)
+    {
+        // First, get the sha of the release's tag.
+        $tagName = $release['tag_name'];
+        $tags = $this->client->getHttpClient()->get('repos/' . $this->repo . '/git/refs/tags');
+        $tags = ResponseMediator::getContent($tags);
+        $sha = false;
+        foreach ($tags as $tag) {
+            if ($tag['ref'] == "refs/tags/$tagName") {
+                $sha = $tag['object']['sha'];
+                break;
+            }
+        }
+        if (!$sha) {
+            return;
+        }
+        // We got the release's sha. Now check the latest builds on jenkins for that sha.
+        $correspondingBuild = false;
+        /** @var Job $job */
+        foreach ($this->jenkinsClient->getJobs() as $job) {
+            /** @var Build $build */
+            foreach ($job->getBuilds() as $build) {
+                if ($sha == $this->getShaFromJenkinsBuild($build)) {
+                    $correspondingBuild = $build;
+                }
+            }
+        }
+        if (!$correspondingBuild) {
+            // We did not find the corresponding build for that sha.
+            return;
+        }
+        // Gotcha! The current Jenkins build has the same sha as the GitHub release.
+        // Now extract the assets from the Jenkins build.
+        $worked = false;
+        list ($repoOwner, $repoName) = explode('/', $this->repo);
+        $assets = $this->getAssetsFromJenkinsBuild($job, $correspondingBuild);
+        foreach ($assets as $asset) {
+            if (!$asset['content_type']) {
+                // GitHub won't allow us to upload files without specifying the content type.
+                // Skip those files (but there shouldn't be any).
+                continue;
+            }
+            try {
+                $this->client->api('repo')->releases()->assets()->create($repoOwner, $repoName, $release['id'], $asset['name'], $asset['content_type'], file_get_contents($asset['download_url']));
+
+                $worked = true;
+            } catch (\Exception $e) {
+                Util::log("Error while uploading assets to GitHub: " . $e->getMessage());
+            }
+        }
+        if ($worked) {
+            // Reload the release.
+            $release = $this->client->api('repo')->releases()->show($repoOwner, $repoName, $release['id']);
         }
     }
 }
