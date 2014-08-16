@@ -413,7 +413,7 @@ class UserController extends \Zikula_AbstractController
         } else if (empty($extension['name'])) {
             // validate step one parameters
             if (empty($vendor['displayName'])) {
-                $this->request->getSession()->getFlashBag()->set('error', $this->__f('%s is required', '<code>Vendor display name</code>'));
+                $this->request->getSession()->getFlashBag()->add('error', $this->__f('%s is required', '<code>Vendor display name</code>'));
                 $request->request->remove('extension');
                 return $this->addExtensionAction($request);
             }
@@ -430,15 +430,15 @@ class UserController extends \Zikula_AbstractController
         $requiredParams = array('name', 'version', 'description', 'license', 'coreCompatibility');
         foreach ($requiredParams as $requiredParam) {
             if (empty($extension[$requiredParam])) {
-                $this->request->getSession()->getFlashBag()->set('error', $this->__f('%s is required', '<code>'.$requiredParam.'</code>'));
+                $this->request->getSession()->getFlashBag()->add('error', $this->__f('%s is required', '<code>'.$requiredParam.'</code>'));
             }
         }
         if (($extension['apitype'] != "1.3") && (!strpos($extension['namespace'], "\\"))) {
-            $this->request->getSession()->getFlashBag()->set('error', $this->__f('%1$s is required if %2$s is selected.', array('<code>namespace</code>', '<code>Core 1.4 '. $this->__("compatible") .' namespaced/PSR-n</code>')));
+            $this->request->getSession()->getFlashBag()->add('error', $this->__f('%1$s is required if %2$s is selected.', array('<code>namespace</code>', '<code>Core 1.4 '. $this->__("compatible") .' namespaced/PSR-n</code>')));
         }
         if (!in_array($extension['repository'], $userRepositoriesWithPushAccess)) {
             // The user tried to select a repository he has no push access to.
-            $this->request->getSession()->getFlashBag()->set('error', $this->__('You selected a repository for which you do not have push access rights. Please select another.'));
+            $this->request->getSession()->getFlashBag()->add('error', $this->__('You selected a repository for which you do not have push access rights. Please select another.'));
         }
 
         // @TODO validate actual semver? validate license acronym?
@@ -477,7 +477,7 @@ class UserController extends \Zikula_AbstractController
         // @TODO enable modification of current composer.json file
         $currentComposerFile = $elRepositoryManager->getFileInRepository($userRepository, $defaultBranch, $composerPath);
         if ($currentComposerFile !== false) {
-            $this->request->getSession()->getFlashBag()->set('error', $this->__('It seems like there already is a composer.json file in your repository. Sorry, we do not support updating composer files yet. Please follow the instructions below.'));
+            $this->request->getSession()->getFlashBag()->add('error', $this->__('It seems like there already is a composer.json file in your repository. Sorry, we do not support updating composer files yet. Please follow the instructions below.'));
 
             return new RedirectResponse(System::normalizeUrl($this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile')));
         }
@@ -520,7 +520,7 @@ class UserController extends \Zikula_AbstractController
         // search for existing zikula.manifest.json file in original repo
         $currentManifestFile = $elRepositoryManager->getFileInRepository($userRepository, $defaultBranch, 'zikula.manifest.json');
         if ($currentManifestFile !== false) {
-            $this->request->getSession()->getFlashBag()->set('error', $this->__('It seems like there already is a zikula.manifest.json file in your repository. Sorry, we do not support updating manifest files yet. Please follow the instructions below.'));
+            $this->request->getSession()->getFlashBag()->add('error', $this->__('It seems like there already is a zikula.manifest.json file in your repository. Sorry, we do not support updating manifest files yet. Please follow the instructions below.'));
 
             return new RedirectResponse(System::normalizeUrl($this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile')));
         }
