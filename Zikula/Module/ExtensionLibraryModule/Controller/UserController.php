@@ -422,6 +422,7 @@ class UserController extends \Zikula_AbstractController
             $repo = $userGitHubClient->api('repo')->show($owner, $repo);
             $this->view->assign('repo',  $repo);
             $this->view->assign('vendor', $request->get('vendor'));
+            $this->view->assign('extension', $extension);
 
             return $this->response($this->view->fetch('User/addextension2.tpl'));
         }
