@@ -472,6 +472,7 @@ class UserController extends \Zikula_AbstractController
         $elRepositoryManager->addBranch($forkedRepository, $defaultBranch, $prBranch);
 
         // search for current composer.json file in original repo
+        $extension['namespace'] = preg_replace("#\\\\+#", "\\", $extension['namespace']);
         $path = strpos($extension['namespace'], "\\") ? str_replace("\\", "/", $extension['namespace']) : '';
         $composerPath = ($extension['apitype'] != '1.4-0') ? 'composer.json' : $path.'/composer.json';
         // @TODO enable modification of current composer.json file
