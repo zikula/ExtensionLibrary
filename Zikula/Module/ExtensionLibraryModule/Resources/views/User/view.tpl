@@ -1,8 +1,9 @@
 {include file='User/header.tpl' displayFilter=true}
 <div class="row">
     <div class="col-sm-4">
-        <a href="{route name='zikulaextensionlibrarymodule_user_addextension'}" class="btn btn-success btn-lg">
-            {gt text='Add your own extension!'}
+        <a href="{route name='zikulaextensionlibrarymodule_user_addextension'}" class="btn btn-success btn-lg btn-block" style="height:90px;">
+            <i class="fa fa-github fa-3x pull-left"></i>
+            <span style='font-size:1.3em'>{gt text='Add your own<br />extension!'}</span>
         </a>
     </div>
     {foreach from=$extensions item="extension" name='loop'}
