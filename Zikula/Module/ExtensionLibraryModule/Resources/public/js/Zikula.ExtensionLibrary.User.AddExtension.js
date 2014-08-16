@@ -6,7 +6,7 @@
 
 jQuery(document).ready(function() {
     // register the click handlers
-    jQuery('#el-add-extension-repository-apitype').change(updateInput);
+    jQuery('#el-add-extension-extension-apitype').change(updateInput);
 
     /**
      * hide/show the namespace input
