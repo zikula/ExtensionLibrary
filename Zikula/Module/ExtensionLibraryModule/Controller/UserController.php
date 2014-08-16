@@ -387,7 +387,7 @@ class UserController extends \Zikula_AbstractController
             $userGitHubClient = $result;
             unset($result);
         } else {
-            throw new \RuntimeException('Something unexpected happend!');
+            throw new \RuntimeException('Something unexpected happened!');
         }
 
         /** @var RepositoryManager $userRepositoryManager */
