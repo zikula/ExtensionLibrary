@@ -83,7 +83,7 @@
                                         <li>{gt text="Dependencies"}
                                             <ul>
                                                 {foreach from=$version.dependencies key="extensionDependency" item="versionDependency"}
-                                                    <li>{if $extensionDependency=='zikula/core'}<mark><strong>{/if}{$extensionDependency} ({$versionDependency}){if $entity=='zikula/core'}</strong></mark>{/if}</li>
+                                                    <li>{if $extensionDependency=='zikula/core'}<mark><strong>{/if}{$extensionDependency} ({$versionDependency}){if $extensionDependency=='zikula/core'}</strong></mark>{/if}</li>
                                                 {/foreach}
                                             </ul>
                                         </li>
