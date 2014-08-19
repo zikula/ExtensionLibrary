@@ -15,11 +15,11 @@
         {/if}        
         <div class="col-xs-12 visible-xs-block visible-sm-block" style="margin-bottom:30px"></div>
         <div class="col-lg-4 col-md-6 col-xs-12">
-            <div class="media extension-display" data-content="[version {$extension.newestVersion.semver}] {$extension.description|safehtml}">
+            <div class="media extension-display" data-content="[version {$extension.newestVersion.semver|safetext}] {$extension.description|safehtml}">
                 <a class="pull-left" href="{route name='zikulaextensionlibrarymodule_user_display' extension_slug=$extension.titleSlug}">
                     <div class="iconStack">
-                        <img class="media-object img-thumbnail" src="{$extension.icon}" alt="" width="90" height="90" />
-                        <img class="img-thumbnail vendorIcon" src="{$extension.vendor.logo}" alt="">
+                        <img class="media-object img-thumbnail" src="{$extension.icon|safetext}" alt="" width="90" height="90" />
+                        <img class="img-thumbnail vendorIcon" src="{$extension.vendor.logo|safetext}" alt="">
                     </div>
                 </a>
                 <div class="media-body">
@@ -27,7 +27,7 @@
                     <em class="text-muted">{$extension.typeForDisplay}</em>
                     <ul class="list-unstyled">
                         {if !empty($extension.vendor.title)}<li>{$extension.vendor.title|safetext}</li>{/if}
-                        {if !empty($extension.vendor.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.url}">{gt text="Vendor Website"}</a></li>{/if}
+                        {if !empty($extension.vendor.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.url|safetext}">{gt text="Vendor Website"}</a></li>{/if}
                     </ul>
                 </div>
             </div>

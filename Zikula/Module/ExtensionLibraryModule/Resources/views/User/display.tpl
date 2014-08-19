@@ -5,10 +5,10 @@
 <div class="row">
     <div class="col-md-8">
         <div style="min-height: 100px;">
-            <img class="media-object img-thumbnail pull-left" style='margin: 0 1em 1em 0' src="{$extension.icon}" alt="" width="90" height="90" />
+            <img class="media-object img-thumbnail pull-left" style='margin: 0 1em 1em 0' src="{$extension.icon|safetext}" alt="" width="90" height="90" />
             <h3 style="margin-top: 0">{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.typeForDisplay}</small></h3>
             <ul class="list-unstyled">
-                {if !empty($extension.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.url}">{gt text="Extension Website"}</a></li>{/if}
+                {if !empty($extension.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.url|safetext}">{gt text="Extension Website"}</a></li>{/if}
                 {if !empty($extension.description)}<li>{$extension.description|safehtml}</li>{/if}
             </ul>
         </div>
@@ -19,20 +19,20 @@
     <div class="well well-sm col-md-4">
         <h3 style="margin-top: 0">{$extension.vendor.title|safetext}</h3>
         <ul class="list-unstyled">
-            {if !empty($extension.vendor.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.url}">{gt text="Vendor Website"}</a></li>{/if}
+            {if !empty($extension.vendor.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.url|safetext}">{gt text="Vendor Website"}</a></li>{/if}
         </ul>
         <div style="min-height: 90px;">
             <div class="iconStack pull-left">
-                <img class="media-object img-thumbnail" src="{$extension.vendor.logo}" alt="" width="90" height="90" />
+                <img class="media-object img-thumbnail" src="{$extension.vendor.logo|safetext}" alt="" width="90" height="90" />
                 {if !empty($extension.vendor.ownerEmail)}
                     <img src="http://www.gravatar.com/avatar/{$extension.vendor.ownerEmail|md5}?d=identicon" alt="" class="img-thumbnail vendorIcon">
                 {/if}
             </div>
 
             <ul class="list-unstyled" style="padding-left: 100px">
-                {if !empty($extension.vendor.ownerName)}<li>{$extension.vendor.ownerName}</li>{/if}
-                {if !empty($extension.vendor.ownerEmail)}<li>{$extension.vendor.ownerEmail}</li>{/if}
-                {if !empty($extension.vendor.ownerUrl)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.ownerUrl|default:''}">{gt text="Owner Website"}</a></li>{/if}
+                {if !empty($extension.vendor.ownerName)}<li>{$extension.vendor.ownerName|safetext}</li>{/if}
+                {if !empty($extension.vendor.ownerEmail)}<li>{$extension.vendor.ownerEmail|safetext}</li>{/if}
+                {if !empty($extension.vendor.ownerUrl)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.ownerUrl|default:''|safetext}">{gt text="Owner Website"}</a></li>{/if}
             </ul>
         </div>
     </div>
@@ -57,7 +57,7 @@
                 <div class="panel {if $version->matchesCoreChosen()}{if $firstMatchingVersion}panel-primary{else}panel-default{/if}{else}panel-warning{/if}">
                     <div class="panel-heading">
                         <em class="pull-right">
-                            <span class="label {if $version->matchesCoreChosen()}label-info{else}label-danger{/if} tooltips" title="{gt text='Zikula Core version compatibility'}">{$version.compatibility}</span>&nbsp;
+                            <span class="label {if $version->matchesCoreChosen()}label-info{else}label-danger{/if} tooltips" title="{gt text='Zikula Core version compatibility'}">{$version.compatibility|safetext}</span>&nbsp;
                             {gt text='Released: %s' tag1=$version.created->format('j M Y')}
                         </em>
                         <h4 class="panel-title">
@@ -75,7 +75,7 @@
                                         {gt text="License" plural="Licenses" count=$version.licenses|count}:
                                         <ul class="list-inline" style="display:inline;">
                                             {foreach from=$version.licenses item="license" name="licenseLoop"}
-                                                <li><a href='http://spdx.org/licenses/{$license}#licenseText'>{$license|safetext}</a></li>
+                                                <li><a href='http://spdx.org/licenses/{$license|urlencode}#licenseText'>{$license|safetext}</a></li>
                                             {/foreach}
                                         </ul>
                                     </li>
@@ -83,7 +83,7 @@
                                         <li>{gt text="Dependencies"}
                                             <ul>
                                                 {foreach from=$version.dependencies key="extensionDependency" item="versionDependency"}
-                                                    <li>{if $extensionDependency=='zikula/core'}<mark><strong>{/if}{$extensionDependency} ({$versionDependency}){if $extensionDependency=='zikula/core'}</strong></mark>{/if}</li>
+                                                    <li>{if $extensionDependency=='zikula/core'}<mark><strong>{/if}{$extensionDependency|safetext} ({$versionDependency|safetext}){if $extensionDependency=='zikula/core'}</strong></mark>{/if}</li>
                                                 {/foreach}
                                             </ul>
                                         </li>
@@ -91,18 +91,18 @@
                                 </ul>
                                 {$version.verifiedIcon}
                                 {if isset($version.urls.download)}
-                                    <a type="button" class="btn btn-success btn-lg" href="{$version.urls.download}"><i class="fa fa-cloud-download fa-lg"></i> Download</a>
+                                    <a type="button" class="btn btn-success btn-lg" href="{$version.urls.download|safetext}"><i class="fa fa-cloud-download fa-lg"></i> Download</a>
                                 {else}
-                                    <a type="button" class="btn btn-success" href="{$version.urls.zipball_url}"><i class="fa fa-github fa-lg"></i> Download Zipball</a>
-                                    <a type="button" class="btn btn-success" href="{$version.urls.tarball_url}"><i class="fa fa-github fa-lg"></i> Download Tarball</a>
+                                    <a type="button" class="btn btn-success" href="{$version.urls.zipball_url|safetext}"><i class="fa fa-github fa-lg"></i> Download Zipball</a>
+                                    <a type="button" class="btn btn-success" href="{$version.urls.tarball_url|safetext}"><i class="fa fa-github fa-lg"></i> Download Tarball</a>
                                 {/if}
                             </div>
                             <div class="col-md-2 btn-group-vertical">
-                                {if !empty($version.contributors)}<a href="" data-toggle="modal" data-people='{$version.encodedContributors}' data-target="#contributorsModal" type="button" class="btn btn-default btn-info btn-sm">{gt text="Contributors"}</a>{/if}
-                                {if !empty($version.urls.version)}<a href="{$version.urls.version}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Version Site"}</a>{/if}
-                                {if !empty($version.urls.docs)}<a href="{$version.urls.docs}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Docs"}</a>{/if}
-                                {if !empty($version.urls.demo)}<a href="{$version.urls.demo}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Demo"}</a>{/if}
-                                {if !empty($version.urls.issues)}<a href="{$version.urls.issues}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Issues"}</a>{/if}
+                                {if !empty($version.contributors)}<a href="" data-toggle="modal" data-people='{$version.encodedContributors|safetext}' data-target="#contributorsModal" type="button" class="btn btn-default btn-info btn-sm">{gt text="Contributors"}</a>{/if}
+                                {if !empty($version.urls.version)}<a href="{$version.urls.version|safetext}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Version Site"}</a>{/if}
+                                {if !empty($version.urls.docs)}<a href="{$version.urls.docs|safetext}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Docs"}</a>{/if}
+                                {if !empty($version.urls.demo)}<a href="{$version.urls.demo|safetext}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Demo"}</a>{/if}
+                                {if !empty($version.urls.issues)}<a href="{$version.urls.issues|safetext}" type="button" class="btn btn-default btn-info btn-sm">{gt text="Issues"}</a>{/if}
                             </div>
                         </div>
                     </div>
