@@ -248,7 +248,7 @@ class VendorEntity extends EntityAccess
     public function getLogo()
     {
         if (empty($this->logo)) {
-            return \ServiceUtil::get('router')->generate('zikulaextensionlibrarymodule_user_getimage');
+            return "https://avatars.githubusercontent.com/u/{$this->id}?v=2&s=120";
         }
         return \ServiceUtil::get('router')->generate('zikulaextensionlibrarymodule_user_getimage', array('name' => $this->logo));
     }
