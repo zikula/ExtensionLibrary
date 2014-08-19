@@ -28,11 +28,11 @@ use Zikula\Module\ExtensionLibraryModule\Util;
 class VendorEntity extends EntityAccess
 {
     /**
-     * id field
+     * id field - NOT auto-generated. The GitHub user id is used.
      *
      * @ORM\Id
      * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\GeneratedValue(strategy="NONE")
      */
     private $id;
 
@@ -71,14 +71,6 @@ class VendorEntity extends EntityAccess
      * @ORM\Column(type="string", length=128, nullable=true)
      */
     private $ownerUrl;
-
-    /**
-     * Associated Zikula Core user_id
-     * can be empty array if the vendor has been unclaimed
-     *
-     * @ORM\Column(type="array")
-     */
-    private $userIds = array();
 
     /**
      * vendor url
@@ -135,10 +127,19 @@ class VendorEntity extends EntityAccess
     /**
      * Constructor
      */
-    public function __construct($owner)
+    public function __construct($id, $owner)
     {
+        $this->id = $id;
         $this->owner = $owner;
         $this->extensions = new ArrayCollection();
+    }
+
+    /**
+     * @param integer $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
     /**
@@ -281,35 +282,6 @@ class VendorEntity extends EntityAccess
     }
 
     /**
-     * @param integer $userId
-     */
-    public function addUserId($userId)
-    {
-        if (!in_array($userId, $this->userIds)) {
-            $this->userIds[] = $userId;
-        }
-    }
-
-    /**
-     * @param integer $userId
-     */
-    public function removeUserId($userId)
-    {
-        $key = array_search($userId, $this->userIds);
-        if (false !== $key) {
-            unset($this->userIds[$key]);
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function getUserIds()
-    {
-        return $this->userIds;
-    }
-
-    /**
      * @return ArrayCollection
      */
     public function getExtensions()
@@ -396,5 +368,4 @@ class VendorEntity extends EntityAccess
             }
         }
     }
-
 }

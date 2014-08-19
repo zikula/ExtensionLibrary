@@ -73,6 +73,16 @@ class ExtensionLibraryModuleInstaller extends \Zikula_AbstractInstaller
             case '1.0.6':
                 DoctrineHelper::updateSchema($this->entityManager, array('Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity'));
                 DoctrineHelper::createSchema($this->entityManager, array('Zikula\Module\ExtensionLibraryModule\Entity\OAuthEntity'));
+            case '1.0.7':
+                DoctrineHelper::updateSchema($this->entityManager, array('Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity'));
+                $vendors = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:VendorEntity')->findAll();
+                $gitHubClient = Util::getGitHubClient();
+                foreach ($vendors as $vendor) {
+                    $user = $gitHubClient->api('user')->show($vendor->getOwner());
+                    $vendor->setId($user['id']);
+                    $this->entityManager->persist($vendor);
+                }
+                $this->entityManager->flush();
         }
 
         // Update successful

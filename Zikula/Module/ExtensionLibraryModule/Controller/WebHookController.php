@@ -105,7 +105,9 @@ class WebHookController extends \Zikula_AbstractController
                 ->findOneBy(array('owner' => $jsonPayload->repository->owner->name));
             if (!isset($vendor)) {
                 // not found, create
-                $vendor = new VendorEntity($jsonPayload->repository->owner->name);
+                $gitHubClient = Util::getGitHubClient();
+                $user = $gitHubClient->api('user')->show($jsonPayload->repository->owner->name);
+                $vendor = new VendorEntity($user['id'], $jsonPayload->repository->owner->name);
                 $this->entityManager->persist($vendor);
                 $responseText .= sprintf('Vendor (%s) created', $jsonPayload->repository->owner->name) . "\n";
             } else {
