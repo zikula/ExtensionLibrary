@@ -18,18 +18,19 @@ use ModUtil;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
 use Zikula\Core\Response\PlainResponse;
+use Zikula\Module\ExtensionLibraryModule\Manager\RemoteJsonManager;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Zikula\Module\ExtensionLibraryModule\Manager\ManifestManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\ImageManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\ComposerManager;
 
 /**
- * UI operations executable by general users.
+ * @Route("/test")
  */
 class TestController extends \Zikula_AbstractController
 {
     /**
-     * @Route("/test")
+     * @Route("")
      * The default entry point.
      *
      * @return string
@@ -47,7 +48,7 @@ class TestController extends \Zikula_AbstractController
     /**
      * test postreceive-hook
      *
-     * @Route("/test/hook/{type}", requirements={"type" = "0|10|11"})
+     * @Route("/hook/{type}", requirements={"type" = "0|10|11"})
      */
     public function postReceiveHookAction($type = 0)
     {
@@ -88,7 +89,7 @@ class TestController extends \Zikula_AbstractController
     /**
      * test get manifest
      *
-     * @Route("/test/getmanifest")
+     * @Route("/getmanifest")
      */
     public function getManifestAction($owner = 'craigh', $repo = 'Nutin', $refs = 'refs/tags/0.0.9')
     {
@@ -107,7 +108,7 @@ class TestController extends \Zikula_AbstractController
     /**
      * Test if image importing works
      *
-     * @Route("/test/importimage/{type}", requirements={"type" = "valid|invalidUrl|extension|fake|size"})
+     * @Route("/importimage/{type}", requirements={"type" = "valid|invalidUrl|extension|fake|size"})
      */
     public function importImage($type = 'valid') {
         $fileUrl = array();
@@ -128,7 +129,7 @@ class TestController extends \Zikula_AbstractController
     }
 
     /**
-     * @Route("/test/composer")
+     * @Route("/composer")
      *
      * Test if the schema properly validates the composer file
      * @return PlainResponse
@@ -143,6 +144,37 @@ class TestController extends \Zikula_AbstractController
         }
         echo "<pre>";
         var_dump($data);
+
+        return new PlainResponse();
+    }
+
+    /**
+     * @Route("/sanitize/{type}", requirements={"type" = "manifest|composer"})
+     *
+     * @param string $type
+     */
+    public function sanitize($type = 'manifest') {
+//        $owner = 'craigh';
+//        $repo = 'Nutin';
+//        $refs = 'refs/tags/0.0.9'; // safe strings
+        $owner = 'cmfcmf-test';
+        $repo = 'EL1-4-PSR-4';
+        $refs = 'refs/tags/1.0.2'; // contains intentional <script> tags in manifest
+        $path = ($type == 'manifest') ? 'zikula.manifest.json' : 'composer.json';
+        echo "<pre>";
+        $managedJson = new RemoteJsonManager($owner, $repo, $refs, $path, false);
+        var_dump($managedJson->getContent(true));
+        $managedJsonSanitized = new RemoteJsonManager($owner, $repo, $refs, $path, true);
+        var_dump($managedJsonSanitized->getContent(true));
+        switch ($type) {
+            case "manifest":
+                $manifestManager = new ManifestManager($owner, $repo, $refs);
+                var_dump($manifestManager->getContent());
+                break;
+            default:
+                $composerManager = new ComposerManager($owner, $repo, $refs, 'composer.json');
+                var_dump($composerManager->getContent());
+        }
 
         return new PlainResponse();
     }

@@ -85,10 +85,11 @@ class RemoteJsonManager {
      * @param string $repo repository name
      * @param string $ref the ref string
      * @param string $remoteRelativePath path to remote file form base of repo e.g. 'zikula.manifest.json'
+     * @param boolean $sanitize
      *
-     * @throws \InvalidArgumentException
+     * @throws ClientException
      */
-    public function __construct($owner, $repo, $ref, $remoteRelativePath)
+    public function __construct($owner, $repo, $ref, $remoteRelativePath, $sanitize = true)
     {
         $module = ModUtil::getModule($this->name);
         $this->modulePath = $module->getPath();
@@ -101,7 +102,12 @@ class RemoteJsonManager {
         }
 
         if ($this->decodeContent()) {
-            $this->validate();
+            if ($sanitize) {
+                $this->content = $this->getSanitizedContent($this->content);
+            }
+            if ($this->schema) {
+                $this->validate();
+            }
         }
     }
 
@@ -154,11 +160,33 @@ class RemoteJsonManager {
     }
 
     /**
-     * @return \stdClass|boolean
+     * recursive function to make sure the content is safe
+     *
+     * @param mixed $content
+     *
+     * @return mixed $content
      */
-    public function getContent()
+    private function getSanitizedContent($content)
     {
-        if ($this->isvalid()) {
+        foreach($content as &$value) {
+            if (is_scalar($value)) {
+                $value = filter_var($value, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
+                continue;
+            }
+            $value = $this->getSanitizedContent($value);
+        }
+
+        return $content;
+    }
+
+    /**
+     * @return \stdClass|boolean
+     *
+     * @param boolean $force
+     */
+    public function getContent($force = false)
+    {
+        if ($force || $this->isvalid()) {
             return $this->content;
         } else {
             return false;
