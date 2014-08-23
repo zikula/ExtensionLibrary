@@ -169,58 +169,14 @@ class ReleaseManager
 
     public function reloadReleases($source = 'all')
     {
-        $newReleases = array();
         // GitHub releases
         if ($source == 'all' || $source == 'github') {
-            $newReleases = $this->reloadReleasesFromGitHub();
+            $this->reloadReleasesFromGitHub();
         }
 
         // Jenkins builds
         if ($this->jenkinsClient && ($source == 'all' || $source == 'jenkins')) {
             $this->reloadReleasesFromJenkins();
-        }
-
-        if (!empty($newReleases) && \ModUtil::available('News')) {
-            foreach ($newReleases as $newRelease) {
-                switch ($newRelease->getState()) {
-                    case CoreReleaseEntity::STATE_DEVELOPMENT:
-                    case CoreReleaseEntity::STATE_OUTDATED:
-                    default:
-                        // Do not create news post.
-                        continue;
-                    case CoreReleaseEntity::STATE_SUPPORTED:
-                        $title = __f('%s released!', array($newRelease->getNameI18n()), $this->dom);
-                        $teaser = '<p>' . __f('The core development team is proud to announce the availabilty of %s.', array($newRelease->getNameI18n())) . '</p>';
-                        break;
-                    case CoreReleaseEntity::STATE_PRERELEASE:
-                        $title = __f('%s ready for testing!', array($newRelease->getNameI18n()), $this->dom);
-                        $teaser = '<p>' . __f('The core development team is proud to announce a pre-release of %s. Please help testing and report bugs!', array($newRelease->getNameI18n())) . '</p>';
-                        break;
-                }
-
-                $downloadLinkTpl = '<a href="%link%" class="btn btn-success btn-sm">%text%</a>';
-                $downloadLinks = array();
-                foreach ($newRelease->getAssets() as $asset) {
-                    $downloadLinks[] = str_replace('%link%', $asset['download_url'], str_replace('%text%', $asset['name'], $downloadLinkTpl));
-                }
-
-                $args = array();
-                $now = \DateUtil::getDatetime();
-                $args['title'] = $title;
-                $args['hometext'] = $teaser;
-                $args['hometextcontenttype'] = 0;
-                $args['bodytextcontenttype'] = 0;
-                $args['bodytext'] = $newRelease->getDescriptionI18n() . implode(' ', $downloadLinks);
-                $args['notes'] = '';
-                $args['published_status'] = \News_Api_User::STATUS_PENDING;
-                $args['displayonindex'] = 1;
-                $args['allowcomments'] = 1;
-                $args['from'] = $now;
-                $args['cr_date'] = $now;
-                $args['tonolimit'] = true;
-
-                $id = \ModUtil::apiFunc('News', 'user', 'create', $args);
-            }
         }
 
         return true;
@@ -282,7 +238,6 @@ class ReleaseManager
 
         if ($mode == 'new' && count($release['assets']) == 0 && $this->jenkinsClient && Util::hasGitHubClientPushAccess($this->client)) {
             // Jenkins Build files are not yet uploaded to GitHub. Try to upload them manually.
-            // First, determine the sha of the release.
             $this->moveAssetsFromJenkinsToGitHubRelease($release);
         }
 
@@ -308,7 +263,13 @@ class ReleaseManager
 
         $this->em->flush();
 
-        return ($mode === 'new') ? $dbRelease : true;
+        if ($mode == 'new') {
+            $this->createNewsArticle($dbRelease);
+        } else if($dbRelease->getNewsId() !== null) {
+            $this->updateNewsArticle($dbRelease);
+        }
+
+        return true;
     }
 
     /**
@@ -328,13 +289,9 @@ class ReleaseManager
 
         // Make sure to always have at least the id "0" in the array, as the IN() SQL statement fails otherwise.
         $ids = array(0);
-        $newReleases = array();
         foreach ($releases as $release) {
             $ids[] = $release['id'];
-            $result = $this->updateGitHubRelease($release, $dbReleases);
-            if ($result instanceof CoreReleaseEntity) {
-                $newReleases[] = $result;
-            }
+            $this->updateGitHubRelease($release, $dbReleases);
         }
 
         /** @var QueryBuilder $qb */
@@ -349,8 +306,6 @@ class ReleaseManager
         }
 
         $this->em->flush();
-
-        return $newReleases;
     }
 
     /**
@@ -636,5 +591,84 @@ class ReleaseManager
             // Reload the release.
             $release = $this->client->api('repo')->releases()->show($repoOwner, $repoName, $release['id']);
         }
+    }
+
+    /**
+     * Creates a news article about a new release.
+     *
+     * @param CoreReleaseEntity $newRelease
+     */
+    private function createNewsArticle(CoreReleaseEntity $newRelease)
+    {
+        if (!\ModUtil::available('News')) {
+            return;
+        }
+        switch ($newRelease->getState()) {
+            case CoreReleaseEntity::STATE_SUPPORTED:
+                $title = __f('%s released!', array($newRelease->getNameI18n()), $this->dom);
+                $teaser = '<p>' . __f('The core development team is proud to announce the availabilty of %s.', array($newRelease->getNameI18n())) . '</p>';
+                break;
+            case CoreReleaseEntity::STATE_PRERELEASE:
+                $title = __f('%s ready for testing!', array($newRelease->getNameI18n()), $this->dom);
+                $teaser = '<p>' . __f('The core development team is proud to announce a pre-release of %s. Please help testing and report bugs!', array($newRelease->getNameI18n())) . '</p>';
+                break;
+            case CoreReleaseEntity::STATE_DEVELOPMENT:
+            case CoreReleaseEntity::STATE_OUTDATED:
+            default:
+                // Do not create news post.
+                return;
+        }
+
+
+
+        $args = array();
+        $now = \DateUtil::getDatetime();
+        $args['title'] = $title;
+        $args['hometext'] = $teaser;
+        $args['hometextcontenttype'] = 0;
+        $args['bodytextcontenttype'] = 0;
+        $args['bodytext'] = $newRelease->getNewsText();
+        $args['notes'] = '';
+        $args['published_status'] = \News_Api_User::STATUS_PENDING;
+        $args['displayonindex'] = 1;
+        $args['allowcomments'] = 1;
+        $args['from'] = $now;
+        $args['cr_date'] = $now;
+        $args['tonolimit'] = true;
+
+        $id = \ModUtil::apiFunc('News', 'user', 'create', $args);
+
+        if (is_numeric($id) && $id > 0) {
+            $newRelease->setNewsId($id);
+            $this->em->persist($newRelease);
+            $this->em->flush();
+        }
+    }
+
+    /**
+     * Updates download links of a news article.
+     *
+     * @param CoreReleaseEntity $release
+     */
+    private function updateNewsArticle(CoreReleaseEntity $release)
+    {
+        if ($release->getNewsId() === null || !\ModUtil::available('News')) {
+            return;
+        }
+
+        $article = \ModUtil::apiFunc('News', 'user', 'get', array ('sid' => $release->getNewsId()));
+        if (!$article) {
+            return;
+        }
+
+        $article['bodytext'] = preg_replace('#' . preg_quote(CoreReleaseEntity::NEWS_DESCRIPTION_START) . '.*?' . preg_quote(CoreReleaseEntity::NEWS_DESCRIPTION_END) . '#',
+            $release->getNewsText(),
+            $article['bodytext']
+        );
+        $article['hometextcontenttype'] = 0;
+        $article['bodytextcontenttype'] = 0;
+        $article['unlimited'] = 1;
+        $article['to'] = 1;
+        \ModUtil::apiFunc('News', 'admin', 'update', $article);
     }
 }
