@@ -387,6 +387,10 @@ class ReleaseManager
                 }
             }
 
+            if (count($builds) == 0) {
+                continue;
+            }
+
             // Sort builds by build number DESC.
             usort($builds, function (Build $a, Build $b) {
                 $a = $a->getNumber();
