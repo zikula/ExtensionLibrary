@@ -41,7 +41,7 @@ use Zikula\Module\ExtensionLibraryModule\Util;
 class WebHookController extends \Zikula_AbstractController
 {
     /**
-     * @Route("/webhook")
+     * @Route("/webhook", options={"i18n"=false})
      * @Method("POST")
      */
     public function extensionAction()
@@ -225,7 +225,7 @@ class WebHookController extends \Zikula_AbstractController
     }
 
     /**
-     * @Route("/webhook-core")
+     * @Route("/webhook-core", options={"i18n"=false})
      * @Method("POST")
      */
     public function coreAction(Request $request)
@@ -283,7 +283,7 @@ class WebHookController extends \Zikula_AbstractController
     }
 
     /**
-     * @Route("/webhook-jenkins/{code}")
+     * @Route("/webhook-jenkins/{code}", options={"i18n"=false})
      * @Method("POST")
      */
     public function jenkinsAction($code)
