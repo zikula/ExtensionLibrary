@@ -20,7 +20,7 @@ use vierbergenlars\SemVer\version;
 use Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity;
 use Zikula_Controller_AbstractBlock;
 
-class JenkinsBuildBlock extends Zikula_Controller_AbstractBlock
+class JenkinsBuildBlock extends AbstractButtonBlock
 {
     /**
      * initialise block
@@ -48,13 +48,14 @@ class JenkinsBuildBlock extends Zikula_Controller_AbstractBlock
     }
 
     /**
-     * display block
+     * {@inheritdoc}
      */
     public function display($blockinfo)
     {
         if (!SecurityUtil::checkPermission('ZikulaExtensionLibraryModule:jenkinsBuild:', "$blockinfo[title]::", ACCESS_OVERVIEW) || !ModUtil::available('ZikulaExtensionLibraryModule')) {
-            return;
+            return "";
         }
+        parent::display($blockinfo);
 
         $releaseManager = $this->get('zikulaextensionlibrarymodule.releasemanager');
         $releases = $releaseManager->getSignificantReleases(false);
@@ -63,15 +64,13 @@ class JenkinsBuildBlock extends Zikula_Controller_AbstractBlock
             return $release->getState() === CoreReleaseEntity::STATE_DEVELOPMENT;
         });
 
-        if (!empty($developmentReleases)) {
-            $this->view->assign('developmentReleases', $developmentReleases);
-            $this->view->assign('id', uniqid());
-            $blockinfo['content'] = $this->view->fetch('Blocks/jenkinsbuilds.tpl');
-        } else {
-            return;
+        if (empty($developmentReleases)) {
+            return "";
         }
+        $this->view->assign('developmentReleases', $developmentReleases);
+        $this->view->assign('id', uniqid());
+        $blockinfo['content'] = $this->view->fetch('Blocks/jenkinsbuilds.tpl');
 
         return BlockUtil::themeBlock($blockinfo);
     }
-
 }

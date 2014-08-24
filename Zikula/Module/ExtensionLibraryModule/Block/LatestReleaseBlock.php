@@ -19,8 +19,9 @@ use SecurityUtil;
 use vierbergenlars\SemVer\version;
 use Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity;
 use Zikula_Controller_AbstractBlock;
+use Zikula_View_Theme;
 
-class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
+class LatestReleaseBlock extends AbstractButtonBlock
 {
     /**
      * initialise block
@@ -48,13 +49,14 @@ class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
     }
 
     /**
-     * display block
+     * {@inheritdoc}
      */
     public function display($blockinfo)
     {
         if (!SecurityUtil::checkPermission('ZikulaExtensionLibraryModule:latestRelease:', "$blockinfo[title]::", ACCESS_OVERVIEW) || !ModUtil::available('ZikulaExtensionLibraryModule')) {
-            return;
+            return "";
         }
+        parent::display($blockinfo);
 
         $releaseManager = $this->get('zikulaextensionlibrarymodule.releasemanager');
         $releases = $releaseManager->getSignificantReleases();
@@ -65,20 +67,18 @@ class LatestReleaseBlock extends Zikula_Controller_AbstractBlock
         $preReleases = array_filter($releases, function (CoreReleaseEntity $release) {
             return $release->getState() === CoreReleaseEntity::STATE_PRERELEASE;
         });
-        if (!empty($supportedReleases) || !empty($preReleases)) {
-            if (!empty($supportedReleases)) {
-                $this->view->assign('supportedRelease', current($supportedReleases));
-            }
-            if (!empty($preReleases)) {
-                $this->view->assign('preRelease', current($preReleases));
-            }
-            $this->view->assign('id', uniqid());
-            $blockinfo['content'] = $this->view->fetch('Blocks/latestrelease.tpl');
-        } else {
-            return;
+        if (empty($supportedReleases) && empty($preReleases)) {
+            return "";
         }
+        if (!empty($supportedReleases)) {
+            $this->view->assign('supportedRelease', current($supportedReleases));
+        }
+        if (!empty($preReleases)) {
+            $this->view->assign('preRelease', current($preReleases));
+        }
+        $this->view->assign('id', uniqid());
+        $blockinfo['content'] = $this->view->fetch('Blocks/latestrelease.tpl');
 
         return BlockUtil::themeBlock($blockinfo);
     }
-
 }
