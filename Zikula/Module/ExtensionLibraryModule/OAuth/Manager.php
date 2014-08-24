@@ -121,9 +121,9 @@ class Manager
         }
 
         $this->repositoryManager->setGitHubClient($userGitHubClient);
-        $userRepositoriesWithPushAccess = array_column($this->repositoryManager->getRepositoriesWithPushAccess(), 'full_name');
+        $userRepositoriesWithPushAccess = array_column($this->repositoryManager->getRepositoriesWithPushAccess(), 'id');
 
-        if (in_array("{$extensionEntity->getVendor()->getOwner()}/{$extensionEntity->getName()}", $userRepositoriesWithPushAccess)) {
+        if (in_array($extensionEntity->getRepositoryId(), $userRepositoriesWithPushAccess)) {
             return true;
         }
 

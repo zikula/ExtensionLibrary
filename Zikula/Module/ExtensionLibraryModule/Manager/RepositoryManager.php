@@ -179,8 +179,6 @@ class RepositoryManager
      * Returns a list of all repositories the user has push access to.
      *
      * @return array
-     *
-     * @todo Include repositories of organizations the user is in.
      */
     public function getRepositoriesWithPushAccess()
     {
