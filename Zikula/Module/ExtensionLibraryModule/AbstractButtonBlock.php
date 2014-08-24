@@ -12,7 +12,7 @@
  * information regarding copyright and licensing.
  */
 
-namespace Zikula\Module\ExtensionLibraryModule\Block;
+namespace Zikula\Module\ExtensionLibraryModule;
 
 use BlockUtil;
 use Zikula_Controller_AbstractBlock;

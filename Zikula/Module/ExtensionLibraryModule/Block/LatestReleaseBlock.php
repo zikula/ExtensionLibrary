@@ -16,10 +16,8 @@ namespace Zikula\Module\ExtensionLibraryModule\Block;
 use BlockUtil;
 use ModUtil;
 use SecurityUtil;
-use vierbergenlars\SemVer\version;
+use Zikula\Module\ExtensionLibraryModule\AbstractButtonBlock;
 use Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity;
-use Zikula_Controller_AbstractBlock;
-use Zikula_View_Theme;
 
 class LatestReleaseBlock extends AbstractButtonBlock
 {
