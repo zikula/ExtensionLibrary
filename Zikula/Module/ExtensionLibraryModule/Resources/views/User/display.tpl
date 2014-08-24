@@ -23,7 +23,7 @@
         </ul>
         <div style="min-height: 90px;">
             <div class="iconStack pull-left">
-                <img class="media-object img-thumbnail" src="{$extension.vendor.logo|safetext}" alt="" width="90" height="90" />
+                <img class="media-object img-thumbnail" src="{$extension.vendor.logoUrl|safetext}" alt="" width="90" height="90" />
                 {if !empty($extension.vendor.ownerEmail)}
                     <img src="http://www.gravatar.com/avatar/{$extension.vendor.ownerEmail|md5}?d=identicon" alt="" class="img-thumbnail vendorIcon">
                 {/if}

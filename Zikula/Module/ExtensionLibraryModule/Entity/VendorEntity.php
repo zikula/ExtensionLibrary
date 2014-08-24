@@ -243,9 +243,17 @@ class VendorEntity extends EntityAccess
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getLogo()
+    {
+        return $this->logo;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogoUrl()
     {
         if (empty($this->logo)) {
             return "https://avatars.githubusercontent.com/u/{$this->id}?v=2&s=120";
