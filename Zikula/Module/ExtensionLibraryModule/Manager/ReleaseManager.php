@@ -19,6 +19,9 @@ use CarlosIO\Jenkins\Job;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Github\HttpClient\Message\ResponseMediator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Event\PostResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 use vierbergenlars\SemVer\version;
 use Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity;
@@ -47,10 +50,15 @@ class ReleaseManager
     private $router;
 
     /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
      * @param                 $em
      * @param RouterInterface $router
      */
-    public function __construct($em, RouterInterface $router)
+    public function __construct($em, RouterInterface $router, EventDispatcherInterface $eventDispatcher)
     {
         $this->client = Util::getGitHubClient();
         $this->jenkinsClient = Util::getJenkinsClient();
@@ -58,6 +66,7 @@ class ReleaseManager
         $this->repo = \ModUtil::getVar('ZikulaExtensionLibraryModule', 'github_core_repo', 'zikula/core');
         $this->dom = \ZLanguage::getModuleDomain('ZikulaExtensionLibraryModule');
         $this->router = $router;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -537,7 +546,7 @@ class ReleaseManager
      *
      * @return array
      */
-    private function moveAssetsFromJenkinsToGitHubRelease(&$release)
+    private function moveAssetsFromJenkinsToGitHubRelease($release)
     {
         // First, get the sha of the release's tag.
         $tagName = $release['tag_name'];
@@ -570,27 +579,30 @@ class ReleaseManager
         }
         // Gotcha! The current Jenkins build has the same sha as the GitHub release.
         // Now extract the assets from the Jenkins build.
-        $worked = false;
         list ($repoOwner, $repoName) = explode('/', $this->repo);
         $assets = $this->getAssetsFromJenkinsBuild($job, $correspondingBuild);
-        foreach ($assets as $asset) {
-            if (!$asset['content_type']) {
-                // GitHub won't allow us to upload files without specifying the content type.
-                // Skip those files (but there shouldn't be any).
-                continue;
-            }
-            try {
-                $this->client->api('repo')->releases()->assets()->create($repoOwner, $repoName, $release['id'], $asset['name'], $asset['content_type'], file_get_contents($asset['download_url']));
 
-                $worked = true;
-            } catch (\Exception $e) {
-                Util::log("Error while uploading assets to GitHub: " . $e->getMessage());
+        $client = $this->client;
+        $releaseManager = $this;
+        $this->eventDispatcher->addListener(KernelEvents::TERMINATE, function (PostResponseEvent $event) use ($release, $assets, $repoOwner, $repoName, $client, $releaseManager) {
+            foreach ($assets as $asset) {
+                if (!$asset['content_type']) {
+                    // GitHub won't allow us to upload files without specifying the content type.
+                    // Skip those files (but there shouldn't be any).
+                    continue;
+                }
+                try {
+                    $client->api('repo')->releases()->assets()->create($repoOwner, $repoName, $release['id'], $asset['name'], $asset['content_type'], file_get_contents($asset['download_url']));
+                } catch (\Exception $e) {
+                    Util::log("Error while uploading assets to GitHub: " . $e->getMessage());
+                }
             }
-        }
-        if ($worked) {
-            // Reload the release.
-            $release = $this->client->api('repo')->releases()->show($repoOwner, $repoName, $release['id']);
-        }
+
+            $release = $client->api('repo')->releases()->show($repoOwner, $repoName, $release['id']);
+            $releaseManager->updateGitHubRelease($release);
+        });
+
+
     }
 
     /**
@@ -618,8 +630,6 @@ class ReleaseManager
                 // Do not create news post.
                 return;
         }
-
-
 
         $args = array();
         $now = \DateUtil::getDatetime();

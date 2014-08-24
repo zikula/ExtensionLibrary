@@ -335,16 +335,27 @@ class CoreReleaseEntity extends EntityAccess
         $this->news_id = $news_id;
     }
 
+    /**
+     * Get a news text to use for this core release.
+     *
+     * @return string
+     */
     public function getNewsText()
     {
-        $downloadLinkTpl = '<a href="%link%" class="btn btn-success btn-sm">%text%</a>';
-        $downloadLinks = array();
-        foreach ($this->getAssets() as $asset) {
-            $downloadLinks[] = str_replace('%link%', $asset['download_url'], str_replace('%text%', $asset['name'], $downloadLinkTpl));
+        $downloadLinks = "";
+        if (count($this->getAssets()) > 0) {
+            $downloadLinkTpl = '<a href="%link%" class="btn btn-success btn-sm">%text%</a>';
+            foreach ($this->getAssets() as $asset) {
+                $downloadLinks .= str_replace('%link%', $asset['download_url'], str_replace('%text%', $asset['name'], $downloadLinkTpl));
+            }
+        } else {
+            $dom = \ZLanguage::getModuleDomain('ZikulaExtensionLibraryModule');
+            $downloadLinks .= "<div class=\"alert alert-warning\">" .
+                __('Direct download links not yet available!', $dom) . "</div>";
         }
 
         return self::NEWS_DESCRIPTION_START .
-            $this->getDescriptionI18n() . implode(' ', $downloadLinks) .
+            $this->getDescriptionI18n() . $downloadLinks .
             self::NEWS_DESCRIPTION_END;
     }
 }
