@@ -65,6 +65,7 @@ return array(
     'Github\\Api\\User' => $vendorDir . '/knplabs/github-api/lib/Github/Api/User.php',
     'Github\\Client' => $vendorDir . '/knplabs/github-api/lib/Github/Client.php',
     'Github\\Exception\\ApiLimitExceedException' => $vendorDir . '/knplabs/github-api/lib/Github/Exception/ApiLimitExceedException.php',
+    'Github\\Exception\\BadMethodCallException' => $vendorDir . '/knplabs/github-api/lib/Github/Exception/BadMethodCallException.php',
     'Github\\Exception\\ErrorException' => $vendorDir . '/knplabs/github-api/lib/Github/Exception/ErrorException.php',
     'Github\\Exception\\ExceptionInterface' => $vendorDir . '/knplabs/github-api/lib/Github/Exception/ExceptionInterface.php',
     'Github\\Exception\\InvalidArgumentException' => $vendorDir . '/knplabs/github-api/lib/Github/Exception/InvalidArgumentException.php',
