@@ -123,7 +123,7 @@ class Manager
         $this->repositoryManager->setGitHubClient($userGitHubClient);
         $userRepositoriesWithPushAccess = array_column($this->repositoryManager->getRepositoriesWithPushAccess(), 'id');
 
-        if (in_array($extensionEntity->getRepositoryId(), $userRepositoriesWithPushAccess)) {
+        if (in_array($extensionEntity->getId(), $userRepositoriesWithPushAccess)) {
             return true;
         }
 

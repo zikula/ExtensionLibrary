@@ -17,7 +17,6 @@ namespace Zikula\Module\ExtensionLibraryModule\Manager;
 
 use Github\Client as GitHubClient;
 use Github\Exception\RuntimeException;
-use Github\Exception\ValidationFailedException;
 use Github\HttpClient\Message\ResponseMediator;
 use Github\ResultPager;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;

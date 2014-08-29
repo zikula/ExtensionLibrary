@@ -119,8 +119,8 @@ class VendorEntity extends EntityAccess
     /**
      * Collection of extensions provided by this vendor
      *
-     * @ORM\OneToMany(targetEntity="ExtensionEntity", mappedBy="vendor", indexBy="repositoryId", cascade={"remove"})
-     * @ORM\OrderBy({"name" = "ASC"})
+     * @ORM\OneToMany(targetEntity="ExtensionEntity", mappedBy="vendor", indexBy="id", cascade={"remove"})
+     * @ORM\OrderBy({"repoName" = "ASC"})
      */
     private $extensions;
 

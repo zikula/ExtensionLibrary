@@ -21,7 +21,6 @@ use Zikula\Module\ExtensionLibraryModule\Util;
  */
 class ExtensionRepository extends EntityRepository
 {
-
     /**
      * Get all extensions matching the provided $coreVersion and $extensionType or the user's core and extension
      * filter otherwise.
