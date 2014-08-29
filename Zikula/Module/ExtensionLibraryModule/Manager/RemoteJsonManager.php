@@ -13,6 +13,8 @@
 
 namespace Zikula\Module\ExtensionLibraryModule\Manager;
 
+use JsonSchema\Uri\UriRetriever;
+use JsonSchema\Validator;
 use ModUtil;
 use Symfony\Component\HttpFoundation\Response;
 use Zikula\Module\ExtensionLibraryModule\Exception\ClientException;
@@ -144,11 +146,11 @@ class RemoteJsonManager {
             throw new ServerException(sprintf("Schema is undefined (%s).", $this->schema), Response::HTTP_BAD_REQUEST);
         }
         // Get the schema and data as objects
-        $retriever = new \JsonSchema\Uri\UriRetriever;
+        $retriever = new UriRetriever;
         $schemaFile = $retriever->retrieve('file://' . realpath($this->modulePath . '/Schema/' . $this->schema));
 
         // Validate
-        $validator = new \JsonSchema\Validator();
+        $validator = new Validator();
         $validator->check($this->content, $schemaFile);
 
         if ($validator->isValid()) {

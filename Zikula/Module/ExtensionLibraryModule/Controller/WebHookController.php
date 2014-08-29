@@ -51,6 +51,7 @@ class WebHookController extends \Zikula_AbstractController
             $payloadManager = new PayloadManager($this->request);
             $jsonPayload = $payloadManager->getJsonPayload();
 
+            ///// (1) Do some general validation of the tag, the json files.
             // check 'refs' for tags, if none, then return
             if (!strpos($jsonPayload->ref, 'tags')) {
                 $responseText .= "Event ignored - no tags found.";
@@ -68,7 +69,7 @@ class WebHookController extends \Zikula_AbstractController
                 foreach ($manifestManager->getDecodingErrors() as $error) {
                     $responseText .= "- $error\n";
                 }
-                Util::log("{$jsonPayload->repository->name}: $error", Util::LOG_PROD);
+                Util::log("{$jsonPayload->repository->name}: " . implode("\n", $manifestManager->getValidationErrors()), Util::LOG_PROD);
                 return new PlainResponse($responseText, Response::HTTP_BAD_REQUEST);
             }
 
@@ -78,7 +79,7 @@ class WebHookController extends \Zikula_AbstractController
                 foreach ($manifestManager->getValidationErrors() as $error) {
                     $responseText .= "- " . sprintf("[%s] %s", $error['property'], $error['message']) . "\n";
                 }
-                Util::log("{$jsonPayload->repository->name}: $error", Util::LOG_PROD);
+                Util::log("{$jsonPayload->repository->name}: " . implode("\n", $manifestManager->getValidationErrors()), Util::LOG_PROD);
                 return new PlainResponse($responseText, Response::HTTP_BAD_REQUEST);
             }
 
@@ -95,23 +96,29 @@ class WebHookController extends \Zikula_AbstractController
                 foreach ($composerManager->getValidationErrors() as $error) {
                     $responseText .= "- " . (sprintf("[%s] %s", $error['property'], $error['message'])) . "\n";
                 }
-                Util::log("{$jsonPayload->repository->name}: $error", Util::LOG_PROD);
+                Util::log("{$jsonPayload->repository->name}: " . implode("\n", $composerManager->getValidationErrors()), Util::LOG_PROD);
                 return new PlainResponse($responseText, Response::HTTP_BAD_REQUEST);
             }
 
-            // check vendor exists, if not create new vendor
-            $vendor = $this->entityManager
-                ->getRepository('ZikulaExtensionLibraryModule:VendorEntity')
-                ->findOneBy(array('owner' => $jsonPayload->repository->owner->name));
-            if (!isset($vendor)) {
+            ///// (2) Get or create vendor.
+            // Get the vendor id from the repository's ownername.
+            $gitHubClient = Util::getGitHubClient();
+            $user = $gitHubClient->api('user')->show($jsonPayload->repository->owner->name);
+            $userId = $user['id'];
+
+            // Check vendor exists, if not create new vendor
+            $vendor = $this->entityManager->find('ZikulaExtensionLibraryModule:VendorEntity', $userId);
+            if (!$vendor) {
                 // not found, create
-                $vendor = new VendorEntity($jsonPayload->repository->owner->name);
+                $vendor = new VendorEntity($userId, $jsonPayload->repository->owner->name);
                 $this->entityManager->persist($vendor);
-                $responseText .= sprintf('Vendor (%s) created', $jsonPayload->repository->owner->name) . "\n";
+                $responseText .= sprintf('Vendor (%s) created', "$userId/{$jsonPayload->repository->owner->name}") . "\n";
             } else {
                 // found
-                $responseText .= sprintf('Vendor (%s) found', $jsonPayload->repository->owner->name) . "\n";
+                $responseText .= sprintf('Vendor (%s) found', "$userId/{$jsonPayload->repository->owner->name}") . "\n";
             }
+
+            ///// (3) Handle vendor logo.
             if (!empty($manifestContent->vendor) && !empty($manifestContent->vendor->logo)) {
                 $imageManager = new ImageManager($manifestContent->vendor->logo);
                 if ($imageManager->import()) {
@@ -121,21 +128,26 @@ class WebHookController extends \Zikula_AbstractController
                     foreach ($imageManager->getValidationErrors() as $error) {
                         $responseText .= "- $error\n";
                     }
-                    Util::log("{$jsonPayload->repository->name}: $error", Util::LOG_PROD);
+                    Util::log("{$jsonPayload->repository->name}: " . implode("\n", $imageManager->getValidationErrors()), Util::LOG_PROD);
                 }
             }
+
+            ///// (4) Set vendor data.
+            // @todo Remove this and exclusively use the Webinterface to set vendor information.
             $vendor->mergeManifest($manifestContent);
             $vendor->mergeComposer($composerContent);
 
+            ///// (5) Get or create extension.
+            $repositoryId = (int)$jsonPayload->repository->id;
             // check extension exists, if not create new extension
-            if ($vendor->hasExtensionById($jsonPayload->repository->id)) {
-                $responseText .= sprintf('Extension (%s) found', $jsonPayload->repository->id) . "\n";
-                $extension = $vendor->getExtensionById($jsonPayload->repository->id);
+            if ($vendor->hasExtensionById($repositoryId)) {
+                $responseText .= sprintf('Extension (%s) found', "$repositoryId/{$jsonPayload->repository->name}") . "\n";
+                $extension = $vendor->getExtensionById($repositoryId);
             } else {
                 // not found, create new extension and assign to vendor
                 $extension = new ExtensionEntity(
                     $vendor,
-                    (int)$jsonPayload->repository->id,
+                    $repositoryId,
                     $jsonPayload->repository->name,
                     $manifestContent->extension->title,
                     $composerContent->description,
@@ -143,8 +155,10 @@ class WebHookController extends \Zikula_AbstractController
                 );
                 $vendor->addExtension($extension);
                 $this->entityManager->persist($extension);
-                $responseText .= sprintf('Extension (%s) created', $jsonPayload->repository->id) . "\n";
+                $responseText .= sprintf('Extension (%s) created', "$repositoryId/{$jsonPayload->repository->name}") . "\n";
             }
+
+            ///// (6) Handle extension icon.
             if (!empty($manifestContent->extension->icon)) {
                 $imageManager = new ImageManager($manifestContent->extension->icon);
                 if ($imageManager->import()) {
@@ -155,12 +169,15 @@ class WebHookController extends \Zikula_AbstractController
                     foreach ($imageManager->getValidationErrors() as $error) {
                         $responseText .= "- $error\n";
                     }
-                    Util::log("{$jsonPayload->repository->name}: $error", Util::LOG_PROD);
+                    Util::log("{$jsonPayload->repository->name}: " . implode("\n", $imageManager->getValidationErrors()), Util::LOG_PROD);
                 }
             }
+
+            ///// (7) Set extension data.
             $extension->mergeManifest($manifestContent);
             $extension->mergeComposer($composerContent);
 
+            ///// (8) Create or check extension version.
             // compare version to newest available. If newer, add new version
             list(, , $semver) = explode('/', $jsonPayload->ref);
             $newestVersion = $extension->getNewestVersion();
@@ -172,13 +189,13 @@ class WebHookController extends \Zikula_AbstractController
                     $manifestContent->version->dependencies,
                     $composerContent->license
                 );
-                $this->entityManager->persist($version);
                 $extension->addVersion($version);
+                $this->entityManager->persist($version);
+
+                ///// (9) Set extension version data.
                 $version->mergeManifest($manifestContent);
                 $version->mergeComposer($composerContent);
-                $responseText .= sprintf("Version %s added to extension %s\n",
-                    $semver,
-                    $extension->getTitle());
+                $responseText .= sprintf("Version %s added to extension %s\n", $semver, $extension->getTitle());
             } else {
                 $responseText .= sprintf("The version %s was not added because it was the same or older than the current version (%s).\n",
                     $semver,
@@ -190,7 +207,7 @@ class WebHookController extends \Zikula_AbstractController
 
             $this->entityManager->flush();
 
-            // add keywords via the Tag module when hooked
+            ///// (10) Add keywords via the Tag module when hooked.
             /** @var $hookDispatcher \Zikula\Component\HookDispatcher\StorageInterface */
             $hookDispatcher = \ServiceUtil::get('hook_dispatcher');
             $url = new ModUrl($this->name, 'user', 'display', ZLanguage::getLanguageCode(), array('extension_slug' => $extension->getTitleSlug()));
@@ -209,6 +226,7 @@ class WebHookController extends \Zikula_AbstractController
                 }
             }
 
+            ///// (11) Handle Dizkus Hook.
             if (ModUtil::available('ZikulaDizkusModule')) {
                 $bindings = $hookDispatcher->getBindingsBetweenOwners($this->name, 'ZikulaDizkusModule');
                 if (count($bindings) > 0) {

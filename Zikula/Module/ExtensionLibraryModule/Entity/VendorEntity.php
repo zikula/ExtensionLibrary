@@ -28,11 +28,11 @@ use Zikula\Module\ExtensionLibraryModule\Util;
 class VendorEntity extends EntityAccess
 {
     /**
-     * id field
+     * id field - NOT auto-generated. The GitHub user id is used.
      *
      * @ORM\Id
      * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\GeneratedValue(strategy="NONE")
      */
     private $id;
 
@@ -71,14 +71,6 @@ class VendorEntity extends EntityAccess
      * @ORM\Column(type="string", length=128, nullable=true)
      */
     private $ownerUrl;
-
-    /**
-     * Associated Zikula Core user_id
-     * can be empty array if the vendor has been unclaimed
-     *
-     * @ORM\Column(type="array")
-     */
-    private $userIds = array();
 
     /**
      * vendor url
@@ -127,18 +119,27 @@ class VendorEntity extends EntityAccess
     /**
      * Collection of extensions provided by this vendor
      *
-     * @ORM\OneToMany(targetEntity="ExtensionEntity", mappedBy="vendor", indexBy="repositoryId", cascade={"remove"})
-     * @ORM\OrderBy({"name" = "ASC"})
+     * @ORM\OneToMany(targetEntity="ExtensionEntity", mappedBy="vendor", indexBy="id", cascade={"remove"})
+     * @ORM\OrderBy({"repoName" = "ASC"})
      */
     private $extensions;
 
     /**
      * Constructor
      */
-    public function __construct($owner)
+    public function __construct($id, $owner)
     {
+        $this->id = $id;
         $this->owner = $owner;
         $this->extensions = new ArrayCollection();
+    }
+
+    /**
+     * @param integer $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
     /**
@@ -242,12 +243,20 @@ class VendorEntity extends EntityAccess
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getLogo()
     {
+        return $this->logo;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogoUrl()
+    {
         if (empty($this->logo)) {
-            return \ServiceUtil::get('router')->generate('zikulaextensionlibrarymodule_user_getimage');
+            return "https://avatars.githubusercontent.com/u/{$this->id}?v=2&s=120";
         }
         return \ServiceUtil::get('router')->generate('zikulaextensionlibrarymodule_user_getimage', array('name' => $this->logo));
     }
@@ -278,35 +287,6 @@ class VendorEntity extends EntityAccess
     public function getUrl()
     {
         return $this->url;
-    }
-
-    /**
-     * @param integer $userId
-     */
-    public function addUserId($userId)
-    {
-        if (!in_array($userId, $this->userIds)) {
-            $this->userIds[] = $userId;
-        }
-    }
-
-    /**
-     * @param integer $userId
-     */
-    public function removeUserId($userId)
-    {
-        $key = array_search($userId, $this->userIds);
-        if (false !== $key) {
-            unset($this->userIds[$key]);
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function getUserIds()
-    {
-        return $this->userIds;
     }
 
     /**
@@ -396,5 +376,4 @@ class VendorEntity extends EntityAccess
             }
         }
     }
-
 }

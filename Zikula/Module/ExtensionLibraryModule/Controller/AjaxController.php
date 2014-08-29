@@ -13,6 +13,8 @@
 
 namespace Zikula\Module\ExtensionLibraryModule\Controller;
 
+use JsonSchema\Uri\UriRetriever;
+use JsonSchema\Validator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method; // used in annotations - do not remove
 use Zikula\Core\Response\Ajax\AjaxResponse;
@@ -45,11 +47,11 @@ class AjaxController extends \Zikula_Controller_AbstractAjax
 
         // Get the schema and data as objects
         $module = ModUtil::getModule($this->name);
-        $retriever = new \JsonSchema\Uri\UriRetriever;
+        $retriever = new UriRetriever;
         $schemaFile = $retriever->retrieve('file://' . realpath($module->getPath() . '/Schema/' . $schema));
 
         // Validate
-        $validator = new \JsonSchema\Validator();
+        $validator = new Validator();
         $validator->check(json_decode($content), $schemaFile);
 
         if ($validator->isValid()) {
@@ -139,5 +141,4 @@ class AjaxController extends \Zikula_Controller_AbstractAjax
 
         return new AjaxResponse(array('status' => 1));
     }
-
 }

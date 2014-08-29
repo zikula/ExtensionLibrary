@@ -17,7 +17,6 @@ namespace Zikula\Module\ExtensionLibraryModule\Manager;
 
 use Github\Client as GitHubClient;
 use Github\Exception\RuntimeException;
-use Github\Exception\ValidationFailedException;
 use Github\HttpClient\Message\ResponseMediator;
 use Github\ResultPager;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
@@ -179,8 +178,6 @@ class RepositoryManager
      * Returns a list of all repositories the user has push access to.
      *
      * @return array
-     *
-     * @todo Include repositories of organizations the user is in.
      */
     public function getRepositoriesWithPushAccess()
     {

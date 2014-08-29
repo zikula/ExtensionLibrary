@@ -128,7 +128,7 @@ class UserController extends \Zikula_AbstractController
                     )
             ),
             array(
-                'title' => \DataUtil::formatForDisplay($extensionEntity->getName())
+                'title' => \DataUtil::formatForDisplay($extensionEntity->getTitle())
             ),
         ));
 
@@ -313,17 +313,13 @@ class UserController extends \Zikula_AbstractController
      */
     public function getImageAction($name = null)
     {
-        // only allow local request for images
-//        if (!($this->request->server->get("REMOTE_ADDR", 0) == $this->request->server->get('SERVER_ADDR', 1))) {
-//            throw new AccessDeniedException();
-//        }
         if (isset($name) && !strpos($name, '/')) {
             $path = ImageManager::STORAGE_PATH . $name;
         } else {
             // get a default image
             $module = ModUtil::getModule('ZikulaExtensionLibraryModule');
             // @todo - getRelativePath() is deprecated
-            $path = $module->getRelativePath() . '/Resources/public/images/logo90px.png';
+            $path = $module->getRelativePath() . '/Resources/public/images/default_extension.png';
         }
 
         if (function_exists('exif_imagetype')) {
@@ -349,7 +345,7 @@ class UserController extends \Zikula_AbstractController
         } else {
             // return default image instead
             Util::log("could not retrieve image ($name)");
-            return $this->getImage();
+            return $this->getImageAction();
         }
     }
 
@@ -453,14 +449,13 @@ class UserController extends \Zikula_AbstractController
         $userRepository = $userRepositoryManager->getRepository($extension['repository']);
 
         try {
-            $webHook = $userRepositoryManager->createWebHook(
+            $userRepositoryManager->createWebHook(
                 $userRepository,
                 array('push'),
                 $this->get('router')->generate('zikulaextensionlibrarymodule_webhook_extension', array(), RouterInterface::ABSOLUTE_URL)
             );
         } catch (ValidationFailedException $e) {
             // Hook already exists.
-            $webHook = false;
         }
 
         // fork repository to zikulabot
@@ -573,7 +568,7 @@ class UserController extends \Zikula_AbstractController
 
 You requested to add this extension to the [Zikula Extension Library]($elLink) :star:. You're just two clicks away from there:
 1. Merge this PR!
-2. Add a new Tag as version {$versionArr['semver']} (either using the git command line, your favourite git client or the [GitHub online interface]($ghReleasesUrl))!
+2. Add a new Tag as version {$extension['version']} (either using the git command line, your favourite git client or the [GitHub online interface]($ghReleasesUrl))!
 
 In case something doesn't work as expected, feel free to open an issue in the [Extension Library repository]($elRepoLink)!
 EOF;

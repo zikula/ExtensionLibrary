@@ -19,7 +19,7 @@
                 <a class="pull-left" href="{route name='zikulaextensionlibrarymodule_user_display' extension_slug=$extension.titleSlug}">
                     <div class="iconStack">
                         <img class="media-object img-thumbnail" src="{$extension.icon|safetext}" alt="" width="90" height="90" />
-                        <img class="img-thumbnail vendorIcon" src="{$extension.vendor.logo|safetext}" alt="">
+                        <img class="img-thumbnail vendorIcon" src="{$extension.vendor.logoUrl|safetext}" alt="">
                     </div>
                 </a>
                 <div class="media-body">

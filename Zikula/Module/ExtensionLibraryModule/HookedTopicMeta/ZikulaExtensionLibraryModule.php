@@ -19,7 +19,6 @@ use Zikula\Module\DizkusModule\AbstractHookedTopicMeta;
 
 class ZikulaExtensionLibraryModule extends AbstractHookedTopicMeta
 {
-
     /**
      * @var \Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity
      */
@@ -53,5 +52,4 @@ class ZikulaExtensionLibraryModule extends AbstractHookedTopicMeta
         );
         $this->content = __f('The %1$s version of extension %2$s was added by %3$s on %4$s.<br /><br />Short description: %5$s<br /><br />[%6$s]', $replacements, $this->dom);
     }
-
 }

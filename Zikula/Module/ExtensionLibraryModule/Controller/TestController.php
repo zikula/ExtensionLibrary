@@ -14,7 +14,6 @@
 namespace Zikula\Module\ExtensionLibraryModule\Controller;
 
 use SecurityUtil;
-use ModUtil;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
 use Zikula\Core\Response\PlainResponse;
@@ -152,6 +151,8 @@ class TestController extends \Zikula_AbstractController
      * @Route("/sanitize/{type}", requirements={"type" = "manifest|composer"})
      *
      * @param string $type
+     *
+     * @return \Zikula\Core\Response\PlainResponse
      */
     public function sanitize($type = 'manifest') {
 //        $owner = 'craigh';
@@ -178,5 +179,4 @@ class TestController extends \Zikula_AbstractController
 
         return new PlainResponse();
     }
-
 }

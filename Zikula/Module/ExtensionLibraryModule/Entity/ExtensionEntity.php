@@ -34,30 +34,20 @@ class ExtensionEntity extends EntityAccess
     const TYPE_PLUGIN = 'zikula-plugin';
 
     /**
-     * id field
+     * id field - NOT auto-generated. The GitHub repository id is used.
      *
      * @ORM\Id
-     * @ORM\Column(type="integer", unique=true)
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="NONE")
      */
     private $id;
 
     /**
-     * github repository id
-     * provided from github repository id in constructor
+     * Repository name. (e.g. "News")
      *
-     * @ORM\Column(type="integer", unique=true)
+     * @ORM\Column(type="string", length=128)
      */
-    private $repositoryId;
-
-    /**
-     * extension name
-     * taken from github repository name
-     * must be unique
-     *
-     * @ORM\Column(type="string", length=128, unique=true)
-     */
-    private $name;
+    private $repoName;
 
     /**
      * Short extension description
@@ -73,13 +63,12 @@ class ExtensionEntity extends EntityAccess
     private $updated;
 
     /**
-     * name slug
-     * automatically computed from $name
+     * Repository name slug.
      *
      * @ORM\Column(type="string", length=128)
-     * @Gedmo\Slug(fields={"name"})
+     * @Gedmo\Slug(fields={"repoName"})
      */
-    private $nameSlug;
+    private $repoNameSlug;
 
     /**
      * extension title
@@ -142,11 +131,11 @@ class ExtensionEntity extends EntityAccess
     /**
      * Constructor
      */
-    public function __construct(VendorEntity $vendor, $id, $name, $title, $description, $type = self::TYPE_MODULE)
+    public function __construct(VendorEntity $vendor, $id, $repoName, $title, $description, $type = self::TYPE_MODULE)
     {
+        $this->id = $id;
         $this->vendor = $vendor;
-        $this->repositoryId = $id;
-        $this->name = $name;
+        $this->repoName = $repoName;
         $this->title= $title;
         $this->description = $description;
         $this->type = $type;
@@ -163,27 +152,19 @@ class ExtensionEntity extends EntityAccess
     }
 
     /**
-     * @return integer
+     * @return string
      */
-    public function getRepositoryId()
+    public function getRepoName()
     {
-        return $this->repositoryId;
+        return $this->repoName;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getName()
+    public function getRepoNameSlug()
     {
-        return $this->name;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getNameSlug()
-    {
-        return $this->nameSlug;
+        return $this->repoNameSlug;
     }
 
     /**
@@ -283,7 +264,7 @@ class ExtensionEntity extends EntityAccess
         if (!empty($this->title)) {
             return $this->title;
         } else {
-            return $this->name;
+            return $this->repoName;
         }
     }
 
@@ -295,7 +276,7 @@ class ExtensionEntity extends EntityAccess
         if (!empty($this->titleSlug)) {
             return $this->titleSlug;
         } else {
-            return $this->nameSlug;
+            return $this->repoNameSlug;
         }
     }
 
