@@ -407,7 +407,7 @@ class UserController extends \Zikula_AbstractController
         if (count($orgsAndUser) == 0) {
             $request->getSession()->getFlashBag()->add('error', $this->__('It seems like you don\'t have permission to any published vendor. If you want to change your own vendor information, make sure to publish an extension first!'));
 
-            return new RedirectResponse($this->get('router')->generate('zikulaextensionlibrarymodule_user_main', array(), RouterInterface::ABSOLUTE_URL));
+            return new RedirectResponse($this->get('router')->generate('zikulaextensionlibrarymodule_user_index', array(), RouterInterface::ABSOLUTE_URL));
         }
 
         $this->view->assign('breadcrumbs', array (array ('title' => $this->__('Edit vendor information'))));
