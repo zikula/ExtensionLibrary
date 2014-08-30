@@ -18,13 +18,11 @@
     </div>
     <div class="well well-sm col-md-4">
         <h3 style="margin-top: 0">{$extension.vendor.title|safetext}</h3>
-        <div style="min-height: 90px;">
-            <div class="iconStack pull-left">
-                <img class="media-object img-thumbnail" src="{$extension.vendor.logoUrl|safetext}" alt="" width="90" height="90" />
-                {if !empty($extension.vendor.email)}
-                    <img src="http://www.gravatar.com/avatar/{$extension.vendor.email|md5}?d=identicon" alt="" class="img-thumbnail vendorIcon">
-                {/if}
-            </div>
+        <div class="iconStack pull-left">
+            <img class="media-object img-thumbnail" src="{$extension.vendor.logoUrl|safetext}" alt="" width="90" height="90" />
+            {if !empty($extension.vendor.email)}
+                <img src="http://www.gravatar.com/avatar/{$extension.vendor.email|md5}?d=identicon" alt="" class="img-thumbnail vendorIcon">
+            {/if}
         </div>
         <ul class="list-unstyled">
             {if !empty($extension.vendor.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.url|safetext}">{gt text="Vendor Website"}</a></li>{/if}
