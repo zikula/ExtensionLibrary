@@ -55,7 +55,7 @@
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
             <button type="submit" class="btn btn-success" {if !isset($vendors)}name="save"{/if}>{if !isset($vendors)}{gt text='Save'}{else}{gt text='Proceed'}{/if}</button>
-            <a class="btn btn-default" href="{route name='zikulaextensionlibrarymodule_user_main'}">{gt text='Cancel'}</a>
+            <a class="btn btn-default" href="{route name='zikulaextensionlibrarymodule_user_index'}">{gt text='Cancel'}</a>
         </div>
     </div>
 </form>
