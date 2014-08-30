@@ -433,17 +433,22 @@ class UserController extends \Zikula_AbstractController
             $vendor->setUrl($vendorData['url']);
             $vendor->setEmail($vendorData['email']);
 
-            $imageManager = new ImageManager($vendorData['logo']);
-            $worked = $imageManager->import();
-            if ($worked) {
-                $vendor->setLogoFileName($imageManager->getName());
-                $vendor->setLogo($vendorData['logo']);
+            if (!empty($vendorData['logo'])) {
+                $imageManager = new ImageManager($vendorData['logo']);
+                $worked = $imageManager->import();
+                if ($worked) {
+                    $vendor->setLogoFileName($imageManager->getName());
+                    $vendor->setLogo($vendorData['logo']);
+                } else {
+                    // Leave old vendor logo.
+                    $request->getSession()->getFlashBag()->add('error',
+                        $this->__f('Could not upload or validate image file. The following error(s) occured: %s', array(
+                            implode("<br />", $imageManager->getValidationErrors())
+                    )));
+                }
             } else {
-                // Leave old vendor logo.
-                $request->getSession()->getFlashBag()->add('error',
-                    $this->__f('Could not upload or validate image file. The following error(s) occured: %s', array(
-                        implode("<br />", $imageManager->getValidationErrors())
-                )));
+                $vendor->setLogo(null);
+                $vendor->setLogoFileName(null);
             }
 
             $this->entityManager->persist($vendor);
