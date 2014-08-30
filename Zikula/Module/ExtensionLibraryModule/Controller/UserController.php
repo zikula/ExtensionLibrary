@@ -356,7 +356,7 @@ class UserController extends \Zikula_AbstractController
     {
         $this->view->assign('breadcrumbs', array (
             array (
-                'title' => 'Core Releases'
+                'title' => $this->__('Core Releases')
             )
         ));
 
@@ -365,6 +365,94 @@ class UserController extends \Zikula_AbstractController
         $this->view->assign('releases', $releases);
 
         return $this->response($this->view->fetch('User/viewreleases.tpl'));
+    }
+
+    /**
+     * @Route("/edit-vendor-information")
+     *
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function editVendorAction(Request $request)
+    {
+        $oAuthManager = $this->get('zikulaextensionlibrarymodule.oauthmanager');
+        $result = $oAuthManager->authenticate($this->get('router')->generate('zikulaextensionlibrarymodule_user_editvendor', array(), RouterInterface::ABSOLUTE_URL));
+        if ($result instanceof RedirectResponse) {
+            return $result;
+        } else if ($result instanceof GitHubClient) {
+            $userGitHubClient = $result;
+            unset($result);
+        } else {
+            throw new \RuntimeException('Something unexpected happened!');
+        }
+
+        /** @var RepositoryManager $userRepositoryManager */
+        $userRepositoryManager = $this->get('zikulaextensionlibrarymodule.repositorymanager');
+        $userRepositoryManager->setGitHubClient($userGitHubClient);
+        $orgsAndUser = $userRepositoryManager->getOrgsAndUserWithAdminAccess();
+
+        // Now check which vendors actually exist in the ExtensionLibrary.
+        $qb = $this->entityManager->createQueryBuilder();
+        $qb->select('v.id')
+            ->from('ZikulaExtensionLibraryModule:VendorEntity', 'v')
+            ->where($qb->expr()->in('v.id', array_column($orgsAndUser, 'id')));
+        $vendorIds = array_column($qb->getQuery()->getArrayResult(), 'id');
+        foreach ($orgsAndUser as $id => $orgOrUser) {
+            if (!in_array($id, $vendorIds)) {
+                // Unset this vendor as it is not known by the ExtensionLibrary (yet).
+                unset($orgsAndUser[$id]);
+            }
+        }
+        if (count($orgsAndUser) == 0) {
+            $request->getSession()->getFlashBag()->add('error', $this->__('It seems like you don\'t have permission to any published vendor. If you want to change your own vendor information, make sure to publish an extension first!'));
+
+            return new RedirectResponse($this->get('router')->generate('zikulaextensionlibrarymodule_user_main', array(), RouterInterface::ABSOLUTE_URL));
+        }
+
+        $this->view->assign('breadcrumbs', array (array ('title' => $this->__('Edit vendor information'))));
+
+        if ($request->isMethod('GET')) {
+            $this->view->assign('vendors', $orgsAndUser);
+
+            return new Response($this->view->fetch('User/editvendor.tpl'));
+        }
+
+        $vendorData = $request->request->get('vendor');
+        $vendor = $this->entityManager->find('ZikulaExtensionLibraryModule:VendorEntity', $vendorData['id']);
+        if (!in_array($vendor->getId(), array_keys($orgsAndUser))) {
+            throw new NotFoundHttpException();
+        }
+
+        if (!$request->request->has('save')) {
+            $this->view->assign('vendor', $vendor);
+
+            return new Response($this->view->fetch('User/editvendor.tpl'));
+        } else {
+            $vendor->setTitle($vendorData['title']);
+            $vendor->setUrl($vendorData['url']);
+            $vendor->setEmail($vendorData['email']);
+
+            $imageManager = new ImageManager($vendorData['logo']);
+            $worked = $imageManager->import();
+            if ($worked) {
+                $vendor->setLogoFileName($imageManager->getName());
+                $vendor->setLogo($vendorData['logo']);
+            } else {
+                // Leave old vendor logo.
+                $request->getSession()->getFlashBag()->add('error',
+                    $this->__f('Could not upload or validate image file. The following error(s) occured: %s', array(
+                        implode("<br />", $imageManager->getValidationErrors())
+                )));
+            }
+
+            $this->entityManager->persist($vendor);
+            $this->entityManager->flush();
+
+            $request->getSession()->getFlashBag()->add('status', $this->__('Your vendor information has been updated.'));
+
+            return new RedirectResponse($this->get('router')->generate('zikulaextensionlibrarymodule_user_filterbyvendor', array('vendor_slug' => $vendor->getTitleSlug()), RouterInterface::ABSOLUTE_URL));
+        }
     }
 
     /**
@@ -524,13 +612,6 @@ class UserController extends \Zikula_AbstractController
         $forkedManifestFile = $elRepositoryManager->getFileInRepository($forkedRepository, $prBranch, 'zikula.manifest.json');
         if ($forkedManifestFile === false) {
             // create and write zikula.manifest file
-            $vendorArr = array("title" => $vendor['displayName']);
-            if (!empty($vendor['url'])) {
-                $vendorArr["url"] = $vendor['url'];
-            }
-            if (!empty($vendor['logo'])) {
-                $vendorArr["logo"] = $vendor['logo'];
-            }
             $extensionArr = array("title" => $extension['displayName']);
             if (!empty($extension['url'])) {
                 $extensionArr["url"] = $extension['url'];
@@ -550,7 +631,6 @@ class UserController extends \Zikula_AbstractController
 
             $content = json_encode(array(
                 /*"api" => "v1",*/
-                "vendor" => $vendorArr,
                 "extension" => $extensionArr,
                 "version" => $versionArr
             ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
@@ -563,12 +643,16 @@ class UserController extends \Zikula_AbstractController
         $elLink = $this->get('router')->generate('zikulaextensionlibrarymodule_user_index', array(), RouterInterface::ABSOLUTE_URL);
         $elRepoLink = 'https://github.com/craigh/ExtensionLibrary/issues/new';
         $ghReleasesUrl = $userRepository['html_url'] . "/releases/new";
+        $vendorEditUrl = $this->get('router')->generate('zikulaextensionlibrarymodule_user_editvendor', array(), RouterInterface::ABSOLUTE_URL);
         $body = <<< EOF
 #### Hi @{$userRepository['owner']['login']}!
 
 You requested to add this extension to the [Zikula Extension Library]($elLink) :star:. You're just two clicks away from there:
 1. Merge this PR!
-2. Add a new Tag as version {$extension['version']} (either using the git command line, your favourite git client or the [GitHub online interface]($ghReleasesUrl))!
+2. Add a new Tag as version {$extension['version']} (either using the git command line, your favourite git client or the
+[GitHub online interface]($ghReleasesUrl))!
+3. You're done! After your extension is published, you can edit your vendor information (such as `logo`, `title`,
+`homepage` and `email` [at zikula.org]($vendorEditUrl).
 
 In case something doesn't work as expected, feel free to open an issue in the [Extension Library repository]($elRepoLink)!
 EOF;

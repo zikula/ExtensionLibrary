@@ -4,21 +4,6 @@
     "description" : "Zikula Extension Library manifest",
     "type": "object",
     "properties": {
-        "vendor": {
-            "description": "Properties describing the extension vendor.",
-            "type": "object",
-            "properties": {
-                "title": {"type": "string"},
-                "url": {
-                    "type": "string",
-                    "format": "uri"
-                },
-                "logo": {
-                    "type": "string",
-                    "format": "uri"
-                }
-            }
-        },
         "extension": {
             "description": "Properties describing the extension.",
             "type": "object",

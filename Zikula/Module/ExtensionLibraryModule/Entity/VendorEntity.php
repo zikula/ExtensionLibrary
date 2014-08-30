@@ -37,40 +37,12 @@ class VendorEntity extends EntityAccess
     private $id;
 
     /**
-     * vendor owner
-     * taken from github repository owner name
-     * must be unique
+     * The vendor's GitHub name - IMPORTANT: These names aren't unique: If a GitHub user deletes or renames his account,
+     * the name can be taken by another user.
      *
-     * @ORM\Column(type="string", length=128, unique=true)
+     * @ORM\Column(type="string", length=128)
      */
-    private $owner;
-
-    /**
-     * owner name
-     * supplied by vendor
-     * can be null
-     *
-     * @ORM\Column(type="string", length=128, nullable=true)
-     */
-    private $ownerName;
-
-    /**
-     * owner email
-     * supplied by vendor
-     * can be null
-     *
-     * @ORM\Column(type="string", length=128, nullable=true)
-     */
-    private $ownerEmail;
-
-    /**
-     * owner email
-     * supplied by vendor
-     * can be null
-     *
-     * @ORM\Column(type="string", length=128, nullable=true)
-     */
-    private $ownerUrl;
+    private $gitHubName;
 
     /**
      * vendor url
@@ -82,30 +54,37 @@ class VendorEntity extends EntityAccess
     private $url = null;
 
     /**
-     * vendor title
+     * vendor email
      * supplied by vendor
      * can be null
      *
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=128, nullable=true)
      */
-    private $title = null;
+    private $email = null;
 
     /**
-     * local logo image path
-     * can be null
+     * vendor title
+     * supplied by vendor
+     * set to the GitHub name if empty.
+     *
+     * @ORM\Column(type="string", length=255)
+     */
+    private $title;
+
+    /**
+     * User supplied url to the vendor logo.
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $logo = null;
 
     /**
-     * ownerName slug
-     * automatically computed from $ownerName
+     * local logo image file name.
+     * can be null
      *
-     * @ORM\Column(type="string", length=128)
-     * @Gedmo\Slug(fields={"ownerName"})
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $ownerNameSlug;
+    private $logoFileName = null;
 
     /**
      * title slug
@@ -127,10 +106,11 @@ class VendorEntity extends EntityAccess
     /**
      * Constructor
      */
-    public function __construct($id, $owner)
+    public function __construct($id, $gitHubName)
     {
         $this->id = $id;
-        $this->owner = $owner;
+        $this->gitHubName = $gitHubName;
+        $this->title = $gitHubName;
         $this->extensions = new ArrayCollection();
     }
 
@@ -151,70 +131,6 @@ class VendorEntity extends EntityAccess
     }
 
     /**
-     * @return string
-     */
-    public function getOwner()
-    {
-        return $this->owner;
-    }
-
-    /**
-     * @param string $ownerEmail
-     */
-    public function setOwnerEmail($ownerEmail)
-    {
-        $this->ownerEmail = $ownerEmail;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOwnerEmail()
-    {
-        return $this->ownerEmail;
-    }
-
-    /**
-     * @param string $ownerName
-     */
-    public function setOwnerName($ownerName)
-    {
-        $this->ownerName = $ownerName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOwnerName()
-    {
-        return $this->ownerName;
-    }
-
-    /**
-     * @param string $ownerUrl
-     */
-    public function setOwnerUrl($ownerUrl)
-    {
-        $this->ownerUrl = $ownerUrl;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOwnerUrl()
-    {
-        return $this->ownerUrl;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOwnerNameSlug()
-    {
-        return $this->ownerNameSlug;
-    }
-
-    /**
      * @param string $title
      */
     public function setTitle($title)
@@ -227,11 +143,7 @@ class VendorEntity extends EntityAccess
      */
     public function getTitle()
     {
-        if (!empty($this->title)) {
-            return $this->title;
-        } else {
-            return $this->owner;
-        }
+        return $this->title;
     }
 
     /**
@@ -255,10 +167,10 @@ class VendorEntity extends EntityAccess
      */
     public function getLogoUrl()
     {
-        if (empty($this->logo)) {
+        if (empty($this->logoFileName)) {
             return "https://avatars.githubusercontent.com/u/{$this->id}?v=2&s=120";
         }
-        return \ServiceUtil::get('router')->generate('zikulaextensionlibrarymodule_user_getimage', array('name' => $this->logo));
+        return \ServiceUtil::get('router')->generate('zikulaextensionlibrarymodule_user_getimage', array('name' => $this->logoFileName));
     }
 
     /**
@@ -266,11 +178,7 @@ class VendorEntity extends EntityAccess
      */
     public function getTitleSlug()
     {
-        if (!empty($this->titleSlug)) {
-            return $this->titleSlug;
-        } else {
-            return $this->owner;
-        }
+        return $this->titleSlug;
     }
 
     /**
@@ -347,20 +255,7 @@ class VendorEntity extends EntityAccess
     }
 
     /**
-     * merge some properties of the manifest file
-     * @param \stdClass $manifest
-     */
-    public function mergeManifest($manifest)
-    {
-        if (!empty($manifest->vendor)) {
-            $this->title = !empty($manifest->vendor->title) ? $manifest->vendor->title : null;
-            $this->url = !empty($manifest->vendor->url) ? $manifest->vendor->url : null;
-            $this->logo = !empty($manifest->vendor->logo) ? $manifest->vendor->logo : null;
-        }
-    }
-
-    /**
-     * merge some properties of the composer file
+     * merge some properties of the composer file. Only do so if the vendor is new!!
      * @param \stdClass $composer
      */
     public function mergeComposer($composer)
@@ -368,12 +263,67 @@ class VendorEntity extends EntityAccess
         if (!empty($composer->authors)) {
             foreach ($composer->authors as $author) {
                 if (!empty($author->role) && ($author->role == "owner")) {
-                    $this->ownerName = !empty($author->name) ? $author->name : null;
-                    $this->ownerEmail = !empty($author->email) ? $author->email : null;
-                    $this->ownerUrl = !empty($author->homepage) ? $author->homepage : null;
-                    break;
+                    if (!empty($author->name)) {
+                        $this->title = $author->name;
+                    }
+                    if (!empty($author->email)) {
+                        $this->email = $author->email;
+                    }
+                    if (!empty($author->homepage)) {
+                        $this->url = $author->homepage;
+                    }
+
+                    return;
                 }
             }
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param mixed $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGitHubName()
+    {
+        return $this->gitHubName;
+    }
+
+    /**
+     * @param mixed $gitHubName
+     */
+    public function setGitHubName($gitHubName)
+    {
+        $this->gitHubName = $gitHubName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLogoFileName()
+    {
+        return $this->logoFileName;
+    }
+
+    /**
+     * @param mixed $logoFileName
+     */
+    public function setLogoFileName($logoFileName)
+    {
+        $this->logoFileName = $logoFileName;
     }
 }
