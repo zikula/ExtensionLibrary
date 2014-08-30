@@ -26,13 +26,13 @@
                 <input type="email" name="vendor[email]" value="{$vendor.email|safetext}" id="el-add-extension-vendor-email" class="form-control" placeholder="{gt text='e.g. example@zikula.org'}">
             </div>
         </div>
-        <div class="form-group">
+        {* <div class="form-group">
             <label for="el-add-extension-vendor-logo" class="col-sm-2 control-label">{gt text='Vendor Logo'}</label>
             <div class="col-sm-10">
                 <input type="url" name="vendor[logo]" value="https://gravatar.com/avatar/{$vendor.gravatar_id|safetext}.png?s=120&d=404" id="el-add-extension-vendor-logo" class="form-control" placeholder="{gt text='e.g. http://example.com/logo.png'}">
                 <span class="help-block">{gt text='The url to your vendor logo (different from extension logo/icon). Supported image types are `.jpg`, `.jpeg`, `.gif` and `.png`. Images MUST be less than 120px x 120px.'}</span>
             </div>
-        </div>
+        </div> *}
     </fieldset>
     <fieldset>
         <legend><i class='fa fa-github'></i> {gt text='GitHub Repo'}</legend>

@@ -17,22 +17,22 @@ A typical github repo url looks like `http://www.github.com/zikula-modules/Legal
 
 Vendor
 ------
-Vendor uses the repository **owner** as a unique id. This value is obtained via the posted payload information when
-the tag is pushed. Other values MAY optionally be set in the manifest. The `title` is used for the display of the
-related extensions, but will default to the repository `owner` if left empty.
+Vendor uses the GitHub's unique `user id` as a unique id. This value is obtained from the user name the posted payload
+information contains when the tag is pushed. The `title` is used for the display of the
+related extensions, but will default to the GitHub `user name` if left empty.
 
-The vendor can later be "claimed" by one or more Core User(s) and then managed (somewhat) by those users. Claims are
-processed by moderators to ensure authenticity.
+The vendor data (`title`, `url`, `email`, `logo`) can be edited via the ExtensionLibrary webinterface. A user can edit
+it's own account's data as well as data of any organization he has admin access at.
 
-Vendors can be *verified*, *unverified* (default), or *denied*. Ultimately, this information will be used to filter
-the user display, probably only displaying verified vendors (at least as a default). Denied vendors would be hidden
-entirely preventing spam. Spam seems unlikely however, since a github account will be required and several steps must
-be taken to "push" an extension to the Library.
+**Not yet implemented:** Vendors can be *verified*, *unverified* (default), or *denied*. Ultimately, this information
+will be used to filter the user display, probably only displaying verified vendors (at least as a default). Denied
+vendors would be hidden entirely preventing spam. Spam seems unlikely however, since a github account will be required
+and several steps must be taken to "push" an extension to the Library.
 
 Extension
 ---------
-Extension uses the repository **id** and **repository name** as unique ids. These values are obtained via the posted
-payload information when the tag is pushed. Additionally, the **title** and **type** MUST be declared in the manifest.
+Extension uses the repository **id** as unique id. This value is obtained from the repository name the posted
+payload information contains when the tag is pushed. Additionally, the **title** and **type** MUST be declared in the manifest.
 Other values MAY optionally be set in the manifest. The `title` is used for the display of the extension but will
 default to the `repository name` if left empty.
 
@@ -81,7 +81,7 @@ translation.
 
 Images
 ------
-Vendor logos and Extension icons are included in the manifest as a URL. When the tag is pushed, the url is processed
+Extension icons are included in the manifest as a URL. When the tag is pushed, the url is processed
 and an attempt is made to transfer that image from the URL to our server. The image is thereafter served from the
 Zikula domain. Several layers of security are active to prevent malicious code from being unwittingly uploaded via this
 process. Only `.jpg`, `.jpeg`, `.gif` and `.png` images are allowed. All images are served from a protected directory.

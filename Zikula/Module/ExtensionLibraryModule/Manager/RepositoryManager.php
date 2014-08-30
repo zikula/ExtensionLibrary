@@ -175,6 +175,28 @@ class RepositoryManager
     }
 
     /**
+     * Returns a list of all the organizations the current user has admin access at. Includes the user himself.
+     *
+     * @return array
+     */
+    public function getOrgsAndUserWithAdminAccess()
+    {
+        $vendors = array();
+
+        $user = $this->gitHubClient->currentUser()->show();
+        $vendors[$user['id']] = $user;
+
+        $teams = $this->getTeams();
+        foreach ($teams as $team) {
+            if ($team['permission'] == 'admin') {
+                $vendors[$team['organization']['id']] = $team['organization'];
+            }
+        }
+
+        return $vendors;
+    }
+
+    /**
      * Returns a list of all repositories the user has push access to.
      *
      * @return array
@@ -184,14 +206,7 @@ class RepositoryManager
         // Get normal repositories (where the user is owner or member).
         $repositories = $this->getRepositories();
 
-        // Get the teams the user is in.
-        try {
-            $teams = ResponseMediator::getContent($this->gitHubClient->getHttpClient()->get('user/teams'));
-        } catch (RuntimeException $e) {
-            // We don't have permission.
-            return $repositories;
-        }
-
+        $teams = $this->getTeams();
         foreach ($teams as $team) {
             if (!in_array($team['permission'], array('admin', 'push'))) {
                 continue;
@@ -205,5 +220,20 @@ class RepositoryManager
         }
 
         return $repositories;
+    }
+
+    /**
+     * Get an array of teams the user is in.
+     *
+     * @return array
+     */
+    private function getTeams()
+    {
+        try {
+            return ResponseMediator::getContent($this->gitHubClient->getHttpClient()->get('user/teams'));
+        } catch (RuntimeException $e) {
+            // We don't have permission.
+            return array();
+        }
     }
 } 

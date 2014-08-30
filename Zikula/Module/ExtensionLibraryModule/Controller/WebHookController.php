@@ -111,6 +111,10 @@ class WebHookController extends \Zikula_AbstractController
             if (!$vendor) {
                 // not found, create
                 $vendor = new VendorEntity($userId, $jsonPayload->repository->owner->name);
+
+                ///// (3) Merge composer author data. Only do so if the vendor is new!
+                $vendor->mergeComposer($composerContent);
+
                 $this->entityManager->persist($vendor);
                 $responseText .= sprintf('Vendor (%s) created', "$userId/{$jsonPayload->repository->owner->name}") . "\n";
             } else {
@@ -122,7 +126,7 @@ class WebHookController extends \Zikula_AbstractController
             if (!empty($manifestContent->vendor) && !empty($manifestContent->vendor->logo)) {
                 $imageManager = new ImageManager($manifestContent->vendor->logo);
                 if ($imageManager->import()) {
-                    $manifestContent->vendor->logo = $imageManager->getName();
+                    $vendor->setLogoFileName($imageManager->getName());
                 } else {
                     $responseText .= "Invalid vendor logo. Violations:\n";
                     foreach ($imageManager->getValidationErrors() as $error) {
@@ -132,12 +136,7 @@ class WebHookController extends \Zikula_AbstractController
                 }
             }
 
-            ///// (4) Set vendor data.
-            // @todo Remove this and exclusively use the Webinterface to set vendor information.
-            $vendor->mergeManifest($manifestContent);
-            $vendor->mergeComposer($composerContent);
-
-            ///// (5) Get or create extension.
+            ///// (4) Get or create extension.
             $repositoryId = (int)$jsonPayload->repository->id;
             // check extension exists, if not create new extension
             if ($vendor->hasExtensionById($repositoryId)) {

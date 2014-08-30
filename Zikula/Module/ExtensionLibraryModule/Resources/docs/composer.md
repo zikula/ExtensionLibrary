@@ -55,8 +55,8 @@ use the standardized identifier acronym for the license as defined by [Software 
 <a name="authors"></a>Authors*
 ------
 
-An array of people that have contributed to the project in some way. The array should have at least one person listed
-and that person's **name** is required. (The role of "owner" is suggested.) See [People Fields](#people-fields)
+An array of people that have contributed to the project in some way. Persons listed as *role = "owner"* are handled
+in a special way and are highlighted on the extension's page. See [People Fields](#people-fields)
 
 <a name="require"></a>Require
 ------

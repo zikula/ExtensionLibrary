@@ -20,20 +20,15 @@
         <h3 style="margin-top: 0">{$extension.vendor.title|safetext}</h3>
         <ul class="list-unstyled">
             {if !empty($extension.vendor.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.url|safetext}">{gt text="Vendor Website"}</a></li>{/if}
+            {if !empty($extension.vendor.email)}<li><i class="fa fa-external-link"></i> <a href="mailto:{$extension.vendor.email|safetext}">{gt text="Vendor Email"}</a></li>{/if}
         </ul>
         <div style="min-height: 90px;">
             <div class="iconStack pull-left">
                 <img class="media-object img-thumbnail" src="{$extension.vendor.logoUrl|safetext}" alt="" width="90" height="90" />
-                {if !empty($extension.vendor.ownerEmail)}
-                    <img src="http://www.gravatar.com/avatar/{$extension.vendor.ownerEmail|md5}?d=identicon" alt="" class="img-thumbnail vendorIcon">
+                {if !empty($extension.vendor.email)}
+                    <img src="http://www.gravatar.com/avatar/{$extension.vendor.email|md5}?d=identicon" alt="" class="img-thumbnail vendorIcon">
                 {/if}
             </div>
-
-            <ul class="list-unstyled" style="padding-left: 100px">
-                {if !empty($extension.vendor.ownerName)}<li>{$extension.vendor.ownerName|safetext}</li>{/if}
-                {if !empty($extension.vendor.ownerEmail)}<li>{$extension.vendor.ownerEmail|safetext}</li>{/if}
-                {if !empty($extension.vendor.ownerUrl)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.ownerUrl|default:''|safetext}">{gt text="Owner Website"}</a></li>{/if}
-            </ul>
         </div>
     </div>
 </div>
