@@ -430,8 +430,18 @@ class UserController extends \Zikula_AbstractController
             return new Response($this->view->fetch('User/editvendor.tpl'));
         } else {
             $vendor->setTitle($vendorData['title']);
-            $vendor->setUrl($vendorData['url']);
             $vendor->setEmail($vendorData['email']);
+
+            $url = $vendorData['url'];
+            // Verify that url is valid.
+            if (
+                (strpos($url, "http://") === 0 || strpos($url, "https://") === 0) &&
+                filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED) !== false
+            ) {
+                $vendor->setUrl($url);
+            } else {
+                $request->getSession()->getFlashBag()->add('error', $this->__('Could not validate the given url. Please make sure to include "http://" or "https://"'));
+            }
 
             if (!empty($vendorData['logo'])) {
                 $imageManager = new ImageManager($vendorData['logo']);
