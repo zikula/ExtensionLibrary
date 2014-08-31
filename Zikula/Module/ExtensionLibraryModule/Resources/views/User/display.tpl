@@ -28,6 +28,7 @@
             {if !empty($extension.vendor.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.vendor.url|safetext}">{gt text="Vendor Website"}</a></li>{/if}
             {if !empty($extension.vendor.email)}<li><i class="fa fa-external-link"></i> <a href="mailto:{$extension.vendor.email|safetext}">{gt text="Vendor Email"}</a></li>{/if}
         </ul>
+        <div class="clearfix"></div>
     </div>
 </div>
 <br />
