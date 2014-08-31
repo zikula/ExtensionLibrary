@@ -656,8 +656,7 @@ You requested to add this extension to the [Zikula Extension Library]($elLink) :
 1. Merge this PR!
 2. Add a new Tag as version {$extension['version']} (either using the git command line, your favourite git client or the
 [GitHub online interface]($ghReleasesUrl))!
-3. You're done! After your extension is published, you can edit your vendor information (such as `logo`, `title`,
-`homepage` and `email` [at zikula.org]($vendorEditUrl).
+3. You're done! After your extension is published, you can edit your vendor information (such as `logo`, `title`, `homepage` and `email` [at zikula.org]($vendorEditUrl).
 
 In case something doesn't work as expected, feel free to open an issue in the [Extension Library repository]($elRepoLink)!
 EOF;
