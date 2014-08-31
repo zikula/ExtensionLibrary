@@ -9,7 +9,7 @@
             <h3 style="margin-top: 0">{$extension.title|safetext}&nbsp;&nbsp;<small>{$extension.typeForDisplay}</small></h3>
             <ul class="list-unstyled">
                 {if !empty($extension.url)}<li><i class="fa fa-external-link"></i> <a href="{$extension.url|safetext}">{gt text="Extension Website"}</a></li>{/if}
-                {if !empty($extension.description)}<li>{$extension.description|safehtml}</li>{/if}
+                {if !empty($extension.description)}<li>{$extension.description|safetext}</li>{/if}
             </ul>
         </div>
         <div>
