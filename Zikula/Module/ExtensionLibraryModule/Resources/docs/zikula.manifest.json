@@ -1,9 +1,4 @@
 {
-    "vendor": {
-        "title": "Acme Corporation, Inc.",
-        "url": "http://www.acme.com",
-        "logo": "http://www.acme.com/logo.png"
-    },
     "extension": {
         "title": "Super Widget",
         "url": "http://www.acme.com/super-widget",
