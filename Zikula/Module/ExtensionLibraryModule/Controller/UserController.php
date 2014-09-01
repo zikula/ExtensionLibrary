@@ -542,6 +542,7 @@ class UserController extends \Zikula_AbstractController
 
         $userRepository = $userRepositoryManager->getRepository($extension['repository']);
 
+        ///// (1) Create WebHook.
         try {
             $userRepositoryManager->createWebHook(
                 $userRepository,
@@ -552,100 +553,106 @@ class UserController extends \Zikula_AbstractController
             // Hook already exists.
         }
 
-        // fork repository to zikulabot
+        ///// (2) Fork repository to zikulabot.
         $forkedRepository = $elRepositoryManager->forkRepository($userRepository);
 
-        // create branch
+        ///// (3) Create PR branch.
         $defaultBranch = $forkedRepository['default_branch'];
-        $prBranch = 'extension-library';
+        $prBranch = 'extension-library-' . uniqid();
         $elRepositoryManager->addBranch($forkedRepository, $defaultBranch, $prBranch);
 
-        // search for current composer.json file in original repo
+        ///// (4) Generate content of composer file.
+        $author = array(
+            "name" => empty($currentUser['name']) ? $currentUser['login'] : $currentUser['name'],
+            "role" => "owner"
+        );
+        if (!empty($currentUser['blog'])) {
+            $author["homepage"] = $currentUser['blog'];
+        }
+        if (!empty($currentUser['email'])) {
+            $author["email"] = $currentUser['email'];
+        }
+        list($vendorPrefix) = explode('/', $extension['repository']);
+        $composerContent = array(
+            "name" => strtolower("$vendorPrefix/{$extension['name']}-" . substr($extension['type'], strlen('zikula-'))),
+            "description" => $extension['description'],
+            "type" => $extension['type'],
+            "license" => $extension['license'],
+            "authors" => array ($author),
+            "require" => array ("php" => ">5.3.3")
+        );
+        // add the `extra` and `autoload` fields for namespaced modules.
+        if ($extension['apitype'] != '1.3') {
+            $psrType = "psr-" . substr($extension['apitype'], -1);
+            $classNameParts = explode("\\", $extension['namespace']);
+            $className = array_shift($classNameParts) . array_pop($classNameParts);
+            $composerContent['autoload'] = array($psrType => array($extension['namespace'] => ""));
+            $composerContent['extra'] = array('zikula' => array('class' => $extension['namespace'] . "\\" . $className));
+        }
+
+        ///// (5) Create or update composer.json file.
+        // Calculate path to composer file to search for current composer.json file in the fork.
         $extension['namespace'] = preg_replace("#\\\\+#", "\\", $extension['namespace']);
         $path = strpos($extension['namespace'], "\\") ? str_replace("\\", "/", $extension['namespace']) : '';
         $composerPath = ($extension['apitype'] != '1.4-0') ? 'composer.json' : $path.'/composer.json';
-        // @TODO enable modification of current composer.json file
-        $currentComposerFile = $elRepositoryManager->getFileInRepository($userRepository, $defaultBranch, $composerPath);
-        if ($currentComposerFile !== false) {
-            $this->request->getSession()->getFlashBag()->add('error', $this->__('It seems like there already is a composer.json file in your repository. Sorry, we do not support updating composer files yet. Please follow the instructions below.'));
 
-            $elRepositoryManager->deleteRepository($forkedRepository);
-
-            return new RedirectResponse(System::normalizeUrl($this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile')));
-        }
-        // ensure composer file also not in forked repo
+        // Check if composer.json exists in fork.
         $forkedComposerFile = $elRepositoryManager->getFileInRepository($forkedRepository, $prBranch, $composerPath);
         if ($forkedComposerFile === false) {
-            // create and write composer file
-            $author = array(
-                "name" => empty($currentUser['name']) ? $currentUser['login'] : $currentUser['name'],
-                "role" => "owner"
-            );
-            if (!empty($currentUser['blog'])) {
-                $author["homepage"] = $currentUser['blog'];
-            }
-            if (!empty($currentUser['email'])) {
-                $author["email"] = $currentUser['email'];
-            }
-            list($vendorPrefix) = explode('/', $extension['repository']);
-            $composerContent = array(
-                "name" => strtolower("$vendorPrefix/{$extension['name']}-" . substr($extension['type'], strlen('zikula-'))),
-                "description" => $extension['description'],
-                "type" => $extension['type'],
-                "license" => $extension['license'],
-                "authors" => array ($author),
-                "require" => array ("php" => ">5.3.3")
-            );
-            // add the `extra` and `autoload` fields for namespaced modules.
-            if ($extension['apitype'] != '1.3') {
-                $psrType = "psr-" . substr($extension['apitype'], -1);
-                $classNameParts = explode("\\", $extension['namespace']);
-                $className = array_shift($classNameParts) . array_pop($classNameParts);
-                $composerContent['autoload'] = array($psrType => array($extension['namespace'] => ""));
-                $composerContent['extra'] = array('zikula' => array('class' => $extension['namespace'] . "\\" . $className));
-            }
+            // create and write composer file.
             $content = json_encode($composerContent, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-            // place composer.json in specified path
             $elRepositoryManager->createFileInRepository($forkedRepository, $prBranch, $composerPath, $content);
+        } else {
+            // update existing composer file.
+            // Get current composer content.
+            $originalContent = json_decode(base64_decode($forkedComposerFile['content']), true);
+            // Merge new content.
+            $composerContent = array_merge_recursive($originalContent, $composerContent);
+            // Update file.
+            $content = json_encode($composerContent, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            $elRepositoryManager->updateFileInRepository($forkedRepository, $prBranch, $forkedComposerFile['sha'], $composerPath, $content);
         }
 
-        // search for existing zikula.manifest.json file in original repo
-        $currentManifestFile = $elRepositoryManager->getFileInRepository($userRepository, $defaultBranch, 'zikula.manifest.json');
-        if ($currentManifestFile !== false) {
-            $this->request->getSession()->getFlashBag()->add('error', $this->__('It seems like there already is a zikula.manifest.json file in your repository. Sorry, we do not support updating manifest files yet. Please follow the instructions below.'));
-
-            $elRepositoryManager->deleteRepository($forkedRepository);
-
-            return new RedirectResponse(System::normalizeUrl($this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile')));
+        ///// (7) Generate content of manifest file.
+        $extensionArr = array("title" => $extension['displayName']);
+        if (!empty($extension['url'])) {
+            $extensionArr["url"] = $extension['url'];
         }
-        // ensure zikula.manifest file also not in forked repo
+        if (!empty($extension['icon'])) {
+            $extensionArr["icon"] = $extension['icon'];
+        }
+        $versionArr = array();
+        if (!empty($extension['keywords'])) {
+            $versionArr['keywords'] = array_map("trim", explode(',', $extension['keywords']));
+        }
+        $versionArr['semver'] = $extension['version'];
+        $versionArr['dependencies']['zikula/core'] = $extension['coreCompatibility'];
+        $versionArr['composerpath'] = $composerPath;
+        $versionArr['description'] = $extension['description'];
+        $versionArr['urls']['issues'] = $userRepository['html_url'] . "/issues";
+
+        $manifestContent = array(
+            /*"api" => "v1",*/
+            "extension" => $extensionArr,
+            "version" => $versionArr
+        );
+
+        ///// (6) Create or update manifest file.
+        // search for existing zikula.manifest.json file in fork.
         $forkedManifestFile = $elRepositoryManager->getFileInRepository($forkedRepository, $prBranch, 'zikula.manifest.json');
         if ($forkedManifestFile === false) {
-            // create and write zikula.manifest file
-            $extensionArr = array("title" => $extension['displayName']);
-            if (!empty($extension['url'])) {
-                $extensionArr["url"] = $extension['url'];
-            }
-            if (!empty($extension['icon'])) {
-                $extensionArr["icon"] = $extension['icon'];
-            }
-            $versionArr = array();
-            if (!empty($extension['keywords'])) {
-                $versionArr['keywords'] = array_map("trim", explode(',', $extension['keywords']));
-            }
-            $versionArr['semver'] = $extension['version'];
-            $versionArr['dependencies']['zikula/core'] = $extension['coreCompatibility'];
-            $versionArr['composerpath'] = $composerPath;
-            $versionArr['description'] = $extension['description'];
-            $versionArr['urls']['issues'] = $userRepository['html_url'] . "/issues";
-
-            $content = json_encode(array(
-                /*"api" => "v1",*/
-                "extension" => $extensionArr,
-                "version" => $versionArr
-            ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            $content = json_encode($manifestContent, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             // place zikula.manifest file in root of repo
             $elRepositoryManager->createFileInRepository($forkedRepository, $prBranch, 'zikula.manifest.json', $content);
+        } else {
+            // update existing manifest file.
+            // Get current manifest content.
+            $originalContent = json_decode(base64_decode($forkedManifestFile['content']), true);
+            // Merge new content.
+            $manifestContent = array_merge_recursive($originalContent, $manifestContent);
+            // Update file.
+            $content = json_encode($manifestContent, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            $elRepositoryManager->updateFileInRepository($forkedRepository, $prBranch, $forkedManifestFile['sha'], 'zikula.manifest.json', $content);
         }
 
         // create Pull Request

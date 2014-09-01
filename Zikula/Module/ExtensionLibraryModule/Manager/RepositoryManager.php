@@ -132,13 +132,19 @@ class RepositoryManager
     public function getFileInRepository($repository, $branch, $path)
     {
         try {
-            return ResponseMediator::getContent($this->gitHubClient->getHttpClient()->get(
+            $file = ResponseMediator::getContent($this->gitHubClient->getHttpClient()->get(
                 "/repos/{$repository['owner']['login']}/{$repository['name']}/contents/$path",
                 array ('ref' => $branch)
             ));
         } catch (RuntimeException $e) {
             return false;
         }
+
+        if ($file['type'] == 'file') {
+            return $file;
+        }
+
+        return false;
     }
 
     public function createFileInRepository($repository, $branch, $path, $content)
@@ -149,7 +155,19 @@ class RepositoryManager
                 'message' => "Created $path file for Extension Library.",
                 'content' => base64_encode($content),
                 'branch' => $branch
-        )));
+            )));
+    }
+
+    public function updateFileInRepository($repository, $branch, $sha, $path, $content)
+    {
+        $this->gitHubClient->getHttpClient()->put(
+            "/repos/{$repository['owner']['login']}/{$repository['name']}/contents/$path",
+            json_encode(array(
+                'message' => "Updated $path file for Extension Library.",
+                'content' => base64_encode($content),
+                'branch' => $branch,
+                'sha' => $sha
+            )));
     }
 
     public function getRepository($name)

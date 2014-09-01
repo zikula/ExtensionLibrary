@@ -1,6 +1,6 @@
 {include file='User/header.tpl'}
 <h2>{gt text='Add your extension to the extension library (step 1 of 2)'}</h2>
-<div class="alert alert-info">{gt text='This step is only required once per extension. It only works if your repository not yet contains a zikula.manifest.json or composer.json file.'}</div>
+<div class="alert alert-info">{gt text='This step is only required once per extension.'}</div>
 
 <form class="form-horizontal" role="form" method="post" action="{route name='zikulaextensionlibrarymodule_user_addextension'}">
     <fieldset>
