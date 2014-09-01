@@ -607,7 +607,7 @@ class UserController extends \Zikula_AbstractController
             // Get current composer content.
             $originalContent = json_decode(base64_decode($forkedComposerFile['content']), true);
             // Merge new content.
-            $composerContent = array_merge_recursive($originalContent, $composerContent);
+            $composerContent = array_merge($originalContent, $composerContent);
             // Update file.
             $content = json_encode($composerContent, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             $elRepositoryManager->updateFileInRepository($forkedRepository, $prBranch, $forkedComposerFile['sha'], $composerPath, $content);
@@ -649,7 +649,7 @@ class UserController extends \Zikula_AbstractController
             // Get current manifest content.
             $originalContent = json_decode(base64_decode($forkedManifestFile['content']), true);
             // Merge new content.
-            $manifestContent = array_merge_recursive($originalContent, $manifestContent);
+            $manifestContent = array_merge($originalContent, $manifestContent);
             // Update file.
             $content = json_encode($manifestContent, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             $elRepositoryManager->updateFileInRepository($forkedRepository, $prBranch, $forkedManifestFile['sha'], 'zikula.manifest.json', $content);
