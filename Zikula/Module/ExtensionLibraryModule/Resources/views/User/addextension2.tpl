@@ -5,7 +5,6 @@
 
 <form class="form-horizontal" role="form" method="post" action="{route name='zikulaextensionlibrarymodule_user_addextension'}">
     <fieldset>
-        <input type="hidden" value="{$vendor|@json_encode|safetext}" name="_vendor" />
         <legend><i class='fa fa-info-circle'></i> {gt text='About your extension'}</legend>
         <div class="form-group">
             <label for="el-add-extension-extension-repository" class="col-sm-2 control-label">{gt text='Repository'}<span class="z-form-mandatory-flag">*</span></label>
@@ -17,9 +16,9 @@
             <label for="el-add-extension-extension-type" class="col-sm-2 control-label">{gt text='Type'}<span class="z-form-mandatory-flag">*</span></label>
             <div class="col-sm-10">
                 <select class="form-control" name="extension[type]" id="el-add-extension-extension-type">
-                    <option value="zikula-module" {if $extension.type=='zikula-module' OR empty($extension.type)}selected="selected"{/if}>{gt text='Module'}</option>
-                    <option value="zikula-theme" {if $extension.type=='zikula-theme'}selected="selected"{/if}>{gt text='Theme'}</option>
-                    <option value="zikula-plugin" {if $extension.type=='zikula-plugin'}selected="selected"{/if}>{gt text='Plugin'}</option>
+                    <option value="zikula-module" {if empty($extension.type)  || (isset($extension.type) && $extension.type=='zikula-module')}selected="selected"{/if}>{gt text='Module'}</option>
+                    <option value="zikula-theme" {if isset($extension.type) && $extension.type=='zikula-theme'}selected="selected"{/if}>{gt text='Theme'}</option>
+                    <option value="zikula-plugin" {if isset($extension.type) && $extension.type=='zikula-plugin'}selected="selected"{/if}>{gt text='Plugin'}</option>
                 </select>
             </div>
         </div>
@@ -27,13 +26,13 @@
             <label for="el-add-extension-extension-apitype" class="col-sm-2 control-label">{gt text='Extension API type'}<span class="z-form-mandatory-flag">*</span></label>
             <div class="col-sm-10">
                 <select class="form-control" name="extension[apitype]" id="el-add-extension-extension-apitype">
-                    <option value="1.4-4" {if $extension.apitype=='1.4-4' OR empty($extension.apitype)}selected="selected"{/if}>Core 1.4 {gt text="compatible"} namespaced/PSR-4</option>
-                    <option value="1.4-0" {if $extension.apitype=='1.4-0'}selected="selected"{/if}>Core 1.4 {gt text="compatible"} namespaced/PSR-0</option>
-                    <option value="1.3" {if $extension.apitype=='1.3'}selected="selected"{/if}>Core 1.3 {gt text="compatible"} OOP-{gt text="style"}</option>
+                    <option value="1.4-4" {if empty($extension.apitype) || (isset($extension.apityp) && $extension.apitype == '1.4-4')}selected="selected"{/if}>Core 1.4 {gt text="compatible"} namespaced/PSR-4</option>
+                    <option value="1.4-0" {if isset($extension.apityp) && $extension.apitype=='1.4-0'}selected="selected"{/if}>Core 1.4 {gt text="compatible"} namespaced/PSR-0</option>
+                    <option value="1.3" {if isset($extension.apityp) && $extension.apitype=='1.3'}selected="selected"{/if}>Core 1.3 {gt text="compatible"} OOP-{gt text="style"}</option>
                 </select>
             </div>
         </div>
-        <div class="form-group" id="el-add-extension-extension-namespace-input"{if $extension.apitype=='1.3'} style="display: none;"{/if}>
+        <div class="form-group" id="el-add-extension-extension-namespace-input"{if isset($extension.apityp) && $extension.apitype=='1.3'} style="display: none;"{/if}>
             <label for="el-add-extension-extension-namespace" class="col-sm-2 control-label">{gt text='Namespace'}<span class="z-form-mandatory-flag">*</span></label>
             <div class="col-sm-10">
                 <input required type="text" name="extension[namespace]" value="{$extension.namespace|default:''}" id="el-add-extension-extension-namespace" class="form-control" placeholder="{gt text='e.g. Acme\Module\WidgetCreatorModule'}" />

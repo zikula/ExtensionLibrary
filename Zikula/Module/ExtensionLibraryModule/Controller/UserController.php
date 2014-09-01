@@ -500,27 +500,17 @@ class UserController extends \Zikula_AbstractController
         $userRepositoriesWithPushAccess = array_column($userRepositoryManager->getRepositoriesWithPushAccess(), 'full_name');
         sort($userRepositoriesWithPushAccess);
 
-        $currentUser = $userGitHubClient->api('current_user')->show();
-        $vendor = $request->request->get('vendor', json_decode($request->request->get('_vendor'), true));
+        $currentUser = $userGitHubClient->currentUser()->show();
         $extension = $request->request->get('extension');
         $this->view->assign('breadcrumbs', array (array ('title' => $this->__('Add extension'))));
         if (empty($extension)) {
             $this->view->assign('repos', $userRepositoriesWithPushAccess);
-            $this->view->assign('vendor', $currentUser);
 
             return $this->response($this->view->fetch('User/addextension.tpl'));
         } else if (empty($extension['name'])) {
-            // validate step one parameters
-            if (empty($vendor['displayName'])) {
-                $this->request->getSession()->getFlashBag()->add('error', $this->__f('%s is required', '<code>Vendor display name</code>'));
-                $request->request->remove('extension');
-                return $this->addExtensionAction($request);
-            }
-
             list($owner, $repo) = explode('/', $extension['repository']);
-            $repo = $userGitHubClient->api('repo')->show($owner, $repo);
+            $repo = $userGitHubClient->repo()->show($owner, $repo);
             $this->view->assign('repo',  $repo);
-            $this->view->assign('vendor', $request->get('vendor'));
             $this->view->assign('extension', $extension);
 
             return $this->response($this->view->fetch('User/addextension2.tpl'));
@@ -537,7 +527,8 @@ class UserController extends \Zikula_AbstractController
         }
         if (!in_array($extension['repository'], $userRepositoriesWithPushAccess)) {
             // The user tried to select a repository he has no push access to.
-            $this->request->getSession()->getFlashBag()->add('error', $this->__('You selected a repository for which you do not have push access rights. Please select another.'));
+            // Throw exception, this should not happen!
+            throw new NotFoundHttpException();
         }
 
         // @TODO validate actual semver? validate license acronym?
@@ -545,7 +536,7 @@ class UserController extends \Zikula_AbstractController
             $request->request->remove('extension');
             unset($extension['name']);
             $request->request->set('extension', $extension);
-            $request->request->set('vendor', $vendor);
+
             return $this->addExtensionAction($request);
         }
 
@@ -578,6 +569,8 @@ class UserController extends \Zikula_AbstractController
         if ($currentComposerFile !== false) {
             $this->request->getSession()->getFlashBag()->add('error', $this->__('It seems like there already is a composer.json file in your repository. Sorry, we do not support updating composer files yet. Please follow the instructions below.'));
 
+            $elRepositoryManager->deleteRepository($forkedRepository);
+
             return new RedirectResponse(System::normalizeUrl($this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile')));
         }
         // ensure composer file also not in forked repo
@@ -585,14 +578,14 @@ class UserController extends \Zikula_AbstractController
         if ($forkedComposerFile === false) {
             // create and write composer file
             $author = array(
-                "name" => $vendor['name'],
+                "name" => empty($currentUser['name']) ? $currentUser['login'] : $currentUser['name'],
                 "role" => "owner"
             );
-            if (!empty($vendor['url'])) {
-                $author["homepage"] = $vendor['url'];
+            if (!empty($currentUser['blog'])) {
+                $author["homepage"] = $currentUser['blog'];
             }
-            if (!empty($vendor['email'])) {
-                $author["email"] = $vendor['email'];
+            if (!empty($currentUser['email'])) {
+                $author["email"] = $currentUser['email'];
             }
             list($vendorPrefix) = explode('/', $extension['repository']);
             $composerContent = array(
@@ -620,6 +613,8 @@ class UserController extends \Zikula_AbstractController
         $currentManifestFile = $elRepositoryManager->getFileInRepository($userRepository, $defaultBranch, 'zikula.manifest.json');
         if ($currentManifestFile !== false) {
             $this->request->getSession()->getFlashBag()->add('error', $this->__('It seems like there already is a zikula.manifest.json file in your repository. Sorry, we do not support updating manifest files yet. Please follow the instructions below.'));
+
+            $elRepositoryManager->deleteRepository($forkedRepository);
 
             return new RedirectResponse(System::normalizeUrl($this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile')));
         }
