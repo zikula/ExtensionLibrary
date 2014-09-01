@@ -429,18 +429,30 @@ class UserController extends \Zikula_AbstractController
 
             return new Response($this->view->fetch('User/editvendor.tpl'));
         } else {
-            $vendor->setTitle($vendorData['title']);
-            $vendor->setEmail($vendorData['email']);
+            if (!empty($vendorData['title'])) {
+                $vendor->setTitle($vendorData['title']);
+            } else {
+                $vendor->setTitle($vendor->getGitHubName());
+            }
+            if (!empty($vendorData['email'])) {
+                $vendor->setEmail($vendorData['email']);
+            } else {
+                $vendor->setEmail(null);
+            }
 
             $url = $vendorData['url'];
-            // Verify that url is valid.
-            if (
-                (strpos($url, "http://") === 0 || strpos($url, "https://") === 0) &&
-                filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED) !== false
-            ) {
-                $vendor->setUrl($url);
+            if (empty($url)) {
+                $vendor->setUrl(null);
             } else {
-                $request->getSession()->getFlashBag()->add('error', $this->__('Could not validate the given url. Please make sure to include "http://" or "https://"'));
+                // Verify that url is valid.
+                if (
+                    (strpos($url, "http://") === 0 || strpos($url, "https://") === 0) &&
+                    filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED) !== false
+                ) {
+                    $vendor->setUrl($url);
+                } else {
+                    $request->getSession()->getFlashBag()->add('error', $this->__('Could not validate the given url. Please make sure to include "http://" or "https://"'));
+                }
             }
 
             if (!empty($vendorData['logo'])) {
