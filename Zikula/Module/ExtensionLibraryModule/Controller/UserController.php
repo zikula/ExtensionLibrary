@@ -606,6 +606,15 @@ class UserController extends \Zikula_AbstractController
             // update existing composer file.
             // Get current composer content.
             $originalContent = json_decode(base64_decode($forkedComposerFile['content']), true);
+            if (!empty($originalContent['authors'])) {
+                unset($composerContent['authors']);
+            }
+            if (!empty($originalContent['require'])) {
+                unset($composerContent['require']);
+            }
+            if (!empty($originalContent['autoload'])) {
+                unset($composerContent['autoload']);
+            }
             // Merge new content.
             $composerContent = array_merge($originalContent, $composerContent);
             // Update file.
