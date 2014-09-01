@@ -176,11 +176,11 @@ class ReleaseManager
         return $releases;
     }
 
-    public function reloadReleases($source = 'all')
+    public function reloadReleases($source = 'all', $createNewsArticles = true)
     {
         // GitHub releases
         if ($source == 'all' || $source == 'github') {
-            $this->reloadReleasesFromGitHub();
+            $this->reloadReleasesFromGitHub($createNewsArticles);
         }
 
         // Jenkins builds
@@ -194,12 +194,13 @@ class ReleaseManager
     /**
      * Update or add one specific release.
      *
-     * @param array               $release    The release data from the GitHub api.
-     * @param CoreReleaseEntity[] $dbReleases INTERNAL: used in self::reloadAllReleases()
+     * @param array               $release           The release data from the GitHub api.
+     * @param bool                $createNewsArticle Whether or not to create pending news articles for new releases.
+     * @param CoreReleaseEntity[] $dbReleases        INTERNAL: used in self::reloadAllReleases()
      *
      * @return bool|CoreReleaseEntity False if it's a draft; true if a release is edited; the release itself if it's new.
      */
-    public function updateGitHubRelease($release, $dbReleases = null)
+    public function updateGitHubRelease($release, $createNewsArticle = true, $dbReleases = null)
     {
         if ($release['draft']) {
             // Ignore drafts.
@@ -272,7 +273,7 @@ class ReleaseManager
 
         $this->em->flush();
 
-        if ($mode == 'new') {
+        if ($mode == 'new' && $createNewsArticle) {
             $this->createNewsArticle($dbRelease);
         } else if($dbRelease->getNewsId() !== null) {
             $this->updateNewsArticle($dbRelease);
@@ -284,7 +285,7 @@ class ReleaseManager
     /**
      * @return CoreReleaseEntity[]
      */
-    private function reloadReleasesFromGitHub()
+    private function reloadReleasesFromGitHub($createNewsArticles)
     {
         $repo = explode('/', $this->repo);
         $releases = $this->client->api('repo')->releases()->all($repo[0], $repo[1]);
@@ -300,7 +301,7 @@ class ReleaseManager
         $ids = array(0);
         foreach ($releases as $release) {
             $ids[] = $release['id'];
-            $this->updateGitHubRelease($release, $dbReleases);
+            $this->updateGitHubRelease($release, $createNewsArticles, $dbReleases);
         }
 
         /** @var QueryBuilder $qb */

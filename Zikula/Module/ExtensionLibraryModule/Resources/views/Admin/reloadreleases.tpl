@@ -8,7 +8,15 @@
 <form class="form-horizontal" role="form" action="{route name='zikulaextensionlibrarymodule_admin_doreloadcorereleases'}" method="post" enctype="application/x-www-form-urlencoded" autocomplete="off">
     <div>
         <div class="form-group">
-            <div class="col-lg-offset-3 col-lg-9">
+            <div class="col-sm-3">
+                <label for="el-createnews">{gt text='Create pending news articles for new releases'}</label>
+            </div>
+            <div class="col-sm-9">
+                <input type="checkbox" id="el-createnews" name="createnews" value="1" checked />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-9">
                 <button class="btn btn-success" title="{gt text='Reload all core releases'}">
                     {gt text="Reload all core releases"}
                 </button>
