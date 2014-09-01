@@ -615,6 +615,10 @@ class UserController extends \Zikula_AbstractController
             if (!empty($originalContent['autoload'])) {
                 unset($composerContent['autoload']);
             }
+            if (!empty($originalContent['extra']) && isset($composerContent['extra'])) {
+                $originalContent['extra'] = array_merge($originalContent['extra'], $composerContent['extra']);
+                unset($composerContent['extra']);
+            }
             // Merge new content.
             $composerContent = array_merge($originalContent, $composerContent);
             // Update file.
