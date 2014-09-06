@@ -232,7 +232,11 @@ class Util
         if (empty($repo)) {
             return false;
         }
-        $user = ResponseMediator::getContent($client->getHttpClient()->get('user'));
+        try {
+            $user = ResponseMediator::getContent($client->getHttpClient()->get('user'));
+        } catch (\Github\Exception\RuntimeException $e) {
+            return false;
+        }
 
         $collaborators = ResponseMediator::getContent($client->getHttpClient()->get('repos/' . $repo . "/collaborators"));
         foreach ($collaborators as $collaborator) {
