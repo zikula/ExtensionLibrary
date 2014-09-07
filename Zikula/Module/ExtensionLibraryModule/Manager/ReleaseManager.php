@@ -338,11 +338,11 @@ class ReleaseManager
                 continue;
             }
             $name = $job->getName();
-            if (!preg_match('#Zikula(_Core|)-([0-9]\.[0-9]\.[0-9])#', $name, $matches)) {
+            if (!preg_match('#^Zikula(?:_Core|)-([0-9]+\.[0-9]+\.[0-9]+)$#', $name, $matches)) {
                 // Ignore jobs not matching the standard pattern.
                 continue;
             }
-            $version = $matches[2];
+            $version = $matches[1];
 
             /** @var Build[] $builds */
             $builds = $job->getBuilds();
