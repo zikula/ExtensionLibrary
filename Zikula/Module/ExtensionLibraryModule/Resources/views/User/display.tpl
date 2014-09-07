@@ -18,7 +18,7 @@
     </div>
     <div class="well well-sm col-md-4">
         <h3 style="margin-top: 0">{$extension.vendor.title|safetext}</h3>
-        <div class="iconStack pull-left">
+        <div class="iconStack pull-left" style="padding: 0 .5em .5em 0;">
             <img class="media-object img-thumbnail" src="{$extension.vendor.logoUrl|safetext}" alt="" width="90" height="90" />
             {if !empty($extension.vendor.email)}
                 <img src="http://www.gravatar.com/avatar/{$extension.vendor.email|md5}?d=identicon" alt="" class="img-thumbnail vendorIcon">
