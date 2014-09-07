@@ -206,6 +206,7 @@ class WebHookController extends \Zikula_AbstractController
             }
 
             $this->entityManager->flush();
+            $this->entityManager->refresh($extension);
 
             ///// (10) Add keywords via the Tag module when hooked.
             /** @var $hookDispatcher \Zikula\Component\HookDispatcher\StorageInterface */
