@@ -50,7 +50,7 @@
                                     {foreach from=$release.assets item='asset'}
                                         <a href="{$asset.download_url}" class="btn btn-sm btn-success">{$asset.name}</a>
                                     {foreachelse}
-                                        <div class="alert alert-warning">{gt text='Direct download links not available!'}</div>
+                                        <div class="alert alert-warning">{gt text='Direct download links not yet available!'}</div>
                                     {/foreach}
                                 </div>
                                 <div class="clearfix"></div>
