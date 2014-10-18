@@ -44,21 +44,13 @@ class UserController extends \Zikula_AbstractController
     /**
      * @Route("")
      *
-     * @Route("/v/{vendor_slug}", name="zikulaextensionlibrarymodule_user_filterbyvendor")
-     * @ParamConverter("vendorEntity",
-     *      class="ZikulaExtensionLibraryModule:VendorEntity",
-     *      options={"mapping": {"vendor_slug": "titleSlug"}}
-     * )
-     *
-     * The default entry point. Shows either all extensions or only the one's matching the specified vendor.
-     *
-     * @param VendorEntity $vendorEntity
+     * The default entry point. Shows all extensions.
      *
      * @throws AccessDeniedException
      *
      * @return Response
      */
-    public function indexAction(VendorEntity $vendorEntity = null)
+    public function indexAction()
     {
         if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_READ)) {
             throw new AccessDeniedException();
@@ -69,19 +61,46 @@ class UserController extends \Zikula_AbstractController
         $perpage = $this->getVar('perpage', 45);
         $offset = $this->request->query->get('offset', null);
 
-        if ($vendorEntity === null) {
-            $extensions = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:ExtensionEntity')->findAllMatchingFilter($orderBy, $orderDir, $perpage, $offset);
-        } else {
-            $extensions = $vendorEntity->getExtensionsbyFilter();
-        }
+        $extensions = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:ExtensionEntity')->findAllMatchingFilter($orderBy, $orderDir, $perpage, $offset);
 
         $this->view->assign('extensions', $extensions);
         $this->view->assign('gravatarDefaultPath', $this->request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
-        if ($vendorEntity === null) {
-            $this->view->assign('breadcrumbs', array());
-        } else {
-            $this->view->assign('breadcrumbs', array(array('title' => \DataUtil::formatForDisplay($vendorEntity->getTitle()))));
+        $this->view->assign('breadcrumbs', array());
+
+        return $this->response($this->view->fetch('User/view.tpl'));
+    }
+
+    /**
+     * @Route("/v/{vendor_slug}", name="zikulaextensionlibrarymodule_user_filterbyvendor")
+     * @ParamConverter("vendorEntity",
+     *      class="ZikulaExtensionLibraryModule:VendorEntity",
+     *      options={"mapping": {"vendor_slug": "titleSlug"}}
+     * )
+     *
+     * Shows extensions matching the specified vendor.
+     *
+     * @param VendorEntity $vendorEntity
+     *
+     * @throws AccessDeniedException
+     *
+     * @return Response
+     */
+    public function extensionsByVendorAction(VendorEntity $vendorEntity)
+    {
+        if (!SecurityUtil::checkPermission($this->name.'::', '::', ACCESS_READ)) {
+            throw new AccessDeniedException();
         }
+
+        $orderBy = 'title';
+        $orderDir = 'ASC';
+        $perpage = $this->getVar('perpage', 45);
+        $offset = $this->request->query->get('offset', null);
+
+        $extensions = $vendorEntity->getExtensionsbyFilter();
+
+        $this->view->assign('extensions', $extensions);
+        $this->view->assign('gravatarDefaultPath', $this->request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
+        $this->view->assign('breadcrumbs', array(array('title' => \DataUtil::formatForDisplay($vendorEntity->getTitle()))));
 
         return $this->response($this->view->fetch('User/view.tpl'));
     }
