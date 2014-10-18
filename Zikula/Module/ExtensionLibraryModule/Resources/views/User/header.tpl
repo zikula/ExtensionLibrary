@@ -40,7 +40,7 @@
     <hr />
     <!-- remove this alert when the public beta ends -->
     <div class="alert alert-danger"><i class="fa fa-exclamation-triangle fa-3x pull-left text-danger"></i> WARNING: The Extension Library software is currently in <strong>PUBLIC BETA</strong>. You are encouraged to
-        use it and submit your extensions. However, it is possible that data may be lost, removed or changed without warning if there is a problem. Please <a href="/library/docs">read the documentation</a>! Please discus
+        use it and submit your extensions. However, it is possible that data may be lost, removed or changed without warning if there is a problem. Please <a href="/library/docs">read the documentation</a>! Please discuss
         the software in <a href='/forums/forum/92'>the forum</a>.
     </div>
     <!-- remove this alert when the public beta ends -->
