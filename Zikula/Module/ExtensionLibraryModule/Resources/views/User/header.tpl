@@ -38,6 +38,12 @@
     {/if}
     <h1><img src="{modgetimage}" alt="" style="vertical-align: bottom; padding-right:.5em;" /><i>{modgetinfo info='displayname'}</i></h1>
     <hr />
+    <!-- remove this alert when the public beta ends -->
+    <div class="alert alert-danger"><i class="fa fa-exclamation-triangle fa-3x pull-left text-danger"></i> WARNING: The Extension Library software is currently in <strong>PUBLIC BETA</strong>. You are encouraged to
+        use it and submit your extensions. However, it is possible that data may be lost, removed or changed without warning if there is a problem. Please <a href="/library/docs">read the documentation</a>! Please discus
+        the software in <a href='/forums/forum/92'>the forum</a>.
+    </div>
+    <!-- remove this alert when the public beta ends -->
     <ol class="breadcrumb">
         <li><a href="{route name='zikulaextensionlibrarymodule_user_index'}">{gt text='Library Home'}</a></li>
         {foreach from=$breadcrumbs item="breadcrumb" name="breadcrumbs"}
