@@ -64,8 +64,13 @@ class UserController extends \Zikula_AbstractController
             throw new AccessDeniedException();
         }
 
+        $orderBy = 'title';
+        $orderDir = 'ASC';
+        $perpage = $this->getVar('perpage', 45);
+        $offset = $this->request->query->get('offset', null);
+
         if ($vendorEntity === null) {
-            $extensions = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:ExtensionEntity')->findAllMatchingFilter();
+            $extensions = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:ExtensionEntity')->findAllMatchingFilter($orderBy, $orderDir, $perpage, $offset);
         } else {
             $extensions = $vendorEntity->getExtensionsbyFilter();
         }

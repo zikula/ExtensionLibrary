@@ -15,6 +15,8 @@ namespace Zikula\Module\ExtensionLibraryModule\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Zikula\Module\ExtensionLibraryModule\Util;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 
 /**
  * Extension repository class.
@@ -25,14 +27,43 @@ class ExtensionRepository extends EntityRepository
      * Get all extensions matching the provided $coreVersion and $extensionType or the user's core and extension
      * filter otherwise.
      *
-     * @param null|string $coreVersion      The core version to filter, defaults to the core selected by the user.
+     * @param string $orderBy default: 'title'
+     * @param string $orderDir default: 'ASC'
+     * @param null|integer $limit pager limit
+     * @param null|integer $offset pager offset
+     * @param null|string $coreVersion The core version to filter, defaults to the core selected by the user.
      * @param null|string $extensionType The extension type to filter, defaults to the extension type selected by the
      * user.
+     *
      * @return \Doctrine\Common\Collections\ArrayCollection|\Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity[]
      */
-    public function findAllMatchingFilter($coreVersion = null, $extensionType = null)
+    public function findAllMatchingFilter($orderBy = 'title', $orderDir = 'ASC', $limit = null, $offset = null, $coreVersion = null, $extensionType = null)
     {
-        return Util::filterExtensions($this->findAll(), $coreVersion, $extensionType);
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('e', 'v')
+            ->from('ZikulaExtensionLibraryModule:ExtensionEntity', 'e')
+            ->join('e.versions', 'v');
+        if (($extensionType != 'all') && (in_array($extensionType , array(ExtensionEntity::TYPE_MODULE, ExtensionEntity::TYPE_PLUGIN, ExtensionEntity::TYPE_THEME)))) {
+            $qb->andWhere('e.type', ':type')
+                ->setParameter('type', $extensionType);
+        }
+        if (isset($orderBy)) {
+            $qb->orderBy("e.$orderBy", $orderDir);
+        }
+        if (!empty($offset)) {
+            $qb->setFirstResult($offset);
+        }
+        if (!empty($limit)) {
+            $qb->setMaxResults($limit);
+        }
+        $extensions = new Paginator($qb);
+        $count = $extensions->count();
+
+        if (isset($coreVersion) && $coreVersion != 'all') {
+            $extensions = Util::filterExtensions($extensions, $coreVersion);
+        }
+
+        return $extensions;
     }
 
     /**

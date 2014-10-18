@@ -90,11 +90,17 @@
                 </div>
             </fieldset>
             <fieldset>
-                <legend>{gt text='Image caching'}</legend>
+                <legend>{gt text='User View'}</legend>
                 <div class="form-group">
                     <label class="col-lg-3 control-label" for="settings_image_cache_time">{gt text="Time (in seconds) for images to be cached"}</label>
                     <div class="col-lg-9">
                         <input id="settings_image_cache_time" type="number" class="form-control" name="settings[image_cache_time]" value="{$settings.image_cache_time|default:0|safetext}" maxlength="100" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-3 control-label" for="settings_perpage">{gt text="Number of extensions per page"}</label>
+                    <div class="col-lg-9">
+                        <input id="settings_perpage" type="number" class="form-control" name="settings[perpage]" value="{$settings.perpage|default:45|safetext}" maxlength="100" />
                     </div>
                 </div>
             </fieldset>

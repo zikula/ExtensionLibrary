@@ -34,6 +34,7 @@
         </div>
     {/foreach}
 </div>
+{pager rowcount=100 limit=$modvars.ZikulaExtensionLibraryModule.perpage posvar='offset' route='zikulaextensionlibrarymodule_user_index'}
 {include file='User/footer.tpl'}
 <script>
     jQuery(document).ready(function() {

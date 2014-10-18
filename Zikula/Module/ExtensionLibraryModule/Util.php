@@ -251,37 +251,23 @@ class Util
     /**
      * Filter the given extensions by core filter.
      *
-     * @param ExtensionEntity[]|ArrayCollection $extensions
+     * @param $extensions
      * @param null|string $coreVersion   The core version to filter, defaults to the core selected by the user.
      * @param null|string $extensionType The extension type to filter, defaults to the extension type selected by the
      * user.
      *
      * @return ExtensionEntity[]|ArrayCollection
      */
-    public static function filterExtensions($extensions, $coreVersion = null, $extensionType = null)
+    public static function filterExtensions($extensions, $coreVersion = null)
     {
         if (!isset($coreVersion)) {
             $coreVersion = Util::getCoreVersionFilter();
         }
-        if (!isset($extensionType)) {
-            $extensionType = Util::getExtensionTypeFilter();
-        }
-        if ($coreVersion === 'all' && $extensionType === 'all') {
-            return $extensions;
-        }
+        $userSelectedCoreVersion = new version($coreVersion);
 
-        if ($coreVersion !== 'all') {
-            $userSelectedCoreVersion = new version($coreVersion);
-        }
-
+        /** @var \Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity $extension */
         foreach ($extensions as $key => $extension) {
-            if ($extensionType !== 'all') {
-                if ($extension->getType() !== $extensionType) {
-                    unset ($extensions[$key]);
-                    continue;
-                }
-            }
-            if ($coreVersion !== 'all' && $extension->getVersions()->filter(function (ExtensionVersionEntity $version) use ($userSelectedCoreVersion) {
+            if ($extension->getVersions()->filter(function (ExtensionVersionEntity $version) use ($userSelectedCoreVersion) {
                 $requiredCoreVersion = new expression($version->getCompatibility());
                 return $requiredCoreVersion->satisfiedBy($userSelectedCoreVersion);
             })->isEmpty()) {
