@@ -63,6 +63,7 @@ class UserController extends \Zikula_AbstractController
 
         $extensions = $this->entityManager->getRepository('ZikulaExtensionLibraryModule:ExtensionEntity')->findAllMatchingFilter($orderBy, $orderDir, $perpage, $offset);
 
+        $this->view->assign('pagerCount', $extensions->count());
         $this->view->assign('extensions', $extensions);
         $this->view->assign('gravatarDefaultPath', $this->request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
         $this->view->assign('breadcrumbs', array());
@@ -91,13 +92,9 @@ class UserController extends \Zikula_AbstractController
             throw new AccessDeniedException();
         }
 
-        $orderBy = 'title';
-        $orderDir = 'ASC';
-        $perpage = $this->getVar('perpage', 45);
-        $offset = $this->request->query->get('offset', null);
-
         $extensions = $vendorEntity->getExtensionsbyFilter();
 
+        $this->view->assign('pagerCount', $extensions->count());
         $this->view->assign('extensions', $extensions);
         $this->view->assign('gravatarDefaultPath', $this->request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
         $this->view->assign('breadcrumbs', array(array('title' => \DataUtil::formatForDisplay($vendorEntity->getTitle()))));

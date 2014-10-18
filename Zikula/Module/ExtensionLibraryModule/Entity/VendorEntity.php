@@ -206,7 +206,7 @@ class VendorEntity extends EntityAccess
     }
 
     /**
-     * Filter the extensions by core version and extension type.
+     * Filter the extensions by core version.
      *
      * @param null|string $coreVersion The core version to filter, defaults to the core selected by the user.
      *

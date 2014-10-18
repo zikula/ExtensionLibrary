@@ -57,7 +57,6 @@ class ExtensionRepository extends EntityRepository
             $qb->setMaxResults($limit);
         }
         $extensions = new Paginator($qb);
-        $count = $extensions->count();
 
         if (isset($coreVersion) && $coreVersion != 'all') {
             $extensions = Util::filterExtensions($extensions, $coreVersion);
