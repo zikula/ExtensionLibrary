@@ -13,6 +13,7 @@
 
 namespace Zikula\Module\ExtensionLibraryModule\Controller;
 
+use GitHub\Exception\RuntimeException;
 use Github\Exception\ValidationFailedException;
 use Github\Client as GitHubClient;
 use SecurityUtil;
@@ -576,6 +577,7 @@ class UserController extends \Zikula_AbstractController
         $userRepository = $userRepositoryManager->getRepository($extension['repository']);
 
         ///// (1) Create WebHook.
+        $hasWebHookPermission = true;
         try {
             $userRepositoryManager->createWebHook(
                 $userRepository,
@@ -584,6 +586,9 @@ class UserController extends \Zikula_AbstractController
             );
         } catch (ValidationFailedException $e) {
             // Hook already exists.
+        } catch (RuntimeException $e) {
+            // User doesn't have permission to add a webhook.
+            $hasWebHookPermission = false;
         }
 
         ///// (2) Fork repository to zikulabot.
@@ -711,6 +716,14 @@ class UserController extends \Zikula_AbstractController
 #### Hi @{$userRepository['owner']['login']}!
 
 You requested to add this extension to the [Zikula Extension Library]($elLink) :star:. You're just two clicks away from there:
+EOF;
+        if (!$hasWebHookPermission) {
+            $elWebHookSetupUrl = $this->get('router')->generate('zikulaextensionlibrarymodule_user_displaydocfile', array('file' => 'webhook'), RouterInterface::ABSOLUTE_URL);
+            $body .= "\n" . <<< EOF
+**0. Add a WebHook to this repository. This couldn't be done by the ExtensionLibrary, as you don't have sufficient permission. Please ask an admin of @{$userRepository['owner']['login']} to do so by following [these instructions]($elWebHookSetupUrl).**
+EOF;
+        }
+        $body .= "\n" . <<< EOF
 1. Merge this PR!
 2. Add a new Tag as version {$extension['version']} (either using the git command line, your favourite git client or the
 [GitHub online interface]($ghReleasesUrl))!

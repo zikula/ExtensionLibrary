@@ -172,7 +172,7 @@ class RepositoryManager
 
     public function getRepository($name)
     {
-        $repos = array_filter($this->getRepositories(), function ($repo) use ($name) {
+        $repos = array_filter($this->getRepositoriesWithPushAccess(), function ($repo) use ($name) {
             return $name === $repo['name'] || $name === $repo['full_name'];
         });
 
