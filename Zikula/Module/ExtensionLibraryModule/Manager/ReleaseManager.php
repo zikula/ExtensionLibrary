@@ -527,7 +527,7 @@ class ReleaseManager
             );
             $response = ResponseMediator::getContent($response);
             $this->client->getHttpClient()->post(
-                'repos/' . $this->repo . '/deployments/' . $response['id'] . '/statuses',
+                'repos/' . $this->repo . '/deployments/' . $response['deployment']['id'] . '/statuses',
                 json_encode(array (
                     'state' => 'success',
                     'target_url' => $this->router->generate('zikulaextensionlibrarymodule_user_viewcorereleases', array(), RouterInterface::ABSOLUTE_URL),
