@@ -26,6 +26,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route; // used in annotations - do not remove
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter; // used in annotations - do not remove
 use Zikula\Core\Response\PlainResponse;
+use Zikula\Core\RouteUrl;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity;
 use Zikula\Module\ExtensionLibraryModule\Manager\RepositoryManager;
@@ -139,6 +140,7 @@ class UserController extends \Zikula_AbstractController
 
         $this->view->assign('isExtensionAdmin', $hasPushAccess);
         $this->view->assign('extension', $extensionEntity);
+        $this->view->assign('hookUrl', new RouteUrl('zikulaextensionlibrarymodule_user_display', array('extension_slug' => $extensionEntity->getTitleSlug())));
         $this->view->assign('gravatarDefaultPath', $request->getUriForPath('/'.UsersConstant::DEFAULT_AVATAR_IMAGE_PATH.'/'.UsersConstant::DEFAULT_GRAVATAR_IMAGE));
         $this->view->assign('breadcrumbs', array(
             array(

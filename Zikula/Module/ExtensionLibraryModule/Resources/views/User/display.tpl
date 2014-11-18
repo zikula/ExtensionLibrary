@@ -107,7 +107,7 @@
     <div class="tab-pane row" id="community">
         <h3>{gt text="Community Feedback"}</h3>
         <div>
-            {notifydisplayhooks eventname='el.ui_hooks.community.display_view' id=$extension.id}
+            {notifydisplayhooks eventname='el.ui_hooks.community.display_view' id=$extension.id urlobject=$hookUrl}
         </div>
     </div>
     {if $isZikulaAdmin || $isExtensionAdmin}
