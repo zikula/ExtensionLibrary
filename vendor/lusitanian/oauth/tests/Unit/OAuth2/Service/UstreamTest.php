@@ -2,17 +2,17 @@
 
 namespace OAuthTest\Unit\OAuth2\Service;
 
-use OAuth\OAuth2\Service\Google;
+use OAuth\OAuth2\Service\Ustream;
 use OAuth\Common\Token\TokenInterface;
 
-class GoogleTest extends \PHPUnit_Framework_TestCase
+class UstreamTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers OAuth\OAuth2\Service\Google::__construct
+     * @covers OAuth\OAuth2\Service\Ustream::__construct
      */
     public function testConstructCorrectInterfaceWithoutCustomUri()
     {
-        $service = new Google(
+        $service = new Ustream(
             $this->getMock('\\OAuth\\Common\\Consumer\\CredentialsInterface'),
             $this->getMock('\\OAuth\\Common\\Http\\Client\\ClientInterface'),
             $this->getMock('\\OAuth\\Common\\Storage\\TokenStorageInterface')
@@ -22,11 +22,11 @@ class GoogleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers OAuth\OAuth2\Service\Google::__construct
+     * @covers OAuth\OAuth2\Service\Ustream::__construct
      */
     public function testConstructCorrectInstanceWithoutCustomUri()
     {
-        $service = new Google(
+        $service = new Ustream(
             $this->getMock('\\OAuth\\Common\\Consumer\\CredentialsInterface'),
             $this->getMock('\\OAuth\\Common\\Http\\Client\\ClientInterface'),
             $this->getMock('\\OAuth\\Common\\Storage\\TokenStorageInterface')
@@ -36,11 +36,11 @@ class GoogleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers OAuth\OAuth2\Service\Google::__construct
+     * @covers OAuth\OAuth2\Service\Ustream::__construct
      */
     public function testConstructCorrectInstanceWithCustomUri()
     {
-        $service = new Google(
+        $service = new Ustream(
             $this->getMock('\\OAuth\\Common\\Consumer\\CredentialsInterface'),
             $this->getMock('\\OAuth\\Common\\Http\\Client\\ClientInterface'),
             $this->getMock('\\OAuth\\Common\\Storage\\TokenStorageInterface'),
@@ -52,81 +52,79 @@ class GoogleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers OAuth\OAuth2\Service\Google::__construct
-     * @covers OAuth\OAuth2\Service\Google::getAuthorizationEndpoint
+     * @covers OAuth\OAuth2\Service\Ustream::__construct
+     * @covers OAuth\OAuth2\Service\Ustream::getAuthorizationEndpoint
      */
     public function testGetAuthorizationEndpoint()
     {
-        $service = new Google(
+        $service = new Ustream(
             $this->getMock('\\OAuth\\Common\\Consumer\\CredentialsInterface'),
             $this->getMock('\\OAuth\\Common\\Http\\Client\\ClientInterface'),
             $this->getMock('\\OAuth\\Common\\Storage\\TokenStorageInterface')
         );
 
         $this->assertSame(
-            'https://accounts.google.com/o/oauth2/auth?access_type=online',
+            'https://www.ustream.tv/oauth2/authorize',
             $service->getAuthorizationEndpoint()->getAbsoluteUri()
         );
-
-        // Verify that 'offine' works
-        $service->setAccessType('offline');
-        $this->assertSame(
-            'https://accounts.google.com/o/oauth2/auth?access_type=offline',
-            $service->getAuthorizationEndpoint()->getAbsoluteUri()
-        );
-
     }
 
     /**
-     * @covers OAuth\OAuth2\Service\Google::__construct
-     * @covers OAuth\OAuth2\Service\Google::getAuthorizationEndpoint
-     */
-    public function testGetAuthorizationEndpointException()
-    {
-        $service = new Google(
-            $this->getMock('\\OAuth\\Common\\Consumer\\CredentialsInterface'),
-            $this->getMock('\\OAuth\\Common\\Http\\Client\\ClientInterface'),
-            $this->getMock('\\OAuth\\Common\\Storage\\TokenStorageInterface')
-        );
-
-        $this->setExpectedException('OAuth\OAuth2\Service\Exception\InvalidAccessTypeException');
-
-        try {
-            $service->setAccessType('invalid');
-        } catch (InvalidAccessTypeException $e) {
-            return;
-        }
-        $this->fail('Expected InvalidAccessTypeException not thrown');
-    }
-
-    /**
-     * @covers OAuth\OAuth2\Service\Google::__construct
-     * @covers OAuth\OAuth2\Service\Google::getAccessTokenEndpoint
+     * @covers OAuth\OAuth2\Service\Ustream::__construct
+     * @covers OAuth\OAuth2\Service\Ustream::getAccessTokenEndpoint
      */
     public function testGetAccessTokenEndpoint()
     {
-        $service = new Google(
+        $service = new Ustream(
             $this->getMock('\\OAuth\\Common\\Consumer\\CredentialsInterface'),
             $this->getMock('\\OAuth\\Common\\Http\\Client\\ClientInterface'),
             $this->getMock('\\OAuth\\Common\\Storage\\TokenStorageInterface')
         );
 
         $this->assertSame(
-            'https://accounts.google.com/o/oauth2/token',
+            'https://www.ustream.tv/oauth2/token',
             $service->getAccessTokenEndpoint()->getAbsoluteUri()
         );
     }
 
     /**
-     * @covers OAuth\OAuth2\Service\Google::__construct
-     * @covers OAuth\OAuth2\Service\Google::parseAccessTokenResponse
+     * @covers OAuth\OAuth2\Service\Ustream::__construct
+     * @covers OAuth\OAuth2\Service\Ustream::getAuthorizationMethod
+     */
+    public function testGetAuthorizationMethod()
+    {
+        $client = $this->getMock('\\OAuth\\Common\\Http\\Client\\ClientInterface');
+        $client->expects($this->once())->method('retrieveResponse')->will($this->returnArgument(2));
+
+        $token = $this->getMock('\\OAuth\\OAuth2\\Token\\TokenInterface');
+        $token->expects($this->once())->method('getEndOfLife')->will($this->returnValue(TokenInterface::EOL_NEVER_EXPIRES));
+        $token->expects($this->once())->method('getAccessToken')->will($this->returnValue('foo'));
+
+        $storage = $this->getMock('\\OAuth\\Common\\Storage\\TokenStorageInterface');
+        $storage->expects($this->once())->method('retrieveAccessToken')->will($this->returnValue($token));
+
+        $service = new Ustream(
+            $this->getMock('\\OAuth\\Common\\Consumer\\CredentialsInterface'),
+            $client,
+            $storage
+        );
+
+        $headers = $service->request('https://pieterhordijk.com/my/awesome/path');
+
+        $this->assertTrue(array_key_exists('Authorization', $headers));
+        $this->assertTrue(in_array('Bearer foo', $headers, true));
+    }
+
+    /**
+     * @covers OAuth\OAuth2\Service\Ustream::__construct
+     * @covers OAuth\OAuth2\Service\Ustream::parseAccessTokenResponse
      */
     public function testParseAccessTokenResponseThrowsExceptionOnNulledResponse()
     {
         $client = $this->getMock('\\OAuth\\Common\\Http\\Client\\ClientInterface');
         $client->expects($this->once())->method('retrieveResponse')->will($this->returnValue(null));
 
-        $service = new Google(
+        $service = new Ustream(
             $this->getMock('\\OAuth\\Common\\Consumer\\CredentialsInterface'),
             $client,
             $this->getMock('\\OAuth\\Common\\Storage\\TokenStorageInterface')
@@ -138,15 +136,15 @@ class GoogleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers OAuth\OAuth2\Service\Google::__construct
-     * @covers OAuth\OAuth2\Service\Google::parseAccessTokenResponse
+     * @covers OAuth\OAuth2\Service\Ustream::__construct
+     * @covers OAuth\OAuth2\Service\Ustream::parseAccessTokenResponse
      */
     public function testParseAccessTokenResponseThrowsExceptionOnError()
     {
         $client = $this->getMock('\\OAuth\\Common\\Http\\Client\\ClientInterface');
         $client->expects($this->once())->method('retrieveResponse')->will($this->returnValue('error=some_error'));
 
-        $service = new Google(
+        $service = new Ustream(
             $this->getMock('\\OAuth\\Common\\Consumer\\CredentialsInterface'),
             $client,
             $this->getMock('\\OAuth\\Common\\Storage\\TokenStorageInterface')
@@ -158,15 +156,15 @@ class GoogleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers OAuth\OAuth2\Service\Google::__construct
-     * @covers OAuth\OAuth2\Service\Google::parseAccessTokenResponse
+     * @covers OAuth\OAuth2\Service\Ustream::__construct
+     * @covers OAuth\OAuth2\Service\Ustream::parseAccessTokenResponse
      */
     public function testParseAccessTokenResponseValidWithoutRefreshToken()
     {
         $client = $this->getMock('\\OAuth\\Common\\Http\\Client\\ClientInterface');
         $client->expects($this->once())->method('retrieveResponse')->will($this->returnValue('{"access_token":"foo","expires_in":"bar"}'));
 
-        $service = new Google(
+        $service = new Ustream(
             $this->getMock('\\OAuth\\Common\\Consumer\\CredentialsInterface'),
             $client,
             $this->getMock('\\OAuth\\Common\\Storage\\TokenStorageInterface')
@@ -176,15 +174,15 @@ class GoogleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers OAuth\OAuth2\Service\Google::__construct
-     * @covers OAuth\OAuth2\Service\Google::parseAccessTokenResponse
+     * @covers OAuth\OAuth2\Service\Ustream::__construct
+     * @covers OAuth\OAuth2\Service\Ustream::parseAccessTokenResponse
      */
     public function testParseAccessTokenResponseValidWithRefreshToken()
     {
         $client = $this->getMock('\\OAuth\\Common\\Http\\Client\\ClientInterface');
         $client->expects($this->once())->method('retrieveResponse')->will($this->returnValue('{"access_token":"foo","expires_in":"bar","refresh_token":"baz"}'));
 
-        $service = new Google(
+        $service = new Ustream(
             $this->getMock('\\OAuth\\Common\\Consumer\\CredentialsInterface'),
             $client,
             $this->getMock('\\OAuth\\Common\\Storage\\TokenStorageInterface')

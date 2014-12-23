@@ -134,7 +134,7 @@ class CurlClientTest extends \PHPUnit_Framework_TestCase
         $response = $client->retrieveResponse(
             $endPoint,
             '',
-            array('Content-type' => 'foo/bar'),
+            array('Content-Type' => 'foo/bar'),
             'get'
         );
 
@@ -211,18 +211,20 @@ class CurlClientTest extends \PHPUnit_Framework_TestCase
             ->method('getAbsoluteUri')
             ->will($this->returnValue('http://httpbin.org/post'));
 
+        $formData = array('baz' => 'fab', 'foo' => 'bar');
+
         $client = new CurlClient();
 
         $response = $client->retrieveResponse(
             $endPoint,
-            'foo',
+            $formData,
             array(),
             'POST'
         );
 
         $response = json_decode($response, true);
 
-        $this->assertSame('foo', $response['data']);
+        $this->assertSame($formData, $response['form']);
     }
 
     /**
@@ -238,18 +240,20 @@ class CurlClientTest extends \PHPUnit_Framework_TestCase
             ->method('getAbsoluteUri')
             ->will($this->returnValue('http://httpbin.org/put'));
 
+        $formData = array('baz' => 'fab', 'foo' => 'bar');
+
         $client = new CurlClient();
 
         $response = $client->retrieveResponse(
             $endPoint,
-            'foo',
+            $formData,
             array(),
             'PUT'
         );
 
         $response = json_decode($response, true);
 
-        $this->assertSame('foo', $response['data']);
+        $this->assertSame($formData, $response['form']);
     }
 
     /**
@@ -265,20 +269,22 @@ class CurlClientTest extends \PHPUnit_Framework_TestCase
             ->method('getAbsoluteUri')
             ->will($this->returnValue('http://httpbin.org/put'));
 
+        $formData = array('baz' => 'fab', 'foo' => 'bar');
+
         $client = new CurlClient();
 
         $client->setMaxRedirects(0);
 
         $response = $client->retrieveResponse(
             $endPoint,
-            'foo',
+            $formData,
             array(),
             'PUT'
         );
 
         $response = json_decode($response, true);
 
-        $this->assertSame('foo', $response['data']);
+        $this->assertSame($formData, $response['form']);
     }
 
     /**
@@ -301,7 +307,7 @@ class CurlClientTest extends \PHPUnit_Framework_TestCase
         $response = $client->retrieveResponse(
             $endPoint,
             '',
-            array('Content-type' => 'foo/bar'),
+            array('Content-Type' => 'foo/bar'),
             'get'
         );
 
@@ -332,7 +338,7 @@ class CurlClientTest extends \PHPUnit_Framework_TestCase
         $response = $client->retrieveResponse(
             $endPoint,
             '',
-            array('Content-type' => 'foo/bar'),
+            array('Content-Type' => 'foo/bar'),
             'get'
         );
 

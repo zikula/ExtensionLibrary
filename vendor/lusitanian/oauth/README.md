@@ -49,9 +49,11 @@ Included service implementations
     - Etsy
     - FitBit
     - Flickr
+    - Scoop.it!
     - Tumblr
     - Twitter
     - Xing
+    - Yahoo
 - OAuth2
     - Amazon
     - BitLy
@@ -73,6 +75,7 @@ Included service implementations
     - Reddit
     - RunKeeper
     - SoundCloud
+    - Ustream
     - Vkontakte
     - Yammer
 - more to come!

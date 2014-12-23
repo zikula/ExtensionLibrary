@@ -22,12 +22,16 @@ $servicesCredentials = array(
     'bitbucket' => array(
         'key'       => '',
         'secret'    => '',
-    ),    
+    ),
     'bitly' => array(
         'key'       => '',
         'secret'    => '',
     ),
     'box' => array(
+        'key'       => '',
+        'secret'    => '',
+    ),
+    'buffer' => array(
         'key'       => '',
         'secret'    => '',
     ),
@@ -87,6 +91,9 @@ $servicesCredentials = array(
         'key'       => '',
         'secret'    => '',
     ),
+    'pocket' => array(
+        'key'       => '',
+    ),
     'reddit' => array(
         'key'       => '',
         'secret'    => '',
@@ -94,6 +101,10 @@ $servicesCredentials = array(
     'runkeeper' => array(
         'key'       => '',
         'secret'    => '',
+    ),
+    'scoopit' => array(
+        'key'       => '',
+        'secret'    => ''
     ),
     'soundcloud' => array(
         'key'       => '',
@@ -107,12 +118,17 @@ $servicesCredentials = array(
         'key'       => '',
         'secret'    => '',
     ),
-    'yammer' => array(
+    'ustream' => array(
+        'key'       => '',
+        'secret'    => '',
+    ),
+    'yahoo' => array(
         'key'       => '',
         'secret'    => ''
     ),
-    'pocket' => array(
+    'yammer' => array(
         'key'       => '',
+        'secret'    => ''
     ),
 );
 

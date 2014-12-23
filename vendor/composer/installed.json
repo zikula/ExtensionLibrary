@@ -44,65 +44,6 @@
         ]
     },
     {
-        "name": "symfony/event-dispatcher",
-        "version": "v2.5.3",
-        "version_normalized": "2.5.3.0",
-        "target-dir": "Symfony/Component/EventDispatcher",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/symfony/EventDispatcher.git",
-            "reference": "8faf5cc7e80fde74a650a36e60d32ce3c3e0457b"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/symfony/EventDispatcher/zipball/8faf5cc7e80fde74a650a36e60d32ce3c3e0457b",
-            "reference": "8faf5cc7e80fde74a650a36e60d32ce3c3e0457b",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.3"
-        },
-        "require-dev": {
-            "psr/log": "~1.0",
-            "symfony/config": "~2.0",
-            "symfony/dependency-injection": "~2.0",
-            "symfony/stopwatch": "~2.2"
-        },
-        "suggest": {
-            "symfony/dependency-injection": "",
-            "symfony/http-kernel": ""
-        },
-        "time": "2014-07-28 13:20:46",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.5-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Symfony\\Component\\EventDispatcher\\": ""
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Symfony Community",
-                "homepage": "http://symfony.com/contributors"
-            },
-            {
-                "name": "Fabien Potencier",
-                "email": "fabien@symfony.com"
-            }
-        ],
-        "description": "Symfony EventDispatcher Component",
-        "homepage": "http://symfony.com"
-    },
-    {
         "name": "guzzle/guzzle",
         "version": "v3.9.2",
         "version_normalized": "3.9.2.0",
@@ -197,72 +138,6 @@
         ]
     },
     {
-        "name": "lusitanian/oauth",
-        "version": "v0.3.0",
-        "version_normalized": "0.3.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/Lusitanian/PHPoAuthLib.git",
-            "reference": "f981b349c03f7e233b7058a9d30903809898659c"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/Lusitanian/PHPoAuthLib/zipball/f981b349c03f7e233b7058a9d30903809898659c",
-            "reference": "f981b349c03f7e233b7058a9d30903809898659c",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "3.7.*",
-            "predis/predis": "0.8.*@dev",
-            "symfony/http-foundation": "~2.1"
-        },
-        "suggest": {
-            "ext-openssl": "Allows for usage of secure connections with the stream-based HTTP client.",
-            "predis/predis": "Allows using the Redis storage backend.",
-            "symfony/http-foundation": "Allows using the Symfony Session storage backend."
-        },
-        "time": "2014-03-30 13:50:10",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "0.1-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "OAuth": "src",
-                "OAuth\\Unit": "tests"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "David Desberg",
-                "email": "david@daviddesberg.com"
-            },
-            {
-                "name": "Pieter Hordijk",
-                "email": "info@pieterhordijk.com",
-                "homepage": "https://pieterhordijk.com",
-                "role": "developer"
-            }
-        ],
-        "description": "PHP 5.3+ oAuth 1/2 Library",
-        "keywords": [
-            "Authentication",
-            "authorization",
-            "oauth",
-            "security"
-        ]
-    },
-    {
         "name": "vierbergenlars/php-semver",
         "version": "3.0.0",
         "version_normalized": "3.0.0.0",
@@ -314,69 +189,6 @@
             "semantic",
             "semver",
             "versioning"
-        ]
-    },
-    {
-        "name": "knplabs/github-api",
-        "version": "1.3.0",
-        "version_normalized": "1.3.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/KnpLabs/php-github-api.git",
-            "reference": "414457e4887dc1ae231a9d50919c948095d33d84"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/KnpLabs/php-github-api/zipball/414457e4887dc1ae231a9d50919c948095d33d84",
-            "reference": "414457e4887dc1ae231a9d50919c948095d33d84",
-            "shasum": ""
-        },
-        "require": {
-            "ext-curl": "*",
-            "guzzle/guzzle": "~3.7",
-            "php": ">=5.3.2"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "~4.0"
-        },
-        "suggest": {
-            "knplabs/gaufrette": "Needed for optional Gaufrette cache"
-        },
-        "time": "2014-08-21 20:10:02",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.3.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-0": {
-                "Github\\": "lib/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Thibault Duplessis",
-                "email": "thibault.duplessis@gmail.com",
-                "homepage": "http://ornicar.github.com"
-            },
-            {
-                "name": "KnpLabs Team",
-                "homepage": "http://knplabs.com"
-            }
-        ],
-        "description": "GitHub API v3 client",
-        "homepage": "https://github.com/KnpLabs/php-github-api",
-        "keywords": [
-            "api",
-            "gh",
-            "gist",
-            "github"
         ]
     },
     {
@@ -445,6 +257,193 @@
         "keywords": [
             "json",
             "schema"
+        ]
+    },
+    {
+        "name": "symfony/event-dispatcher",
+        "version": "v2.6.1",
+        "version_normalized": "2.6.1.0",
+        "target-dir": "Symfony/Component/EventDispatcher",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/EventDispatcher.git",
+            "reference": "720fe9bca893df7ad1b4546649473b5afddf0216"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/EventDispatcher/zipball/720fe9bca893df7ad1b4546649473b5afddf0216",
+            "reference": "720fe9bca893df7ad1b4546649473b5afddf0216",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3"
+        },
+        "require-dev": {
+            "psr/log": "~1.0",
+            "symfony/config": "~2.0",
+            "symfony/dependency-injection": "~2.6",
+            "symfony/expression-language": "~2.6",
+            "symfony/stopwatch": "~2.2"
+        },
+        "suggest": {
+            "symfony/dependency-injection": "",
+            "symfony/http-kernel": ""
+        },
+        "time": "2014-12-02 20:19:20",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.6-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Symfony\\Component\\EventDispatcher\\": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
+            },
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            }
+        ],
+        "description": "Symfony EventDispatcher Component",
+        "homepage": "http://symfony.com"
+    },
+    {
+        "name": "knplabs/github-api",
+        "version": "1.4.1",
+        "version_normalized": "1.4.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/KnpLabs/php-github-api.git",
+            "reference": "c4fb5fe66df44efa83a7236c3e18dca557649217"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/KnpLabs/php-github-api/zipball/c4fb5fe66df44efa83a7236c3e18dca557649217",
+            "reference": "c4fb5fe66df44efa83a7236c3e18dca557649217",
+            "shasum": ""
+        },
+        "require": {
+            "ext-curl": "*",
+            "guzzle/guzzle": "~3.7",
+            "php": ">=5.3.2"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "~4.0"
+        },
+        "suggest": {
+            "knplabs/gaufrette": "Needed for optional Gaufrette cache"
+        },
+        "time": "2014-12-22 23:59:03",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.3.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Github\\": "lib/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Thibault Duplessis",
+                "email": "thibault.duplessis@gmail.com",
+                "homepage": "http://ornicar.github.com"
+            },
+            {
+                "name": "KnpLabs Team",
+                "homepage": "http://knplabs.com"
+            }
+        ],
+        "description": "GitHub API v3 client",
+        "homepage": "https://github.com/KnpLabs/php-github-api",
+        "keywords": [
+            "api",
+            "gh",
+            "gist",
+            "github"
+        ]
+    },
+    {
+        "name": "lusitanian/oauth",
+        "version": "v0.3.5",
+        "version_normalized": "0.3.5.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Lusitanian/PHPoAuthLib.git",
+            "reference": "ac5a1cd5a4519143728dce2213936eea302edf8a"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Lusitanian/PHPoAuthLib/zipball/ac5a1cd5a4519143728dce2213936eea302edf8a",
+            "reference": "ac5a1cd5a4519143728dce2213936eea302edf8a",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "3.7.*",
+            "predis/predis": "0.8.*@dev",
+            "symfony/http-foundation": "~2.1"
+        },
+        "suggest": {
+            "ext-openssl": "Allows for usage of secure connections with the stream-based HTTP client.",
+            "predis/predis": "Allows using the Redis storage backend.",
+            "symfony/http-foundation": "Allows using the Symfony Session storage backend."
+        },
+        "time": "2014-09-05 15:19:58",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "0.1-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "OAuth": "src",
+                "OAuth\\Unit": "tests"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "David Desberg",
+                "email": "david@daviddesberg.com"
+            },
+            {
+                "name": "Pieter Hordijk",
+                "email": "info@pieterhordijk.com"
+            }
+        ],
+        "description": "PHP 5.3+ oAuth 1/2 Library",
+        "keywords": [
+            "Authentication",
+            "authorization",
+            "oauth",
+            "security"
         ]
     }
 ]

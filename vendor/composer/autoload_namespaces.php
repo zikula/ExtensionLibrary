@@ -8,7 +8,6 @@ $baseDir = dirname($vendorDir);
 return array(
     'vierbergenlars\\SemVer\\' => array($vendorDir . '/vierbergenlars/php-semver/src'),
     'vierbergenlars\\LibJs\\' => array($vendorDir . '/vierbergenlars/php-semver/src'),
-    'Zikula\\Module\\ExtensionLibraryModule\\' => array($baseDir . '/'),
     'Symfony\\Component\\EventDispatcher\\' => array($vendorDir . '/symfony/event-dispatcher'),
     'OAuth\\Unit' => array($vendorDir . '/lusitanian/oauth/tests'),
     'OAuth' => array($vendorDir . '/lusitanian/oauth/src'),
