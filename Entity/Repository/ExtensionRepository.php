@@ -47,7 +47,7 @@ class ExtensionRepository extends EntityRepository
             ->from('ZikulaExtensionLibraryModule:ExtensionEntity', 'e')
             ->join('e.versions', 'v');
         if (($extensionType != 'all') && (in_array($extensionType , array(ExtensionEntity::TYPE_MODULE, ExtensionEntity::TYPE_PLUGIN, ExtensionEntity::TYPE_THEME)))) {
-            $qb->andWhere('e.type', ':type')
+            $qb->where($qb->expr()->eq('e.type', ':type'))
                 ->setParameter('type', $extensionType);
         }
         if (isset($orderBy)) {
