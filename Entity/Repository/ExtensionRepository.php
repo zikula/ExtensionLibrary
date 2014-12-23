@@ -39,6 +39,9 @@ class ExtensionRepository extends EntityRepository
      */
     public function findAllMatchingFilter($orderBy = 'title', $orderDir = 'ASC', $limit = null, $offset = null, $coreVersion = null, $extensionType = null)
     {
+        if (!isset($extensionType)) {
+            $extensionType = Util::getExtensionTypeFilter();
+        }
         $qb = $this->_em->createQueryBuilder();
         $qb->select('e', 'v')
             ->from('ZikulaExtensionLibraryModule:ExtensionEntity', 'e')
