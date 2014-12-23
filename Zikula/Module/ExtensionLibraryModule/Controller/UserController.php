@@ -615,14 +615,28 @@ class UserController extends \Zikula_AbstractController
         if (!empty($currentUser['email'])) {
             $author["email"] = $currentUser['email'];
         }
+
+        $extensionNameForComposer = $extension['name'];
+        $extensionTypeForComposer = substr($extension['type'], strlen('zikula-'));
+        if (strtolower(substr($extensionNameForComposer, -strlen($extensionTypeForComposer))) == strtolower($extensionTypeForComposer)) {
+            // $extensionNameForComposer is something like "AcmeModule"
+            // $extensionTypeForComposer is "module"
+            $extensionNameForComposer = substr($extensionNameForComposer, 0, -strlen($extensionTypeForComposer));
+
+            // Check if $extensionNameForComposer ends with "-"
+            if (substr($extensionNameForComposer, -1) == '-') {
+                $extensionNameForComposer = substr($extensionNameForComposer, 0, -1);
+            }
+        }
+
         list($vendorPrefix) = explode('/', $extension['repository']);
         $composerContent = array(
-            "name" => strtolower("$vendorPrefix/{$extension['name']}-" . substr($extension['type'], strlen('zikula-'))),
+            "name" => strtolower("$vendorPrefix/$extensionNameForComposer-$extensionTypeForComposer"),
             "description" => $extension['description'],
             "type" => $extension['type'],
             "license" => $extension['license'],
             "authors" => array ($author),
-            "require" => array ("php" => ">5.3.3")
+            "require" => array ("php" => ">=5.3.3")
         );
         // add the `extra` and `autoload` fields for namespaced modules.
         if ($extension['apitype'] != '1.3') {
