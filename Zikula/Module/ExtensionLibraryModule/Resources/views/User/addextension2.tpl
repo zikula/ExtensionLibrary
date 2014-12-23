@@ -1,4 +1,4 @@
-{pageaddvar name='javascript' value=$moduleBundle->getRelativePath()|cat:'/Resources/public/js/Zikula.ExtensionLibrary.User.AddExtension.js'}
+{pageaddvar name='javascript' value='@ZikulaExtensionLibraryModule/Resources/public/js/Zikula.ExtensionLibrary.User.AddExtension.js'}
 {include file='User/header.tpl'}
 <h2>{gt text='Add your extension to the extension library (step 2 of 2)'}</h2>
 <div class="alert alert-info">{gt text='This step is only required once per extension.'}</div>

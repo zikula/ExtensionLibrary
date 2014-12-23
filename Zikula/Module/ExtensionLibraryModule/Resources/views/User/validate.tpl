@@ -1,4 +1,4 @@
-{pageaddvar name='javascript' value=$moduleBundle->getRelativePath()|cat:'/Resources/public/js/Zikula.ExtensionLibrary.User.Validate.js'}
+{pageaddvar name='javascript' value='@ZikulaExtensionLibraryModule/Resources/public/js/Zikula.ExtensionLibrary.User.Validate.js'}
 {include file='User/header.tpl'}
 <div class="row">
     <h3>{gt text="Validate %s Content" tag1="<code id='json-type'>zikula.manifest.json</code>"}</h3>

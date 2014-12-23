@@ -1,4 +1,4 @@
-{pageaddvar name='javascript' value=$moduleBundle->getRelativePath()|cat:'/Resources/public/js/Zikula.ExtensionLibrary.Admin.ModifyConfig.js'}
+{pageaddvar name='javascript' value='@ZikulaExtensionLibraryModule/Resources/public/js/Zikula.ExtensionLibrary.Admin.ModifyConfig.js'}
 {adminheader}
     <h3>
         <span class="fa fa-wrench"></span>&nbsp;{gt text="Settings"}

@@ -1,4 +1,4 @@
-{pageaddvar name='javascript' value=$moduleBundle->getRelativePath()|cat:'/Resources/public/js/Zikula.ExtensionLibrary.User.Display.js'}
+{pageaddvar name='javascript' value='@ZikulaExtensionLibraryModule/Resources/public/js/Zikula.ExtensionLibrary.User.Display.js'}
 {include file='User/header.tpl' icon=$extension.icon}
 {checkpermission component=$module|cat:"::" instance=".*" level="ACCESS_ADMIN" assign='isZikulaAdmin'}
 
