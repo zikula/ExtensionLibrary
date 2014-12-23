@@ -4,21 +4,23 @@
  * jQuery based JS
  */
 
-jQuery(document).ready(function() {
-    // register the click handlers
-    jQuery('#el-add-extension-extension-apitype').change(updateInput);
+(function ($) {
+    $(document).ready(function() {
+        // register the click handlers
+        $('#el-add-extension-extension-apitype').change(updateInput);
 
-    /**
-     * hide/show the namespace input
-     */
-    function updateInput() {
-        var apitype = jQuery('#el-add-extension-extension-apitype').val();
-        if (apitype != '1.3') {
-            jQuery('#el-add-extension-extension-namespace-input').show(400).find('input').attr('required', '');
-            jQuery('#el-add-extension-extension-coreCompatibility').val('>=1.4 <1.5');
-        } else {
-            jQuery('#el-add-extension-extension-namespace-input').hide(400).find('input').removeAttr('required');
-            jQuery('#el-add-extension-extension-coreCompatibility').val('>=1.3.5 <1.5');
+        /**
+         * hide/show the namespace input
+         */
+        function updateInput() {
+            var apitype = $('#el-add-extension-extension-apitype').val();
+            if (apitype === '1.3') {
+                $('#el-add-extension-extension-namespace-row').hide(400).find('input').removeAttr('required');
+                $('#el-add-extension-extension-coreCompatibility').val('>=1.3.5 <2.0');
+            } else {
+                $('#el-add-extension-extension-namespace-row').show(400).find('input').attr('required', '');
+                $('#el-add-extension-extension-coreCompatibility').val('>=1.4 <2.0');
+            }
         }
-    }
-});
+    });
+}(jQuery));
