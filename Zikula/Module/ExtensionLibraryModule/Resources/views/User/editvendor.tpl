@@ -1,4 +1,4 @@
-{include file='User/header.tpl' displayFilter=true}
+{include file='User/header.tpl' displayFilter=false}
 
 {assign var='vendorId' value=null}
 {if isset($vendor)}

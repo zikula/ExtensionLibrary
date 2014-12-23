@@ -133,6 +133,9 @@ class UserController extends \Zikula_AbstractController
                 return $result;
             } else if ($result instanceof GitHubClient) {
                 $hasPushAccess = $oAuthManager->hasPushAccess($extensionEntity);
+                if (!$hasPushAccess) {
+                    $request->getSession()->getFlashBag()->add('error', $this->__('You don\'t have permission to edit this extension');
+                }
             } else {
                 throw new \RuntimeException('Something went wrong!');
             }
