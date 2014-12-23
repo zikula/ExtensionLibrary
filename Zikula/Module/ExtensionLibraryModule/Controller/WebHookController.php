@@ -69,8 +69,7 @@ class WebHookController extends \Zikula_AbstractController
                 foreach ($manifestManager->getDecodingErrors() as $error) {
                     $responseText .= "- $error\n";
                 }
-                $errorLogText = implode("\n", $manifestManager->getValidationErrors());
-                Util::log("{$jsonPayload->repository->name}: " . $errorLogText, Util::LOG_PROD);
+                Util::log("{$jsonPayload->repository->name}: " . $responseText, Util::LOG_PROD);
                 return new PlainResponse($responseText, Response::HTTP_BAD_REQUEST);
             }
 
@@ -80,7 +79,7 @@ class WebHookController extends \Zikula_AbstractController
                 foreach ($manifestManager->getValidationErrors() as $error) {
                     $responseText .= "- " . sprintf("[%s] %s", $error['property'], $error['message']) . "\n";
                 }
-                Util::log("{$jsonPayload->repository->name}: " . implode("\n", $manifestManager->getValidationErrors()), Util::LOG_PROD);
+                Util::log("{$jsonPayload->repository->name}: " . $responseText, Util::LOG_PROD);
                 return new PlainResponse($responseText, Response::HTTP_BAD_REQUEST);
             }
 
@@ -97,7 +96,7 @@ class WebHookController extends \Zikula_AbstractController
                 foreach ($composerManager->getValidationErrors() as $error) {
                     $responseText .= "- " . (sprintf("[%s] %s", $error['property'], $error['message'])) . "\n";
                 }
-                Util::log("{$jsonPayload->repository->name}: " . implode("\n", $composerManager->getValidationErrors()), Util::LOG_PROD);
+                Util::log("{$jsonPayload->repository->name}: " . $responseText, Util::LOG_PROD);
                 return new PlainResponse($responseText, Response::HTTP_BAD_REQUEST);
             }
 
