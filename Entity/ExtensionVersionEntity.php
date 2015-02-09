@@ -61,7 +61,7 @@ class ExtensionVersionEntity extends EntityAccess
     /**
      * json array of related urls
      * supplied by vendor
-     * 
+     *
      * @ORM\Column(type="json_array", nullable=true)
      */
     private $urls;
@@ -69,7 +69,7 @@ class ExtensionVersionEntity extends EntityAccess
     /**
      * extension version description
      * supplied by vendor
-     * 
+     *
      * @ORM\Column(type="text", nullable=true)
      */
     private $description;
@@ -77,7 +77,7 @@ class ExtensionVersionEntity extends EntityAccess
     /**
      * string defining Zikula Core version compatibility
      * supplied by vendor
-     * 
+     *
      * @ORM\Column(type="string")
      */
     private $compatibility;
@@ -85,7 +85,7 @@ class ExtensionVersionEntity extends EntityAccess
     /**
      * array of licenses
      * supplied by vendor
-     * 
+     *
      * @ORM\Column(type="array")
      */
     private $licenses;
@@ -93,7 +93,7 @@ class ExtensionVersionEntity extends EntityAccess
     /**
      * json array of contributors
      * supplied by vendor
-     * 
+     *
      * @ORM\Column(type="json_array", nullable=true)
      */
     private $contributors;
@@ -101,14 +101,14 @@ class ExtensionVersionEntity extends EntityAccess
     /**
      * json array of extension dependencies
      * supplied by vendor
-     * 
+     *
      * @ORM\Column(type="json_array", nullable=true)
      */
     private $dependencies;
 
     /**
      * status of version
-     * 
+     *
      * @ORM\Column(type="integer")
      */
     private $status = self::UNVERIFIED;
@@ -122,7 +122,7 @@ class ExtensionVersionEntity extends EntityAccess
 
     /**
      * the related extension
-     * 
+     *
      * @ORM\ManyToOne(targetEntity="ExtensionEntity", inversedBy="versions")
      */
     private $extension;
@@ -347,10 +347,10 @@ class ExtensionVersionEntity extends EntityAccess
 
     /**
      * Checks if the current extension version is compatible with the specified core version.
-     * 
+     *
      * @param string|null $coreVersion The core version to check compatability with, can be anything
      * matching SemVer or 'all'. If null is given, the version will be set to the one selected by the user.
-     * 
+     *
      * @return bool True if this extension version is compatible with the core version, false otherwise.
      */
     public function matchesCoreChosen($coreVersion = null)
@@ -378,10 +378,11 @@ class ExtensionVersionEntity extends EntityAccess
      */
     public function getVerifiedIcon()
     {
+        $dom = ZLanguage::getModuleDomain('ZikulaExtensionLibraryModule');
         if ($this->status == self::VERIFIED) {
-            return "<span title='Extension has been verified!' data-container='body' class='fa-stack fa-lg tooltips'><i class='fa fa-certificate fa-stack-2x text-success'></i><i class='fa fa-check fa-stack-1x fa-inverse'></i></span>";
+            return "<span title='" . __('Extension has been verified to work and be secure by the Zikula Team!', $dom) . "' data-container='body' class='fa-stack fa-lg tooltips'><i class='fa fa-certificate fa-stack-2x text-success'></i><i class='fa fa-check fa-stack-1x fa-inverse'></i></span>";
         } else {
-            return "<span title='Extension not yet tested.' data-container='body' class='fa-stack fa-lg tooltips'><i class='fa fa-certificate fa-stack-2x text-muted'></i><i class='fa fa-times fa-stack-1x fa-inverse'></i></span>";
+            return "<span title='" . __('Extension has not yet been tested by the Zikula Team.', $dom) . "' data-container='body' class='fa-stack fa-lg tooltips'><i class='fa fa-certificate fa-stack-2x text-muted'></i><i class='fa fa-times fa-stack-1x fa-inverse'></i></span>";
         }
     }
 }
