@@ -378,7 +378,7 @@ class ExtensionVersionEntity extends EntityAccess
      */
     public function getVerifiedIcon()
     {
-        $dom = ZLanguage::getModuleDomain('ZikulaExtensionLibraryModule');
+        $dom = \ZLanguage::getModuleDomain('ZikulaExtensionLibraryModule');
         if ($this->status == self::VERIFIED) {
             return "<span title='" . __('Extension has been verified to work and be secure by the Zikula Team!', $dom) . "' data-container='body' class='fa-stack fa-lg tooltips'><i class='fa fa-certificate fa-stack-2x text-success'></i><i class='fa fa-check fa-stack-1x fa-inverse'></i></span>";
         } else {
