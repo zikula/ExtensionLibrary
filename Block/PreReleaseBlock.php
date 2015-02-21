@@ -19,14 +19,14 @@ use SecurityUtil;
 use Zikula\Module\ExtensionLibraryModule\AbstractButtonBlock;
 use Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity;
 
-class LatestReleaseBlock extends AbstractButtonBlock
+class PreReleaseBlock extends AbstractButtonBlock
 {
     /**
      * initialise block
      */
     public function init()
     {
-        SecurityUtil::registerPermissionSchema('ZikulaExtensionLibraryModule:latestRelease:', 'Block title::');
+        SecurityUtil::registerPermissionSchema('ZikulaExtensionLibraryModule:preRelease:', 'Block title::');
     }
 
     /**
@@ -35,9 +35,9 @@ class LatestReleaseBlock extends AbstractButtonBlock
     public function info()
     {
         return array(
-            'text_type' => 'latestRelease',
+            'text_type' => 'preRelease',
             'module' => 'ZikulaExtensionLibraryModule',
-            'text_type_long' => $this->__('Latest release button'),
+            'text_type_long' => $this->__('Pre release button'),
             'allow_multiple' => true,
             'form_content' => false,
             'form_refresh' => false,
@@ -51,7 +51,7 @@ class LatestReleaseBlock extends AbstractButtonBlock
      */
     public function display($blockinfo)
     {
-        if (!SecurityUtil::checkPermission('ZikulaExtensionLibraryModule:latestRelease:', "$blockinfo[title]::", ACCESS_OVERVIEW) || !ModUtil::available('ZikulaExtensionLibraryModule')) {
+        if (!SecurityUtil::checkPermission('ZikulaExtensionLibraryModule:preRelease:', "$blockinfo[title]::", ACCESS_OVERVIEW) || !ModUtil::available('ZikulaExtensionLibraryModule')) {
             return "";
         }
         parent::display($blockinfo);
@@ -59,15 +59,15 @@ class LatestReleaseBlock extends AbstractButtonBlock
         $releaseManager = $this->get('zikulaextensionlibrarymodule.releasemanager');
         $releases = $releaseManager->getSignificantReleases();
 
-        $supportedReleases = array_filter($releases, function (CoreReleaseEntity $release) {
-            return $release->getState() === CoreReleaseEntity::STATE_SUPPORTED;
+        $preReleases = array_filter($releases, function (CoreReleaseEntity $release) {
+            return $release->getState() === CoreReleaseEntity::STATE_PRERELEASE;
         });
-        if (empty($supportedReleases)) {
+        if (empty($preReleases)) {
             return "";
         }
-        $this->view->assign('supportedRelease', current($supportedReleases));
+        $this->view->assign('preRelease', current($preReleases));
         $this->view->assign('id', uniqid());
-        $blockinfo['content'] = $this->view->fetch('Blocks/latestrelease.tpl');
+        $blockinfo['content'] = $this->view->fetch('Blocks/prerelease.tpl');
 
         return BlockUtil::themeBlock($blockinfo);
     }
