@@ -42,6 +42,10 @@ class ExtensionRepository extends EntityRepository
         if (!isset($extensionType)) {
             $extensionType = Util::getExtensionTypeFilter();
         }
+        if (!isset($coreVersion)) {
+            $coreVersion = Util::getCoreVersionFilter();
+        }
+
         $qb = $this->_em->createQueryBuilder();
         $qb->select('e', 'v')
             ->from('ZikulaExtensionLibraryModule:ExtensionEntity', 'e')
@@ -61,7 +65,7 @@ class ExtensionRepository extends EntityRepository
         }
         $extensions = new Paginator($qb);
 
-        if (isset($coreVersion) && $coreVersion != 'all') {
+        if ($coreVersion != 'all') {
             $extensions = Util::filterExtensions($extensions, $coreVersion);
         }
 
