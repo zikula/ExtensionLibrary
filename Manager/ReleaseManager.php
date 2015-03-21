@@ -97,21 +97,26 @@ class ReleaseManager
         $ids = array();
         foreach ($versionMap as $version => $stateReleaseMap) {
             // Now check if there is a supported version. If so, ignore all the outdated versions, prereleases and
-            // development versions.. We only want to serve the supported version. If there isn't a supported version
+            // development versions. We only want to serve the supported version. If there isn't a supported version
             // but an outdated version, serve the outdated version but ignore all prereleases and development versions
             // and so on.
+            // Make sure to show the development version even if there is a prerelease.
+            $showDev = true;
             if (isset($stateReleaseMap[CoreReleaseEntity::STATE_SUPPORTED])) {
                 // There is a supported core release for version x.y.z
                 $ids[CoreReleaseEntity::STATE_SUPPORTED][$version][] = $stateReleaseMap[CoreReleaseEntity::STATE_SUPPORTED][0];
+                $showDev = false;
             } else if (isset($stateReleaseMap[CoreReleaseEntity::STATE_OUTDATED])) {
                 // There is an outdated core release for version x.y.z
                 $ids[CoreReleaseEntity::STATE_OUTDATED][$version][] = $stateReleaseMap[CoreReleaseEntity::STATE_OUTDATED][0];
+                $showDev = false;
             } else if (isset($stateReleaseMap[CoreReleaseEntity::STATE_PRERELEASE])) {
                 // There is at least one prerelease core for version x.y.z
                 // There might be multiple prereleases. Sort them by id and use the latest one.
                 rsort($stateReleaseMap[CoreReleaseEntity::STATE_PRERELEASE]);
                 $ids[CoreReleaseEntity::STATE_PRERELEASE][$version][] = $stateReleaseMap[CoreReleaseEntity::STATE_PRERELEASE][0];
-            } else if (isset($stateReleaseMap[CoreReleaseEntity::STATE_DEVELOPMENT])) {
+            }
+            if (isset($stateReleaseMap[CoreReleaseEntity::STATE_DEVELOPMENT]) && $showDev) {
                 // There is at least one development core for version x.y.z
                 // There might be multiple development cores. Sort them by id and use the latest one.
                 rsort($stateReleaseMap[CoreReleaseEntity::STATE_DEVELOPMENT]);
