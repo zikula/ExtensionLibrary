@@ -616,7 +616,9 @@ class ReleaseManager
      */
     private function createNewsArticle(CoreReleaseEntity $newRelease)
     {
+        Util::log("Creating News article for new release", Util::LOG_PROD);
         if (!\ModUtil::available('News')) {
+            Util::log("News module not available!", Util::LOG_PROD);
             return;
         }
         switch ($newRelease->getState()) {
@@ -650,12 +652,17 @@ class ReleaseManager
         $args['cr_date'] = $now;
         $args['tonolimit'] = true;
 
+        Util::log("Calling News Api: " . print_r($args, true), Util::LOG_PROD);
         $id = \ModUtil::apiFunc('News', 'user', 'create', $args);
 
         if (is_numeric($id) && $id > 0) {
+            Util::log("News article successfully create, id = $id", Util::LOG_PROD);
             $newRelease->setNewsId($id);
-            $this->em->persist($newRelease);
+            $this->em->merge($newRelease);
             $this->em->flush();
+            Util::log("Release entity updated with news id", Util::LOG_PROD);
+        } else {
+            Util::log("News article NOT created, invalid id.", Util::LOG_PROD);
         }
     }
 
