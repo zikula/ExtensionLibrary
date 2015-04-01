@@ -527,18 +527,16 @@ class ReleaseManager
                     'required_contexts' => array(),
                     'environment' => 'Extension Library',
                     'description' => 'Updating the Extension Library.'
-                )),
-                array ('Accept' => 'application/vnd.github.cannonball-preview+json')
+                ))
             );
             $response = ResponseMediator::getContent($response);
             $this->client->getHttpClient()->post(
-                'repos/' . $this->repo . '/deployments/' . $response['deployment']['id'] . '/statuses',
+                'repos/' . $this->repo . '/deployments/' . $response['id'] . '/statuses',
                 json_encode(array (
                     'state' => 'success',
                     'target_url' => $this->router->generate('zikulaextensionlibrarymodule_user_viewcorereleases', array(), RouterInterface::ABSOLUTE_URL),
                     'description' => 'Build has been added to the Extension Library.'
-                )),
-                array ('Accept' => 'application/vnd.github.cannonball-preview+json')
+                ))
             );
         } catch (\Exception $e) {
             Util::log("Deployment API failed:" . $e->getMessage(), Util::LOG_PROD);
