@@ -216,7 +216,7 @@ class UserController extends \Zikula_AbstractController
         } else {
             $logfile = $this->__('Nothing logged yet!');
         }
-        $this->view->assign('log', nl2br($logfile));
+        $this->view->assign('log', nl2br(DataUtil::formatForDisplay($logfile)));
         $this->view->assign('breadcrumbs', array(array('title' => $this->__('Log'))));
 
         return $this->response($this->view->fetch('User/log.tpl'));
