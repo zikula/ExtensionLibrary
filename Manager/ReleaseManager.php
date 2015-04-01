@@ -652,11 +652,11 @@ class ReleaseManager
         $args['cr_date'] = $now;
         $args['tonolimit'] = true;
 
-        Util::log("Calling News Api: " . print_r($args, true), Util::LOG_PROD);
+        Util::log("Calling News Api", Util::LOG_PROD);
         $id = \ModUtil::apiFunc('News', 'user', 'create', $args);
 
         if (is_numeric($id) && $id > 0) {
-            Util::log("News article successfully create, id = $id", Util::LOG_PROD);
+            Util::log("News article successfully created, id = $id", Util::LOG_PROD);
             $newRelease->setNewsId($id);
             $this->em->merge($newRelease);
             $this->em->flush();
