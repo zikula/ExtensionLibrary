@@ -71,7 +71,7 @@
                         <input id="settings_jenkins_token" type="password" class="form-control" name="settings[jenkins_token]" value="{$settings.jenkins_token|default:''|safetext}" maxlength="100" />
                         {route name='zikulaextensionlibrarymodule_webhook_jenkins' code='SECURITYTOKEN' absolute=true assign='route'}
                         {assign var='route' value="<a href=\"`$route`\">`$route`</a>"}
-                        <p class="help-block">{gt text='A security token to verify requests from Jenkins. Please setup Jenkins to make a POST request to the following url everytime a build has finished: %s' tag1=$route}</p>
+                        <p class="help-block">{gt text='A security token to verify requests from Jenkins. Please setup Jenkins to make a POST request to the following url everytime a build has finished: %s. You can use the "Post Completed Build Result Plugin" to do the job: https://wiki.jenkins-ci.org/display/JENKINS/Post+Completed+Build+Result+Plugin.' tag1=$route}</p>
                     </div>
                 </div>
                 <div class="form-group">
