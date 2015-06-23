@@ -28,6 +28,7 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use CarlosIO\Jenkins\Dashboard;
 use CarlosIO\Jenkins\Source;
+use Zikula\Module\ExtensionLibraryModule\Manager\CoreReleaseManager;
 
 class Util
 {
@@ -54,31 +55,6 @@ class Util
     }
 
     /**
-     * Get all available core versions.
-     *
-     * @return array An array of arrays providing "outdated", "supported" and "dev" core versions.
-     *
-     * @todo Fetch from GitHub.
-     */
-    public static function getAvailableCoreVersions($indexBy = 'stateText')
-    {
-        $releaseManager = \ServiceUtil::get('zikulaextensionlibrarymodule.releasemanager');
-        $dbReleases = $releaseManager->getSignificantReleases(false);
-
-        $releases = array();
-        foreach ($dbReleases as $dbRelease) {
-            if ($indexBy == 'stateText') {
-                $key = CoreReleaseEntity::stateToText($dbRelease->getState(), 'plural');
-            } else {
-                $key = $dbRelease->getState();
-            }
-            $releases[$key][$dbRelease->getSemver()] = '';
-        }
-
-        return $releases;
-    }
-
-    /**
      * Get all available extension types.
      *
      * @return array An array of allowed extension types.
@@ -92,61 +68,6 @@ class Util
             ExtensionEntity::TYPE_THEME => __('Themes', $dom),
             ExtensionEntity::TYPE_PLUGIN => __('Plugins', $dom)
         );
-    }
-
-    /**
-     * Saves the chosen core version to a session variable.
-     *
-     * @param string $filter The core version, can be anything matching SemVer or 'all'.
-     *
-     * @throws \InvalidArgumentException If $filter is invalid.
-     */
-    public static function setCoreFilter($filter)
-    {
-        $coreVersions = self::getAvailableCoreVersions('state');
-
-        // @todo Simplify this :/
-        if (!(
-            $filter === 'all'
-            || (
-                isset($coreVersions[CoreReleaseEntity::STATE_SUPPORTED])
-                &&
-                array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_SUPPORTED])
-            )
-            || (
-                isset($coreVersions[CoreReleaseEntity::STATE_OUTDATED])
-                &&
-                array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_OUTDATED])
-            )
-            || (
-                isset($coreVersions[CoreReleaseEntity::STATE_PRERELEASE])
-                &&
-                array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_PRERELEASE])
-            )
-            || (
-                isset($coreVersions[CoreReleaseEntity::STATE_DEVELOPMENT])
-                &&
-                array_key_exists($filter, $coreVersions[CoreReleaseEntity::STATE_DEVELOPMENT])
-            )
-        )) {
-            throw new \InvalidArgumentException();
-        }
-
-        /** @var \Symfony\Component\HttpFoundation\Request $request */
-        $request = \ServiceUtil::get('request');
-        $request->getSession()->set('zikulaextensionslibrarymodule_chosenCore', $filter);
-    }
-
-    /**
-     * Returns the chosen core version from session variable. Defaults to 'all'.
-     * 
-     * @return string The core version, can be anything matching SemVer or 'all'.
-     */
-    public static function getCoreVersionFilter()
-    {
-        /** @var \Symfony\Component\HttpFoundation\Request $request */
-        $request = \ServiceUtil::get('request');
-        return $request->getSession()->get('zikulaextensionslibrarymodule_chosenCore', 'all');
     }
 
     /**
@@ -261,7 +182,9 @@ class Util
     public static function filterExtensions($extensions, $coreVersion = null)
     {
         if (!isset($coreVersion)) {
-            $coreVersion = Util::getCoreVersionFilter();
+            /** @var CoreReleaseManager $coreReleaseManager */
+            $coreReleaseManager = \ServiceUtil::get('zikulaextensionlibrarymodule.corereleasemanager');
+            $coreVersion = $coreReleaseManager->getCoreVersionFilter();
         }
         $userSelectedCoreVersion = new version($coreVersion);
 

@@ -28,7 +28,7 @@
                     {foreach from=$coreVersions key="type" item="versions"}
                         <li role="presentation"  class="divider"></li>
                         <li role="presentation" class="dropdown-header">{$type}</li>
-                        {foreach from=$versions key='version' item='foo'}
+                        {foreach from=$versions item='version'}
                             <li><a href="{route name='zikulaextensionlibrarymodule_user_filter' filterType="coreVersion" filter=$version returnUrl=$request->getRequestUri()|urlencode}">{$version}</a></li>
                         {/foreach}
                     {/foreach}

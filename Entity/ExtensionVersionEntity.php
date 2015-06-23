@@ -18,6 +18,7 @@ use vierbergenlars\SemVer\version;
 use Zikula\Core\Doctrine\EntityAccess;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Zikula\Module\ExtensionLibraryModule\Manager\CoreReleaseManager;
 use Zikula\Module\ExtensionLibraryModule\Util;
 
 /**
@@ -356,7 +357,9 @@ class ExtensionVersionEntity extends EntityAccess
     public function matchesCoreChosen($coreVersion = null)
     {
         if (!isset($coreVersion)) {
-            $coreVersion = Util::getCoreVersionFilter();
+            /** @var CoreReleaseManager $coreReleaseManager */
+            $coreReleaseManager = \ServiceUtil::get('zikulaextensionlibrarymodule.corereleasemanager');
+            $coreVersion = $coreReleaseManager->getCoreVersionFilter();
         }
 
         if ($coreVersion === 'all') {

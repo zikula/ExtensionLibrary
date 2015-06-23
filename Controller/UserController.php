@@ -29,6 +29,7 @@ use Zikula\Core\Response\PlainResponse;
 use Zikula\Core\RouteUrl;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity;
+use Zikula\Module\ExtensionLibraryModule\Manager\CoreReleaseManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\RepositoryManager;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Zikula\Module\UsersModule\Constant as UsersConstant;
@@ -182,7 +183,9 @@ class UserController extends \Zikula_AbstractController
         switch ($filterType) {
             case 'coreVersion':
                 try {
-                    Util::setCoreFilter($filter);
+                    /** @var CoreReleaseManager $releaseManager */
+                    $releaseManager = $this->get('zikulaextensionlibrarymodule.corereleasemanager');
+                    $releaseManager->setCoreFilter($filter);
                 } catch (\InvalidArgumentException $e) {
                     throw new NotFoundHttpException('Invalid arguments received.');
                 }
