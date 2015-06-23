@@ -35,13 +35,6 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-lg-3 control-label" for="settings_github_webhook_token">{gt text="Webhook Security Token"}</label>
-                    <div class="col-lg-9">
-                        <input id="settings_github_webhook_token" type="password" class="form-control" name="settings[github_webhook_token]" value="{$settings.github_webhook_token|default:''|safetext}" maxlength="100" autocomplete="off" />
-                        <p class="help-block">{gt text='Create a secrete webhook token at %s to verify payloads from the Zikula Core repository.' tag1='<a href="https://developer.github.com/webhooks/securing">https://developer.github.com/webhooks/securing/</a>'}</p>
-                    </div>
-                </div>
-                <div class="form-group">
                     <label class="col-lg-3 control-label" for="settings_github_app_id">{gt text="Application Client ID"}</label>
                     <div class="col-lg-9">
                         <input id="settings_github_app_id" type="text" class="form-control" name="settings[github_app_id]" value="{$settings.github_app_id|default:''|safetext}" maxlength="100" />
@@ -53,39 +46,6 @@
                     <div class="col-lg-9">
                         <input id="settings_github_app_secret" type="password" class="form-control" name="settings[github_app_secret]" value="{$settings.github_app_secret|default:''|safetext}" maxlength="100" autocomplete="off" />
                         <p class="help-block">{gt text='Create an application at %s to ease the process of adding a module to the Extension Library for new users.' tag1='<a href="https://github.com/settings/applications">https://github.com/settings/applications</a>'}</p>
-                    </div>
-                </div>
-            </fieldset>
-            <fieldset>
-                <legend>{gt text='Jenkins server'}</legend>
-                <div class="form-group">
-                    <label class="col-lg-3 control-label" for="settings_jenkins_server">{gt text="URL of the server"}</label>
-                    <div class="col-lg-9">
-                        <input id="settings_jenkins_server" type="text" class="form-control" name="settings[jenkins_server]" value="{$settings.jenkins_server|default:''|safetext}" maxlength="100" />
-                        <p class="help-block">{gt text='Make sure to include "http://". Do not include "www". Example: "http://ci.zikula.org"'}</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-lg-3 control-label" for="settings_jenkins_token">{gt text="Security token"}</label>
-                    <div class="col-lg-9">
-                        <input id="settings_jenkins_token" type="password" class="form-control" name="settings[jenkins_token]" value="{$settings.jenkins_token|default:''|safetext}" maxlength="100" />
-                        {route name='zikulaextensionlibrarymodule_webhook_jenkins' code='SECURITYTOKEN' absolute=true assign='route'}
-                        {assign var='route' value="<a href=\"`$route`\">`$route`</a>"}
-                        <p class="help-block">{gt text='A security token to verify requests from Jenkins. Please setup Jenkins to make a POST request to the following url everytime a build has finished: %s. You can use the "Post Completed Build Result Plugin" to do the job: https://wiki.jenkins-ci.org/display/JENKINS/Post+Completed+Build+Result+Plugin.' tag1=$route}</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-lg-3 control-label" for="settings_jenkins_user">{gt text="Username"}</label>
-                    <div class="col-lg-9">
-                        <input id="settings_jenkins_user" type="text" class="form-control" name="settings[jenkins_user]" value="{$settings.jenkins_user|default:''|safetext}" maxlength="100" />
-                        <p class="help-block">{gt text='Can be left empty if the server isn\'t private.'}</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-lg-3 control-label" for="settings_jenkins_password">{gt text="Password"}</label>
-                    <div class="col-lg-9">
-                        <input id="settings_jenkins_password" type="password" class="form-control" name="settings[jenkins_password]" value="{$settings.jenkins_password|default:''|safetext}" maxlength="100" />
-                        <p class="help-block">{gt text='Can be left empty if the server isn\'t private.'}</p>
                     </div>
                 </div>
             </fieldset>
