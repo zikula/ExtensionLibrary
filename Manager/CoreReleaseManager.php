@@ -41,6 +41,9 @@ class CoreReleaseManager
      */
     public function getAvailableCoreVersions($indexBy = 'stateText')
     {
+        if ($this->api === null) {
+            return array();
+        }
         $releases = $this->api->getSignificantReleases(false);
         $states = $this->api->getReleaseStates();
 
@@ -66,7 +69,7 @@ class CoreReleaseManager
      */
     public function setCoreFilter($filter)
     {
-        $coreVersions = self::getAvailableCoreVersions('state');
+        $coreVersions = $this->getAvailableCoreVersions('state');
 
         foreach ($coreVersions as $state => $coreVersion) {
             foreach ($coreVersion as $version) {
