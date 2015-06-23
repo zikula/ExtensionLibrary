@@ -62,12 +62,12 @@ class RegExp extends Object
 
     /**
      *
-     * @param string|String $str
+     * @param string|JString $str
      */
     public function exec($str)
     {
         if($this->global) {
-            if(!preg_match_all($this->_pregSource, (string)$src, $matches))
+            if(!preg_match_all($this->_pregSource, (string)$str, $matches))
                 return null;
         } else {
             if(!preg_match($this->_pregSource, (string)$str, $matches))
@@ -78,7 +78,7 @@ class RegExp extends Object
 
     /**
      *
-     * @param string|String $str
+     * @param string|JString $str
      */
     public function test($str)
     {

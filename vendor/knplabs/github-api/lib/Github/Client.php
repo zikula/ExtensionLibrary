@@ -9,7 +9,7 @@ use Github\HttpClient\HttpClient;
 use Github\HttpClient\HttpClientInterface;
 
 /**
- * Simple yet very cool PHP GitHub client
+ * Simple yet very cool PHP GitHub client.
  *
  * @method Api\CurrentUser currentUser()
  * @method Api\CurrentUser me()
@@ -22,6 +22,8 @@ use Github\HttpClient\HttpClientInterface;
  * @method Api\Issue issue()
  * @method Api\Issue issues()
  * @method Api\Markdown markdown()
+ * @method Api\Notification notification()
+ * @method Api\Notification notifications()
  * @method Api\Organization organization()
  * @method Api\Organization organizations()
  * @method Api\PullRequest pr()
@@ -54,7 +56,7 @@ class Client
 
     /**
      * Constant for authentication method. Not indicates the new login, but allows
-     * usage of unauthenticated rate limited requests for given client_id + client_secret
+     * usage of unauthenticated rate limited requests for given client_id + client_secret.
      */
     const AUTH_URL_CLIENT_ID = 'url_client_id';
 
@@ -80,20 +82,20 @@ class Client
         'timeout'     => 10,
 
         'api_limit'   => 5000,
-        'api_version' => 'beta',
+        'api_version' => 'v3',
 
         'cache_dir'   => null
     );
 
     /**
-     * The Buzz instance used to communicate with GitHub
+     * The Buzz instance used to communicate with GitHub.
      *
      * @var HttpClient
      */
     private $httpClient;
 
     /**
-     * Instantiate a new GitHub client
+     * Instantiate a new GitHub client.
      *
      * @param null|HttpClientInterface $httpClient Github http client
      */
@@ -105,9 +107,9 @@ class Client
     /**
      * @param string $name
      *
-     * @return ApiInterface
-     *
      * @throws InvalidArgumentException
+     *
+     * @return ApiInterface
      */
     public function api($name)
     {
@@ -116,6 +118,11 @@ class Client
             case 'current_user':
             case 'currentUser':
                 $api = new Api\CurrentUser($this);
+                break;
+
+            case 'deployment':
+            case 'deployments':
+                $api = new Api\Deployment($this);
                 break;
 
             case 'ent':
@@ -141,6 +148,11 @@ class Client
 
             case 'markdown':
                 $api = new Api\Markdown($this);
+                break;
+
+            case 'notification':
+            case 'notifications':
+                $api = new Api\Notification($this);
                 break;
 
             case 'organization':
@@ -194,7 +206,7 @@ class Client
     }
 
     /**
-     * Authenticate a user for all next requests
+     * Authenticate a user for all next requests.
      *
      * @param string      $tokenOrLogin GitHub private token/username/client ID
      * @param null|string $password     GitHub password/secret (optionally can contain $authMethod)
@@ -252,7 +264,7 @@ class Client
     }
 
     /**
-     * Clears used headers
+     * Clears used headers.
      */
     public function clearHeaders()
     {
@@ -270,9 +282,9 @@ class Client
     /**
      * @param string $name
      *
-     * @return mixed
-     *
      * @throws InvalidArgumentException
+     *
+     * @return mixed
      */
     public function getOption($name)
     {
@@ -295,32 +307,19 @@ class Client
         if (!array_key_exists($name, $this->options)) {
             throw new InvalidArgumentException(sprintf('Undefined option called: "%s"', $name));
         }
-        $supportedApiVersions = $this->getSupportedApiVersions();
-        if ('api_version' == $name && !in_array($value, $supportedApiVersions)) {
-            throw new InvalidArgumentException(sprintf('Invalid API version ("%s"), valid are: %s', $name, implode(', ', $supportedApiVersions)));
-        }
 
         $this->options[$name] = $value;
     }
 
     /**
-     * Returns an array of valid API versions supported by this client.
-     *
-     * @return array
-     */
-    public function getSupportedApiVersions()
-    {
-        return array('v3', 'beta');
-    }
-
-    /**
      * @param string $name
      *
-     * @return ApiInterface
-     *
      * @throws InvalidArgumentException
+     *
+     * @return ApiInterface
      */
-    public function __call($name, $args) {
+    public function __call($name, $args)
+    {
         try {
             return $this->api($name);
         } catch (InvalidArgumentException $e) {

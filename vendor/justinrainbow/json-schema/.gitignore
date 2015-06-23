@@ -5,3 +5,5 @@ coverage
 .buildpath
 .project
 .settings
+composer.lock
+docs-api
