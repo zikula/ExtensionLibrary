@@ -14,6 +14,7 @@
 namespace Zikula\Module\ExtensionLibraryModule\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Zikula\Module\ExtensionLibraryModule\Manager\CoreReleaseManager;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
@@ -43,7 +44,9 @@ class ExtensionRepository extends EntityRepository
             $extensionType = Util::getExtensionTypeFilter();
         }
         if (!isset($coreVersion)) {
-            $coreVersion = Util::getCoreVersionFilter();
+            /** @var CoreReleaseManager $coreReleaseManager */
+            $coreReleaseManager = \ServiceUtil::get('zikulaextensionlibrarymodule.corereleasemanager');
+            $coreVersion = $coreReleaseManager->getCoreVersionFilter();
         }
 
         $qb = $this->_em->createQueryBuilder();

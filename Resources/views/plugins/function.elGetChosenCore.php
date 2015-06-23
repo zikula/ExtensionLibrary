@@ -28,7 +28,11 @@
  */
 function smarty_function_elGetChosenCore($params, Zikula_View $view)
 {
-    $version = \Zikula\Module\ExtensionLibraryModule\Util::getCoreVersionFilter();
+    /**
+     * @var \Zikula\Module\ExtensionLibraryModule\Manager\CoreReleaseManager $coreReleaseManager
+     */
+    $coreReleaseManager = ServiceUtil::get('zikulaextensionlibrarymodule.corereleasemanager');
+    $version = $coreReleaseManager->getCoreVersionFilter();
 
     if (isset($params['assign']) && !empty($params['assign'])) {
         $view->assign($params['assign'], $version);

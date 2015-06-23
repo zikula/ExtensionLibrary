@@ -40,6 +40,15 @@ class ExtensionLibraryModuleVersion extends \Zikula_AbstractVersion
             'capabilities' => array(
                 HookUtil::SUBSCRIBER_CAPABLE => array('enabled' => true),
                 AbstractSearchable::SEARCHABLE => array('class' => 'Zikula\Module\ExtensionLibraryModule\Helper\SearchHelper'),
+            ),
+            'dependencies' => array(
+                array(
+                    'modname' => 'ZikulaCoreManagerModule',
+                    'minversion' => '1.0.0',
+                    'maxversion' => '1.99.99',
+                    'reason' => $this->__('To filter extensions by core version.'),
+                    'status' => \ModUtil::DEPENDENCY_REQUIRED
+                )
             )
         );
     }

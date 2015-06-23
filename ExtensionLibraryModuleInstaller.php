@@ -25,7 +25,6 @@ class ExtensionLibraryModuleInstaller extends \Zikula_AbstractInstaller
         'Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity',
         'Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity',
         'Zikula\Module\ExtensionLibraryModule\Entity\ExtensionVersionEntity',
-        'Zikula\Module\ExtensionLibraryModule\Entity\CoreReleaseEntity',
         'Zikula\Module\ExtensionLibraryModule\Entity\OAuthEntity'
     );
 

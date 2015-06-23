@@ -29,6 +29,7 @@ use Zikula\Core\Response\PlainResponse;
 use Zikula\Core\RouteUrl;
 use Zikula\Module\ExtensionLibraryModule\Entity\ExtensionEntity;
 use Zikula\Module\ExtensionLibraryModule\Entity\VendorEntity;
+use Zikula\Module\ExtensionLibraryModule\Manager\CoreReleaseManager;
 use Zikula\Module\ExtensionLibraryModule\Manager\RepositoryManager;
 use Zikula\Module\ExtensionLibraryModule\Util;
 use Zikula\Module\UsersModule\Constant as UsersConstant;
@@ -182,7 +183,9 @@ class UserController extends \Zikula_AbstractController
         switch ($filterType) {
             case 'coreVersion':
                 try {
-                    Util::setCoreFilter($filter);
+                    /** @var CoreReleaseManager $releaseManager */
+                    $releaseManager = $this->get('zikulaextensionlibrarymodule.corereleasemanager');
+                    $releaseManager->setCoreFilter($filter);
                 } catch (\InvalidArgumentException $e) {
                     throw new NotFoundHttpException('Invalid arguments received.');
                 }
@@ -374,24 +377,6 @@ class UserController extends \Zikula_AbstractController
             Util::log("could not retrieve image ($name)");
             return $this->getImageAction();
         }
-    }
-
-    /**
-     * @Route("/releases")
-     */
-    public function viewCoreReleasesAction()
-    {
-        $this->view->assign('breadcrumbs', array (
-            array (
-                'title' => $this->__('Core Releases')
-            )
-        ));
-
-        $releaseManager = $this->get('zikulaextensionlibrarymodule.releasemanager');
-        $releases = $releaseManager->getSignificantReleases(false);
-        $this->view->assign('releases', $releases);
-
-        return $this->response($this->view->fetch('User/viewreleases.tpl'));
     }
 
     /**
