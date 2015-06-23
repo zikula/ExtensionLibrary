@@ -42,11 +42,13 @@ class ExtensionLibraryModuleVersion extends \Zikula_AbstractVersion
                 AbstractSearchable::SEARCHABLE => array('class' => 'Zikula\Module\ExtensionLibraryModule\Helper\SearchHelper'),
             ),
             'dependencies' => array(
-                'modname' => 'ZikulaCoreManagerModule',
-                'minversion' => '1.0.0',
-                'maxversion' => '1.99.99',
-                'reason' => $this->__('To filter extensions by core version.'),
-                'status' => \ModUtil::DEPENDENCY_REQUIRED
+                array(
+                    'modname' => 'ZikulaCoreManagerModule',
+                    'minversion' => '1.0.0',
+                    'maxversion' => '1.99.99',
+                    'reason' => $this->__('To filter extensions by core version.'),
+                    'status' => \ModUtil::DEPENDENCY_REQUIRED
+                )
             )
         );
     }
