@@ -31,7 +31,7 @@ function smarty_function_elGetAvailableCoreVersions($params, Zikula_View $view)
     /**
      * @var \Zikula\Module\ExtensionLibraryModule\Manager\CoreReleaseManager $coreReleaseManager
      */
-    $coreReleaseManager = ServiceUtil::get('zikulaextensionlibrarymodule.corereleasemanager');
+    $coreReleaseManager = $view->getContainer()->get('zikulaextensionlibrarymodule.corereleasemanager');
     $coreVersions = $coreReleaseManager->getAvailableCoreVersions();
 
     if (isset($params['assign']) && !empty($params['assign'])) {
