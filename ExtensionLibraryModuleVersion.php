@@ -47,7 +47,7 @@ class ExtensionLibraryModuleVersion extends \Zikula_AbstractVersion
                     'minversion' => '1.0.0',
                     'maxversion' => '1.99.99',
                     'reason' => $this->__('To filter extensions by core version.'),
-                    'status' => \ModUtil::DEPENDENCY_REQUIRED
+                    'status' => \ModUtil::DEPENDENCY_RECOMMENDED
                 )
             )
         );
