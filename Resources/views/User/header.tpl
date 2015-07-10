@@ -36,7 +36,7 @@
             </div>
         </div>
     {/if}
-    <h1><img src="{modgetimage}" alt="" style="vertical-align: bottom; padding-right:.5em;" /><i>{modgetinfo info='displayname'}</i></h1>
+    <h1><img src="/{modgetimage}" alt="" style="vertical-align: bottom; padding-right:.5em;" /><i>{modgetinfo info='displayname'}</i></h1>
     <hr />
     <!-- remove this alert when the public beta ends -->
     <div class="alert alert-danger"><i class="fa fa-exclamation-triangle fa-3x pull-left text-danger"></i> WARNING: The Extension Library software is currently in <strong>PUBLIC BETA</strong>. You are encouraged to
